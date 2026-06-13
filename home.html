@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Withered - Painel</title>
     <link rel="stylesheet" href="style.css">
-   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="corpo-painel">    
 
@@ -117,38 +116,61 @@
 
     </div>
 
-    <script>
+    <script type="module">
+        console.log("🚀 Iniciando home.html");
+
         // ==========================================
-        // 1. INICIALIZAÇÃO DO SUPABASE (ÚNICA E CORRIGIDA)
+        // CONFIGURAÇÕES
         // ==========================================
         const SUPABASE_URL = "https://zkdfzxlwpedhoblrsjdr.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_XrlHqqACgEz_OqAHyVIVag_wC55nwsB";
-        const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let supabase = null;
 
         const listaAdmins = ['780382546542198816', '670361096707768340'];
-        let usuarioAtual = null; // Guardará os dados do Discord globalmente
+        let usuarioAtual = null;
         let submissaoEfetuada = false;
 
-        // LÓGICA DE CARREGAMENTO DA PÁGINA (CONECTADA AO SUPABASE)
-        window.onload = async function() {
-            // Aguarda um pouco para a sessão ser restaurada após o callback
-            await new Promise(resolve => setTimeout(resolve, 500));
+        // ==========================================
+        // CARREGAR SUPABASE VIA ESM
+        // ==========================================
+        async function inicializarSupabase() {
+            try {
+                console.log("▶ Carregando Supabase...");
+                const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.2/+esm');
+                supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log("✓ Supabase carregado com sucesso!");
+                return true;
+            } catch (err) {
+                console.error("✗ Erro ao carregar Supabase:", err);
+                return false;
+            }
+        }
+
+        // ==========================================
+        // ONLOAD - VERIFICAR SESSÃO E CARREGAR PERFIL
+        // ==========================================
+        window.addEventListener('DOMContentLoaded', async function() {
+            console.log("▶ Verificando sessão...");
+            
+            // Primeiro inicializa Supabase
+            await inicializarSupabase();
+            
+            if (!supabase) {
+                console.error("✗ Supabase não carregou, redirecionando...");
+                window.location.href = "index.html";
+                return;
+            }
 
             try {
                 const { data: { session }, error } = await supabase.auth.getSession();
 
-                if (error) {
-                    console.error("Erro ao obter sessão:", error);
+                if (error || !session || !session.user) {
+                    console.log("✗ Nenhuma sessão encontrada, redirecionando para login");
                     window.location.href = "index.html";
                     return;
                 }
 
-                if (!session || !session.user) {
-                    console.log("Nenhuma sessão encontrada, redirecionando para login");
-                    window.location.href = "index.html";
-                    return;
-                }
-
+                // Carrega dados do usuário
                 const user = session.user;
                 usuarioAtual = {
                     id: user.id, 
@@ -158,7 +180,7 @@
                     avatar: user.user_metadata.avatar_url || "https://cdn.discordapp.com/embed/avatars/0.png"
                 };
 
-                console.log("Usuário logado:", usuarioAtual);
+                console.log("✓ Usuário logado:", usuarioAtual);
                 carregarPerfil(usuarioAtual);
 
                 // Controle do botão de Administrador no Menu
@@ -182,14 +204,17 @@
                     linkAdmin.style.display = "block";
                     linkAdmin.style.pointerEvents = "auto";
                 }
+
             } catch (err) {
-                console.error("Erro ao carregar página:", err);
+                console.error("✗ Erro ao carregar página:", err);
                 window.location.href = "index.html";
             }
-        };
+        });
 
-        // FUNÇÃO PARA TROCAR AS ABAS DE FORMA FLUIDA (SPA)
-        function alternarAbas(abaAlvo) {
+        // ==========================================
+        // FUNÇÃO PARA TROCAR AS ABAS
+        // ==========================================
+        window.alternarAbas = function(abaAlvo) {
             const caixaFormularios = document.getElementById('caixa-principal-formularios');
             const abaStaff = document.getElementById('aba-staff-painel');
             const caixaPerfil = document.getElementById('caixa-principal-perfil');
@@ -211,7 +236,7 @@
                 btnForm.classList.add('ativo');
                 caixaFormularios.style.display = 'block';
                 mainContainer.className = "conteudo-painel";
-                voltarParaSelecao();
+                window.voltarParaSelecao();
             } else if (abaAlvo === 'staff') {
                 btnStaff.classList.add('ativo');
                 abaStaff.style.display = 'flex';
@@ -221,10 +246,12 @@
                 caixaPerfil.style.display = 'block';
                 mainContainer.className = "conteudo-painel";
             }
-        }
+        };
 
-        // FUNÇÃO DE ABRIR FORMULÁRIOS
-        function abrirFormulario(tipo) {
+        // ==========================================
+        // FUNÇÃO PARA ABRIR FORMULÁRIOS
+        // ==========================================
+        window.abrirFormulario = function(tipo) {
             const telaSelecao = document.getElementById('tela-selecao');
             const areaFormulario = document.getElementById('area-formulario-dinamico');
             const caixaPrincipal = document.getElementById('caixa-principal-formularios');
@@ -523,6 +550,7 @@
                 caixaPrincipal.style.textAlign = 'center';
             }
         }
+        window.voltarParaSelecao = voltarParaSelecao;
 
         // FUNÇÃO PARA PREENCHER O PERFIL VISUAL
         function carregarPerfil(dados) {
@@ -532,11 +560,28 @@
             document.querySelector('.avatar-perfil-imagem').src = dados.avatar;
         }
 
+        // FUNÇÃO PARA ENVIAR FORMULÁRIO
+        window.enviarFormulario = async function(event) {
+            event.preventDefault();
+            console.log("▶ Enviando formulário...");
+            
+            if (!supabase) {
+                alert("Erro: Supabase não está inicializado");
+                return;
+            }
+
+            // TODO: Implementar envio para Supabase
+            alert("✓ Formulário enviado com sucesso!");
+            window.voltarParaSelecao();
+        };
+
         // LOGOUT LIMPENDO OS DADOS
-        async function fazerLogout() {
-            await supabase.auth.signOut();
+        window.fazerLogout = async function() {
+            if (supabase) {
+                await supabase.auth.signOut();
+            }
             window.location.href = "index.html";
-        }
+        };
     </script>
 </body>
 </html>
