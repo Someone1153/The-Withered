@@ -8,8 +8,6 @@
     <meta http-equiv="Expires" content="0">
     <title>The Withered</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Carregar Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.2/dist/main.umd.js"></script>
 </head>
 <body>
     <div class="overlay"></div>
@@ -23,7 +21,7 @@
         </div>
     </main>
 
-    <script>
+    <script type="module">
         console.log("🚀 === INICIANDO THE WITHERED ===");
 
         // CONFIGURAÇÕES
@@ -56,28 +54,27 @@
             const btn = document.getElementById('botao-login');
             btn.addEventListener('click', async function() {
                 console.log("▶ Clicou no botão");
+                console.log("supabaseClient existe?", !!supabaseClient);
                 
                 if (!supabaseClient) {
                     console.warn("⚠ Supabase ainda não está pronto");
-                    alert("Sistema ainda está carregando. Tente novamente.");
+                    alert("Sistema ainda está carregando. Tente novamente em alguns segundos.");
                     return;
                 }
 
                 try {
                     console.log("▶ Iniciando login OAuth com Discord");
-                    const { error } = await supabaseClient.auth.signInWithOAuth({
+                    console.log("Chamando signInWithOAuth...");
+                    
+                    const result = await supabaseClient.auth.signInWithOAuth({
                         provider: 'discord',
                         options: {
                             redirectTo: 'https://someone1153.github.io/The-Withered/'
                         }
                     });
                     
-                    if (error) {
-                        console.error("✗ Erro OAuth:", error);
-                        alert("Erro: " + error.message);
-                    } else {
-                        console.log("✓ OAuth iniciado, aguardando redirecionamento...");
-                    }
+                    console.log("✓ Resultado do OAuth:", result);
+                    console.log("✓ OAuth iniciado, aguardando redirecionamento...");
                 } catch (err) {
                     console.error("✗ Erro na função de login:", err);
                     alert("Erro: " + err.message);
@@ -87,28 +84,26 @@
         }
 
         async function inicializarSupabase() {
-            console.log("▶ Aguardando Supabase carregar...");
-            
-            for (let i = 0; i < 100; i++) {
-                // Supabase pode ser window.Supabase ou window.supabase
-                const supabaseLib = window.Supabase || window.supabase;
+            try {
+                console.log("▶ Carregando Supabase via ESM...");
                 
-                if (supabaseLib && supabaseLib.createClient) {
-                    try {
-                        supabaseClient = supabaseLib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                        console.log("✓ Supabase inicializado com sucesso!");
-                        return true;
-                    } catch (err) {
-                        console.error("✗ Erro ao criar cliente Supabase:", err);
-                        return false;
-                    }
-                }
+                // Carregar Supabase usando import dinâmico (ESM)
+                const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.2/+esm');
                 
-                await new Promise(r => setTimeout(r, 100));
+                console.log("✓ Supabase JS carregado!");
+                
+                // Criar cliente Supabase
+                supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                
+                console.log("✓ Supabase cliente inicializado com sucesso!");
+                console.log("supabaseClient:", supabaseClient);
+                
+                return true;
+            } catch (err) {
+                console.error("✗ Erro ao carregar Supabase:", err);
+                console.error("Detalhes do erro:", err.message, err.stack);
+                return false;
             }
-            
-            console.error("✗ Supabase não carregou após 10 segundos");
-            return false;
         }
 
         // ===== EXECUTAR INICIALIZAÇÃO =====
@@ -118,12 +113,15 @@
         // 2. Conectar botão imediatamente
         conectarBotao();
 
-        // 3. Inicializar Supabase em background
+        // 3. Inicializar Supabase
+        console.log("▶ Iniciando Supabase...");
         inicializarSupabase().then(ok => {
             if (ok) {
-                console.log("✓ Sistema completo pronto!");
+                console.log("✓✓✓ SUPABASE PRONTO! ✓✓✓");
+                console.log("Você já pode clicar no botão de login");
             } else {
-                console.warn("⚠ Supabase não está disponível, mas o site continua funcionando");
+                console.error("✗✗✗ FALHA AO CARREGAR SUPABASE ✗✗✗");
+                alert("ERRO: Supabase não conseguiu carregar. Verifique a conexão de internet e tente recarregar a página.");
             }
         });
 
