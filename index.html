@@ -180,15 +180,18 @@
         });
 
         // Também escuta o evento de restauração de sessão (após OAuth)
-        if (window.Supabase) {
-            window.Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY).auth.onAuthStateChange((event, session) => {
-                console.log("▶ Evento de autenticação:", event);
-                if (event === 'SIGNED_IN' && session) {
-                    console.log("✓ Usuário autenticado, redirecionando...");
-                    window.location.href = 'https://someone1153.github.io/The-Withered/home.html';
-                }
-            });
-        }
+        // Aguarda um pouco para Supabase estar disponível antes de usar
+        setTimeout(function() {
+            if (supabaseClient) {
+                supabaseClient.auth.onAuthStateChange((event, session) => {
+                    console.log("▶ Evento de autenticação:", event);
+                    if (event === 'SIGNED_IN' && session) {
+                        console.log("✓ Usuário autenticado, redirecionando...");
+                        window.location.href = 'https://someone1153.github.io/The-Withered/home.html';
+                    }
+                });
+            }
+        }, 1000);
     </script>
 </body>
 </html>
