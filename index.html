@@ -8,36 +8,9 @@
     <meta http-equiv="Expires" content="0">
     <title>The Withered</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Carregar Supabase de múltiplas formas para garantir -->
+    <!-- Carregar Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.2/dist/main.umd.js"></script>
-    <script>
-        // Verificar se Supabase carregou
-        console.log("▶ Verificando se Supabase foi carregado...");
-        
-        // Se não carregar em 2 segundos, tenta outra fonte
-        setTimeout(function() {
-            if (window.supabase) {
-                console.log("✓ Supabase (minúsculo) está disponível!");
-                window.Supabase = window.supabase;
-            } else if (window.Supabase) {
-                console.log("✓ Supabase (maiúsculo) está disponível!");
-            } else {
-                console.error("✗ Supabase NÃO foi carregado, tentando alternativa...");
-                var script = document.createElement('script');
-                script.src = 'https://unpkg.com/@supabase/supabase-js@2/dist/main.umd.js';
-                script.onload = function() {
-                    console.log("✓ Supabase carregado via unpkg!");
-                    if (window.supabase && !window.Supabase) {
-                        window.Supabase = window.supabase;
-                    }
-                };
-                script.onerror = function() {
-                    console.error("✗ Falha ao carregar de unpkg também");
-                };
-                document.head.appendChild(script);
-            }
-        }, 2000);
-    </script></head>
+</head>
 <body>
     <div class="overlay"></div>
 
@@ -51,7 +24,7 @@
     </main>
 
     <script>
-        console.log("🚀 Script iniciado!");
+        console.log("🚀 === INICIANDO THE WITHERED ===");
 
         // CONFIGURAÇÕES
         const SUPABASE_URL = "https://zkdfzxlwpedhoblrsjdr.supabase.co";
@@ -72,72 +45,87 @@
             "Nascidos do declínio, moldados pela ausência... nós resistimos."
         ];
 
-        // EXIBIR CITAÇÃO
+        // ===== FUNÇÕES =====
         function exibirCitacao() {
             const citacao = citacoes[Math.floor(Math.random() * citacoes.length)];
             document.getElementById('frase-efeito').textContent = `"${citacao}"`;
             console.log("✓ Citação exibida");
         }
 
-        // CONECTAR BOTÃO
         function conectarBotao() {
-            document.getElementById('botao-login').addEventListener('click', async function() {
-                console.log("▶ Clicou no botão de login");
-                console.log("Estado do Supabase:", {
-                    supabaseClient: !!supabaseClient,
-                    windowSupabase: !!window.Supabase,
-                    windowsupabase: !!window.supabase
-                });
+            const btn = document.getElementById('botao-login');
+            btn.addEventListener('click', async function() {
+                console.log("▶ Clicou no botão");
                 
                 if (!supabaseClient) {
-                    alert("Sistema ainda está carregando. Tente novamente em alguns segundos.");
+                    console.warn("⚠ Supabase ainda não está pronto");
+                    alert("Sistema ainda está carregando. Tente novamente.");
                     return;
                 }
 
                 try {
-                    console.log("▶ Iniciando OAuth com Discord");
-                    await supabaseClient.auth.signInWithOAuth({
+                    console.log("▶ Iniciando login OAuth com Discord");
+                    const { error } = await supabaseClient.auth.signInWithOAuth({
                         provider: 'discord',
                         options: {
                             redirectTo: 'https://someone1153.github.io/The-Withered/'
                         }
                     });
-                    console.log("✓ OAuth iniciado!");
+                    
+                    if (error) {
+                        console.error("✗ Erro OAuth:", error);
+                        alert("Erro: " + error.message);
+                    } else {
+                        console.log("✓ OAuth iniciado, aguardando redirecionamento...");
+                    }
                 } catch (err) {
-                    console.error("✗ Erro no OAuth:", err);
+                    console.error("✗ Erro na função de login:", err);
                     alert("Erro: " + err.message);
                 }
             });
             console.log("✓ Botão conectado");
         }
 
-        // INICIALIZAR SUPABASE
         async function inicializarSupabase() {
-            for (let i = 0; i < 50; i++) {
-                // Verificar ambas as variações (maiúsculo e minúsculo)
+            console.log("▶ Aguardando Supabase carregar...");
+            
+            for (let i = 0; i < 100; i++) {
+                // Supabase pode ser window.Supabase ou window.supabase
                 const supabaseLib = window.Supabase || window.supabase;
                 
                 if (supabaseLib && supabaseLib.createClient) {
-                    // Garantir que Supabase (maiúsculo) existe
-                    if (!window.Supabase) {
-                        window.Supabase = supabaseLib;
+                    try {
+                        supabaseClient = supabaseLib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                        console.log("✓ Supabase inicializado com sucesso!");
+                        return true;
+                    } catch (err) {
+                        console.error("✗ Erro ao criar cliente Supabase:", err);
+                        return false;
                     }
-                    
-                    supabaseClient = window.Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                    console.log("✓ Supabase inicializado com sucesso!");
-                    return;
                 }
+                
                 await new Promise(r => setTimeout(r, 100));
             }
-            console.error("✗ Supabase não carregou após 5 segundos");
+            
+            console.error("✗ Supabase não carregou após 10 segundos");
+            return false;
         }
 
-        // EXECUTAR TUDO AGORA
-        console.log("🚀 === INICIANDO THE WITHERED === 🚀");
-        
+        // ===== EXECUTAR INICIALIZAÇÃO =====
+        // 1. Exibir citação imediatamente
         exibirCitacao();
+
+        // 2. Conectar botão imediatamente
         conectarBotao();
-        inicializarSupabase();
+
+        // 3. Inicializar Supabase em background
+        inicializarSupabase().then(ok => {
+            if (ok) {
+                console.log("✓ Sistema completo pronto!");
+            } else {
+                console.warn("⚠ Supabase não está disponível, mas o site continua funcionando");
+            }
+        });
 
         console.log("✓ === PÁGINA PRONTA ===");
     </script>
