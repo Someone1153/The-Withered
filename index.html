@@ -69,7 +69,7 @@
                     const result = await supabaseClient.auth.signInWithOAuth({
                         provider: 'discord',
                         options: {
-                            redirectTo: 'https://someone1153.github.io/The-Withered/'
+                            redirectTo: 'https://someone1153.github.io/The-Withered/home.html'
                         }
                     });
                     
@@ -119,11 +119,30 @@
             if (ok) {
                 console.log("✓✓✓ SUPABASE PRONTO! ✓✓✓");
                 console.log("Você já pode clicar no botão de login");
+                
+                // VERIFICAR SE JÁ ESTÁ LOGADO
+                verificarSessao();
             } else {
                 console.error("✗✗✗ FALHA AO CARREGAR SUPABASE ✗✗✗");
                 alert("ERRO: Supabase não conseguiu carregar. Verifique a conexão de internet e tente recarregar a página.");
             }
         });
+
+        async function verificarSessao() {
+            try {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                
+                if (session) {
+                    console.log("✓ Usuário já autenticado! Redirecionando para home.html");
+                    console.log("Usuário:", session.user.user_metadata);
+                    window.location.href = 'https://someone1153.github.io/The-Withered/home.html';
+                } else {
+                    console.log("✓ Nenhum usuário autenticado ainda");
+                }
+            } catch (err) {
+                console.error("✗ Erro ao verificar sessão:", err);
+            }
+        }
 
         console.log("✓ === PÁGINA PRONTA ===");
     </script>
