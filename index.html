@@ -8,8 +8,36 @@
     <meta http-equiv="Expires" content="0">
     <title>The Withered</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
+    <!-- Carregar Supabase de múltiplas formas para garantir -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.2/dist/main.umd.js"></script>
+    <script>
+        // Verificar se Supabase carregou
+        console.log("▶ Verificando se Supabase foi carregado...");
+        
+        // Se não carregar em 2 segundos, tenta outra fonte
+        setTimeout(function() {
+            if (window.supabase) {
+                console.log("✓ Supabase (minúsculo) está disponível!");
+                window.Supabase = window.supabase;
+            } else if (window.Supabase) {
+                console.log("✓ Supabase (maiúsculo) está disponível!");
+            } else {
+                console.error("✗ Supabase NÃO foi carregado, tentando alternativa...");
+                var script = document.createElement('script');
+                script.src = 'https://unpkg.com/@supabase/supabase-js@2/dist/main.umd.js';
+                script.onload = function() {
+                    console.log("✓ Supabase carregado via unpkg!");
+                    if (window.supabase && !window.Supabase) {
+                        window.Supabase = window.supabase;
+                    }
+                };
+                script.onerror = function() {
+                    console.error("✗ Falha ao carregar de unpkg também");
+                };
+                document.head.appendChild(script);
+            }
+        }, 2000);
+    </script></head>
 <body>
     <div class="overlay"></div>
 
@@ -54,21 +82,29 @@
         // CONECTAR BOTÃO
         function conectarBotao() {
             document.getElementById('botao-login').addEventListener('click', async function() {
-                console.log("Clicou no botão");
+                console.log("▶ Clicou no botão de login");
+                console.log("Estado do Supabase:", {
+                    supabaseClient: !!supabaseClient,
+                    windowSupabase: !!window.Supabase,
+                    windowsupabase: !!window.supabase
+                });
                 
                 if (!supabaseClient) {
-                    alert("Sistema ainda está carregando");
+                    alert("Sistema ainda está carregando. Tente novamente em alguns segundos.");
                     return;
                 }
 
                 try {
+                    console.log("▶ Iniciando OAuth com Discord");
                     await supabaseClient.auth.signInWithOAuth({
                         provider: 'discord',
                         options: {
                             redirectTo: 'https://someone1153.github.io/The-Withered/'
                         }
                     });
+                    console.log("✓ OAuth iniciado!");
                 } catch (err) {
+                    console.error("✗ Erro no OAuth:", err);
                     alert("Erro: " + err.message);
                 }
             });
@@ -78,22 +114,32 @@
         // INICIALIZAR SUPABASE
         async function inicializarSupabase() {
             for (let i = 0; i < 50; i++) {
-                if (window.Supabase) {
+                // Verificar ambas as variações (maiúsculo e minúsculo)
+                const supabaseLib = window.Supabase || window.supabase;
+                
+                if (supabaseLib && supabaseLib.createClient) {
+                    // Garantir que Supabase (maiúsculo) existe
+                    if (!window.Supabase) {
+                        window.Supabase = supabaseLib;
+                    }
+                    
                     supabaseClient = window.Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                    console.log("✓ Supabase inicializado");
+                    console.log("✓ Supabase inicializado com sucesso!");
                     return;
                 }
                 await new Promise(r => setTimeout(r, 100));
             }
-            console.error("✗ Supabase não carregou");
+            console.error("✗ Supabase não carregou após 5 segundos");
         }
 
         // EXECUTAR TUDO AGORA
+        console.log("🚀 === INICIANDO THE WITHERED === 🚀");
+        
         exibirCitacao();
         conectarBotao();
         inicializarSupabase();
 
-        console.log("✓ Página pronta!");
+        console.log("✓ === PÁGINA PRONTA ===");
     </script>
 </body>
 </html>
