@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>The Withered</title>
     <link rel="stylesheet" href="style.css">
-    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-
     <div class="overlay"></div>
 
     <main class="conteudo-principal">
@@ -22,12 +23,12 @@
     </main>
 
     <script>
-        // Inicialização do Supabase
+        // ===== VARIÁVEIS GLOBAIS =====
         const SUPABASE_URL = "https://zkdfzxlwpedhoblrsjdr.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InprZGZ6eGx3cGVkaG9ibHJzamRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMDMxNTIsImV4cCI6MjA5NjY3OTE1Mn0.vJIxWeEOUymBp8ySeGS0vM9FVocABr8ucEmGNodacs4";
-        const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let supabaseClient = null;
 
-        // Lista de citações do universo do site
+        // ===== CITAÇÕES =====
         const citacoes = [
             "Até mesmo as cinzas têm histórias sobre o fogo que costumavam ser.",
             "O silêncio do que murchou ecoa mais forte do que o clamor do que tenta crescer.",
@@ -41,13 +42,32 @@
             "Nascidos do declínio, moldados pela ausência... nós resistimos."
         ];
 
-        // Função que realiza o login com o Discord via Supabase
+        // ===== INICIALIZAÇÃO DO SUPABASE =====
+        function inicializarSupabase() {
+            if (!window.Supabase) {
+                console.error("Supabase não carregou corretamente!");
+                return false;
+            }
+            
+            supabaseClient = window.Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log("✓ Supabase inicializado com sucesso");
+            return true;
+        }
+
+        // ===== FUNÇÃO DE LOGIN =====
         async function fazerLogin() {
+            console.log("▶ Clicou no botão de login");
+            
+            if (!supabaseClient) {
+                console.error("✗ Supabase não está inicializado");
+                alert("Erro: Supabase não está pronto. Tente recarregar a página.");
+                return;
+            }
+
             try {
-                console.log("Iniciando login com Discord...");
-                console.log("Supabase inicializado:", !!supabase);
+                console.log("▶ Iniciando fluxo OAuth com Discord...");
                 
-                const { data, error } = await supabase.auth.signInWithOAuth({
+                const { data, error } = await supabaseClient.auth.signInWithOAuth({
                     provider: 'discord',
                     options: {
                         redirectTo: 'https://someone1153.github.io/The-Withered/'
@@ -55,45 +75,101 @@
                 });
 
                 if (error) {
-                    console.error("Erro ao tentar fazer login:", error);
-                    alert("Ocorreu um erro ao conectar com o Discord: " + error.message);
+                    console.error("✗ Erro OAuth:", error);
+                    alert("Erro ao conectar com Discord:\n" + error.message);
                 } else {
-                    console.log("Login iniciado com sucesso, aguarde redirecionamento...");
+                    console.log("✓ OAuth iniciado, aguardando redirecionamento...");
                 }
             } catch (err) {
-                console.error("Erro na função de login:", err);
-                alert("Erro ao conectar com Discord. Verifique a console. Erro: " + err.message);
+                console.error("✗ Erro na função de login:", err);
+                alert("Erro: " + err.message);
             }
         }
 
-        // Executa assim que a página carregar por completo
-        window.addEventListener('load', async function() {
-            console.log("Página carregada, verificando sessão...");
+        // ===== EXIBIR CITAÇÃO ALEATÓRIA =====
+        function exibirCitacao() {
+            const citacao = citacoes[Math.floor(Math.random() * citacoes.length)];
+            const elemento = document.getElementById('frase-efeito');
+            if (elemento) {
+                elemento.textContent = `"${citacao}"`;
+                console.log("✓ Citação exibida");
+            }
+        }
+
+        // ===== CONECTAR BOTÃO =====
+        function conectarBotao() {
+            const btn = document.getElementById('botao-login');
+            if (!btn) {
+                console.error("✗ Botão não encontrado no DOM");
+                return;
+            }
             
-            // Verifica se já existe uma sessão ativa
-            const { data: { session } } = await supabase.auth.getSession();
-            
-            if (session && session.user) {
-                console.log("Usuário já está logado, redirecionando...");
-                window.location.href = 'https://someone1153.github.io/The-Withered/home.html';
+            btn.addEventListener('click', fazerLogin);
+            console.log("✓ Botão conectado ao evento de click");
+        }
+
+        // ===== VERIFICAR SESSÃO =====
+        async function verificarSessao() {
+            if (!supabaseClient) {
+                console.error("✗ Supabase não está inicializado");
                 return;
             }
 
-            console.log("Nenhuma sessão ativa, exibindo citação aleatória");
-            
-            // Seleciona e exibe uma citação aleatória
-            const fraseAleatoria = citacoes[Math.floor(Math.random() * citacoes.length)];
-            document.getElementById('frase-efeito').innerText = `"${fraseAleatoria}"`;
-            
-            // Conecta o botão à função de login
-            const btnLogin = document.getElementById('botao-login');
-            if (btnLogin) {
-                btnLogin.addEventListener('click', fazerLogin);
-                console.log("Botão de login conectado com sucesso");
-            } else {
-                console.error("Botão de login não encontrado!");
+            try {
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
+                
+                if (error) {
+                    console.error("✗ Erro ao obter sessão:", error);
+                    return;
+                }
+
+                if (session && session.user) {
+                    console.log("✓ Sessão ativa, redirecionando para home...");
+                    window.location.href = 'https://someone1153.github.io/The-Withered/home.html';
+                } else {
+                    console.log("▶ Nenhuma sessão ativa");
+                }
+            } catch (err) {
+                console.error("✗ Erro ao verificar sessão:", err);
             }
+        }
+
+        // ===== CARREGAR A PÁGINA =====
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log("=== INICIANDO THE WITHERED ===");
+            
+            // 1. Inicializar Supabase
+            if (!inicializarSupabase()) {
+                console.error("✗ Falha ao inicializar Supabase");
+                alert("Erro ao carregar o sistema de autenticação. Tente recarregar.");
+                return;
+            }
+
+            // 2. Aguardar um pouco para Supabase ficar pronto
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            // 3. Verificar se há sessão ativa
+            await verificarSessao();
+
+            // 4. Exibir citação
+            exibirCitacao();
+
+            // 5. Conectar o botão
+            conectarBotao();
+
+            console.log("=== PÁGINA PRONTA ===");
         });
+
+        // Também escuta o evento de restauração de sessão (após OAuth)
+        if (window.Supabase) {
+            window.Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY).auth.onAuthStateChange((event, session) => {
+                console.log("▶ Evento de autenticação:", event);
+                if (event === 'SIGNED_IN' && session) {
+                    console.log("✓ Usuário autenticado, redirecionando...");
+                    window.location.href = 'https://someone1153.github.io/The-Withered/home.html';
+                }
+            });
+        }
     </script>
 </body>
 </html>
