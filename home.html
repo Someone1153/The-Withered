@@ -131,44 +131,60 @@
 
         // LÓGICA DE CARREGAMENTO DA PÁGINA (CONECTADA AO SUPABASE)
         window.onload = async function() {
-            const { data: { session }, error } = await supabase.auth.getSession();
+            // Aguarda um pouco para a sessão ser restaurada após o callback
+            await new Promise(resolve => setTimeout(resolve, 500));
 
-            if (error || !session) {
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
+
+                if (error) {
+                    console.error("Erro ao obter sessão:", error);
+                    window.location.href = "index.html";
+                    return;
+                }
+
+                if (!session || !session.user) {
+                    console.log("Nenhuma sessão encontrada, redirecionando para login");
+                    window.location.href = "index.html";
+                    return;
+                }
+
+                const user = session.user;
+                usuarioAtual = {
+                    id: user.id, 
+                    discord_id: user.user_metadata.provider_id, 
+                    nome: user.user_metadata.full_name || user.user_metadata.name || "Usuário",
+                    tag: "@" + (user.user_metadata.custom_claims?.global_name || user.user_metadata.name || user.email),
+                    avatar: user.user_metadata.avatar_url || "https://cdn.discordapp.com/embed/avatars/0.png"
+                };
+
+                console.log("Usuário logado:", usuarioAtual);
+                carregarPerfil(usuarioAtual);
+
+                // Controle do botão de Administrador no Menu
+                const nav = document.querySelector('.menu-nav');
+                const botaoSair = document.querySelector('.item-menu-sair');
+                
+                let linkAdmin = document.getElementById('botao-admin-feito');
+                if (!linkAdmin) {
+                    linkAdmin = document.createElement('a');
+                    linkAdmin.id = 'botao-admin-feito';
+                    linkAdmin.href = "admin.html";
+                    linkAdmin.className = "item-menu";
+                    linkAdmin.innerText = "Formulários Feitos";
+                    nav.insertBefore(linkAdmin, botaoSair);
+                }
+
+                if (!listaAdmins.includes(usuarioAtual.discord_id)) {
+                    linkAdmin.style.display = "none";
+                    linkAdmin.style.pointerEvents = "none";
+                } else {
+                    linkAdmin.style.display = "block";
+                    linkAdmin.style.pointerEvents = "auto";
+                }
+            } catch (err) {
+                console.error("Erro ao carregar página:", err);
                 window.location.href = "index.html";
-                return;
-            }
-
-            const user = session.user;
-            usuarioAtual = {
-                id: user.id, 
-                discord_id: user.user_metadata.provider_id, 
-                nome: user.user_metadata.full_name || user.user_metadata.name,
-                tag: "@" + (user.user_metadata.custom_claims?.global_name || user.user_metadata.name),
-                avatar: user.user_metadata.avatar_url || "https://cdn.discordapp.com/embed/avatars/0.png"
-            };
-
-            carregarPerfil(usuarioAtual);
-
-            // Controle do botão de Administrador no Menu
-            const nav = document.querySelector('.menu-nav');
-            const botaoSair = document.querySelector('.item-menu-sair');
-            
-            let linkAdmin = document.getElementById('botao-admin-feito');
-            if (!linkAdmin) {
-                linkAdmin = document.createElement('a');
-                linkAdmin.id = 'botao-admin-feito';
-                linkAdmin.href = "admin.html";
-                linkAdmin.className = "item-menu";
-                linkAdmin.innerText = "Formulários Feitos";
-                nav.insertBefore(linkAdmin, botaoSair);
-            }
-
-            if (!listaAdmins.includes(usuarioAtual.discord_id)) {
-                linkAdmin.style.display = "none";
-                linkAdmin.style.pointerEvents = "none";
-            } else {
-                linkAdmin.style.display = "block";
-                linkAdmin.style.pointerEvents = "auto";
             }
         };
 

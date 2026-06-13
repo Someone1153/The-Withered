@@ -17,7 +17,7 @@
         
         <div class="bloco-inferior">
             <p id="frase-efeito">Carregando citação...</p>
-            <button id="botao-login" onclick="fazerLogin()">Entrar com o Discord</button>
+            <button id="botao-login">Entrar com o Discord</button>
         </div>
     </main>
 
@@ -41,28 +41,59 @@
             "Nascidos do declínio, moldados pela ausência... nós resistimos."
         ];
 
+        // Função que realiza o login com o Discord via Supabase
+        async function fazerLogin() {
+            try {
+                console.log("Iniciando login com Discord...");
+                console.log("Supabase inicializado:", !!supabase);
+                
+                const { data, error } = await supabase.auth.signInWithOAuth({
+                    provider: 'discord',
+                    options: {
+                        redirectTo: 'https://someone1153.github.io/The-Withered/'
+                    }
+                });
+
+                if (error) {
+                    console.error("Erro ao tentar fazer login:", error);
+                    alert("Ocorreu um erro ao conectar com o Discord: " + error.message);
+                } else {
+                    console.log("Login iniciado com sucesso, aguarde redirecionamento...");
+                }
+            } catch (err) {
+                console.error("Erro na função de login:", err);
+                alert("Erro ao conectar com Discord. Verifique a console. Erro: " + err.message);
+            }
+        }
+
         // Executa assim que a página carregar por completo
-        window.onload = function() {
+        window.addEventListener('load', async function() {
+            console.log("Página carregada, verificando sessão...");
+            
+            // Verifica se já existe uma sessão ativa
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (session && session.user) {
+                console.log("Usuário já está logado, redirecionando...");
+                window.location.href = 'https://someone1153.github.io/The-Withered/home.html';
+                return;
+            }
+
+            console.log("Nenhuma sessão ativa, exibindo citação aleatória");
+            
             // Seleciona e exibe uma citação aleatória
             const fraseAleatoria = citacoes[Math.floor(Math.random() * citacoes.length)];
             document.getElementById('frase-efeito').innerText = `"${fraseAleatoria}"`;
-        };
-
-        // Função que realiza o login com o Discord via Supabase
-        async function fazerLogin() {
-            const { data, error } = await supabase.auth.signInWithOAuth({
-                provider: 'discord',
-                options: {
-                    // Após o login, redireciona o usuário para o painel principal
-                    redirectTo: window.location.origin + '/The-Withered/home.html' 
-                }
-            });
-
-            if (error) {
-                console.error("Erro ao tentar fazer login:", error.message);
-                alert("Ocorreu um erro ao conectar com o Discord: " + error.message);
+            
+            // Conecta o botão à função de login
+            const btnLogin = document.getElementById('botao-login');
+            if (btnLogin) {
+                btnLogin.addEventListener('click', fazerLogin);
+                console.log("Botão de login conectado com sucesso");
+            } else {
+                console.error("Botão de login não encontrado!");
             }
-        }
+        });
     </script>
 </body>
 </html>

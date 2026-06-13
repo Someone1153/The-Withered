@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Admin - The Withered</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="corpo-painel">
     <div class="container-painel">
@@ -22,29 +23,51 @@
     </div>
 
     <script>
-    const admins = ["780382546542198816", "670361096707768340", "1234567890123456"];
-
-    window.onload = function() {
-        const usuarioStorage = localStorage.getItem('usuarioLogado');
+        const SUPABASE_URL = "https://zkdfzxlwpedhoblrsjdr.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InprZGZ6eGx3cGVkaG9ibHJzamRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMDMxNTIsImV4cCI6MjA5NjY3OTE1Mn0.vJIxWeEOUymBp8ySeGS0vM9FVocABr8ucEmGNodacs4";
+        const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
-        // Verifica se existe usuário E se o ID está na lista
-        if (!usuarioStorage || !admins.includes(JSON.parse(usuarioStorage).id)) {
-            alert("Acesso Negado!");
-            window.location.href = "home.html"; // Manda de volta para o painel principal
-            return;
+        const admins = ["780382546542198816", "670361096707768340", "1234567890123456"];
+
+        window.onload = async function() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                
+                if (!session || !session.user) {
+                    alert("Você não está autenticado!");
+                    window.location.href = "index.html";
+                    return;
+                }
+
+                const discord_id = session.user.user_metadata.provider_id;
+                
+                // Verifica se o usuário é admin
+                if (!admins.includes(discord_id)) {
+                    alert("Acesso Negado! Você não é administrador.");
+                    window.location.href = "home.html";
+                    return;
+                }
+                
+                carregarFormularios();
+            } catch (err) {
+                console.error("Erro ao verificar permissões:", err);
+                window.location.href = "index.html";
+            }
+        };
+
+        function carregarFormularios() {
+            const container = document.getElementById('grid-formularios');
+            const dados = JSON.parse(localStorage.getItem('bancoFormularios') || "[]");
+            
+            if (dados.length === 0) {
+                container.innerHTML = "<p>Nenhum formulário recebido ainda.</p>";
+                return;
+            }
+            
+            dados.forEach((form, index) => {
+                container.innerHTML += `<button onclick="abrirForm(${index})">Formulário #${index + 1}</button>`;
+            });
         }
-        
-        carregarFormularios();
-    };
-
-    function carregarFormularios() {
-        const container = document.getElementById('grid-formularios');
-        const dados = JSON.parse(localStorage.getItem('bancoFormularios') || "[]");
-        
-        dados.forEach((form, index) => {
-            container.innerHTML += `<button onclick="abrirForm(${index})">Formulário #${index + 1}</button>`;
-        });
-    }
-</script>
+    </script>
 </body>
 </html>
