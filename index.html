@@ -169,28 +169,25 @@
         document.addEventListener('DOMContentLoaded', async function() {
             console.log("=== INICIANDO THE WITHERED ===");
             
-            // 1. Inicializar Supabase (sem interrupção)
+            // 1. PRIMEIRO: Exibir citação (sem depender de nada)
+            exibirCitacao();
+            console.log("✓ Citação exibida imediatamente");
+
+            // 2. Conectar o botão
+            conectarBotao();
+            console.log("✓ Botão conectado");
+
+            // 3. Inicializar Supabase em background (sem bloquear)
             const supabaseOk = await inicializarSupabase();
             
             if (!supabaseOk) {
-                console.warn("⚠ Supabase não foi inicializado, continuando sem autenticação...");
+                console.warn("⚠ Supabase não foi inicializado");
             } else {
                 console.log("✓ Supabase está pronto");
-            }
-
-            // 2. Aguardar um pouco
-            await new Promise(resolve => setTimeout(resolve, 300));
-
-            // 3. Verificar se há sessão ativa
-            if (supabaseOk) {
+                
+                // 4. Verificar sessão apenas se Supabase estiver ok
                 await verificarSessao();
             }
-
-            // 4. Exibir citação
-            exibirCitacao();
-
-            // 5. Conectar o botão
-            conectarBotao();
 
             console.log("=== PÁGINA PRONTA ===");
         });
