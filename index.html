@@ -23,10 +23,6 @@
     </main>
 
     <script>
-        // ===== VERSÃO: 2026-06-13-v3 =====
-        console.clear();
-        console.log("🔄 Carregando The Withered v3...");
-        
         // ===== VARIÁVEIS GLOBAIS =====
         const SUPABASE_URL = "https://zkdfzxlwpedhoblrsjdr.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InprZGZ6eGx3cGVkaG9ibHJzamRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMDMxNTIsImV4cCI6MjA5NjY3OTE1Mn0.vJIxWeEOUymBp8ySeGS0vM9FVocABr8ucEmGNodacs4";
@@ -46,16 +42,35 @@
             "Nascidos do declínio, moldados pela ausência... nós resistimos."
         ];
 
+        // ===== AGUARDAR SUPABASE CARREGAR =====
+        async function aguardarSupabase(maxTentativas = 30) {
+            for (let i = 0; i < maxTentativas; i++) {
+                if (window.Supabase) {
+                    console.log("✓ Supabase carregou após " + (i * 100) + "ms");
+                    return true;
+                }
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            console.error("✗ Supabase não carregou após 3 segundos");
+            return false;
+        }
+
         // ===== INICIALIZAÇÃO DO SUPABASE =====
-        function inicializarSupabase() {
-            if (!window.Supabase) {
-                console.error("Supabase não carregou corretamente!");
+        async function inicializarSupabase() {
+            try {
+                // Aguarda Supabase estar disponível
+                if (!await aguardarSupabase()) {
+                    console.error("✗ Supabase library não está disponível");
+                    return false;
+                }
+                
+                supabaseClient = window.Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log("✓ Supabase inicializado com sucesso");
+                return true;
+            } catch (err) {
+                console.error("✗ Erro ao inicializar Supabase:", err);
                 return false;
             }
-            
-            supabaseClient = window.Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            console.log("✓ Supabase inicializado com sucesso");
-            return true;
         }
 
         // ===== FUNÇÃO DE LOGIN =====
@@ -143,7 +158,7 @@
             console.log("=== INICIANDO THE WITHERED ===");
             
             // 1. Inicializar Supabase
-            if (!inicializarSupabase()) {
+            if (!await inicializarSupabase()) {
                 console.error("✗ Falha ao inicializar Supabase");
                 alert("Erro ao carregar o sistema de autenticação. Tente recarregar.");
                 return;
