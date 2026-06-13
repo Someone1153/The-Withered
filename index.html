@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Withered</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <div class="overlay"></div>
+
+    <main class="conteudo-principal">
+        <h1 class="titulo-site">The Withered</h1>
+        
+        <div class="bloco-inferior">
+            <p id="frase-efeito">Carregando citação...</p>
+            <button id="botao-login" onclick="fazerLogin()">Entrar com o Discord</button>
+        </div>
+    </main>
+
+    <script>
+        // Inicialização do Supabase
+        const SUPABASE_URL = "https://zkdfzxlwpedhoblrsjdr.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InprZGZ6eGx3cGVkaG9ibHJzamRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMDMxNTIsImV4cCI6MjA5NjY3OTE1Mn0.vJIxWeEOUymBp8ySeGS0vM9FVocABr8ucEmGNodacs4";
+        const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Lista de citações do universo do site
+        const citacoes = [
+            "Até mesmo as cinzas têm histórias sobre o fogo que costumavam ser.",
+            "O silêncio do que murchou ecoa mais forte do que o clamor do que tenta crescer.",
+            "As sombras mais densas pertencem àqueles que já carregaram a luz mais brilhante.",
+            "Não tema o inverno da alma; é no solo devastado que os segredos mais antigos se escondem.",
+            "O tempo consome a carne, mas imortaliza a ruína.",
+            "Sob as folhas secas do passado, repousa aquilo que nunca pôde ser destruído.",
+            "Há uma beleza esquecida no que definha longe dos olhos do mundo.",
+            "Resta muito pouco de nós além das memórias que o vento se recusa a levar.",
+            "Quando a última pétala cair, restará apenas a verdade imutável do que fomos.",
+            "Nascidos do declínio, moldados pela ausência... nós resistimos."
+        ];
+
+        // Executa assim que a página carregar por completo
+        window.onload = function() {
+            // Seleciona e exibe uma citação aleatória
+            const fraseAleatoria = citacoes[Math.floor(Math.random() * citacoes.length)];
+            document.getElementById('frase-efeito').innerText = `"${fraseAleatoria}"`;
+        };
+
+        // Função que realiza o login com o Discord via Supabase
+        async function fazerLogin() {
+            const { data, error } = await supabase.auth.signInWithOAuth({
+                provider: 'discord',
+                options: {
+                    // Após o login, redireciona o usuário para o painel principal
+                    redirectTo: window.location.origin + '/home.html' 
+                }
+            });
+
+            if (error) {
+                console.error("Erro ao tentar fazer login:", error.message);
+                alert("Ocorreu um erro ao conectar com o Discord: " + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,624 @@
+/* ==========================================================
+   1. CONFIGURAÇÕES GERAIS E RESET (Aplica a todo o site)
+   ========================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #ffffff;
+    min-height: 100vh;
+    background: url('fundo.jpg') no-repeat center center/cover;
+    background-attachment: fixed;
+    position: relative;
+}
+
+/* Película escura sobre a foto de fundo */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.75);
+    z-index: 1;
+}
+
+
+/* ==========================================================
+   2. ESTILOS DA TELA INICIAL (index.html)
+   ========================================================== */
+.conteudo-principal {
+    position: relative;
+    z-index: 2;
+    max-width: 700px;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    margin: 0 auto; 
+}
+
+.titulo-site {
+    font-size: 4rem;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    font-weight: 300;
+    text-shadow: 0px 4px 12px rgba(0, 0, 0, 0.9);
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.bloco-inferior {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+/* Caixinha da citação (Efeito Vidro) */
+#frase-efeito {
+    font-size: 1.25rem;
+    font-style: italic;
+    line-height: 1.8;
+    color: #e0e0e0;
+    text-align: center;
+    max-width: 580px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    background-color: rgba(30, 30, 30, 0.5);
+    padding: 25px 35px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    margin-bottom: 45px;
+}
+
+/* Botão de Login do Discord */
+#botao-login {
+    padding: 14px 35px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #5865F2;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+#botao-login:hover {
+    background-color: #4752c4;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(88, 101, 242, 0.4);
+}
+
+#botao-login:active {
+    transform: translateY(0);
+}
+
+
+/* ==========================================================
+   3. ESTILOS DO PAINEL E DA SIDEBAR (formulario.html)
+   ========================================================== */
+.corpo-painel {
+    overflow: hidden;
+}
+
+.container-painel {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    z-index: 2; 
+}
+
+/* Barra Lateral Esquerda */
+.sidebar {
+    width: 260px;
+    min-width: 260px;
+    background-color: rgba(20, 20, 20, 0.6); 
+    backdrop-filter: blur(10px);
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+    padding: 30px 20px;
+    height: 100vh;
+}
+
+.logo-sidebar {
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-weight: 300;
+    margin-bottom: 40px;
+    color: #ffffff;
+    text-align: left;
+    padding-left: 10px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.menu-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Links da barra lateral */
+.item-menu {
+    color: #b3b3b3;
+    text-decoration: none;
+    padding: 12px 15px;
+    border-radius: 8px;
+    font-size: 1rem;
+    text-align: left;
+    transition: all 0.3s ease;
+    background-color: transparent;
+}
+
+.item-menu:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.05);
+    padding-left: 20px;
+}
+
+/* Estado ativo do menu */
+.item-menu.ativo {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.1);
+    font-weight: bold;
+    border-left: 4px solid #5865F2; 
+}
+
+/* ADIÇÃO: ESTILO PARA O BOTÃO SAIR */
+.item-menu-sair {
+    color: #ff4d4d !important;
+    margin-top: 20px;
+    border: 1px solid rgba(255, 77, 77, 0.2);
+}
+
+.item-menu-sair:hover {
+    background-color: rgba(255, 77, 77, 0.1) !important;
+    color: #ff8080 !important;
+    padding-left: 20px;
+}
+
+/* Área central onde ficam os formulários */
+.conteudo-painel {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    height: 100vh;
+}
+
+/* Caixinha central de vidro */
+.caixa-conteudo {
+    background-color: rgba(30, 30, 30, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 650px;
+    max-height: 85vh; 
+    overflow-y: auto; 
+    padding: 40px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    text-align: center;
+}
+
+.subtitulo-painel {
+    font-size: 2rem;
+    font-weight: 300;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    color: #ffffff;
+}
+
+.instrucao-painel {
+    color: #b3b3b3;
+    font-size: 1rem;
+    margin-bottom: 35px;
+}
+
+/* Lista dos 3 botões de formulário */
+.botoes-formularios {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Estado normal do botão */
+.btn-tipo-form {
+    background-color: rgba(25, 25, 25, 0.6);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 16px;
+    font-size: 1.05rem;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+    padding-left: 25px;
+    transition: all 0.3s ease;
+}
+
+/* Efeito de passar o mouse */
+.btn-tipo-form:hover {
+    background-color: rgba(15, 23, 42, 0.8); 
+    border-color: rgba(88, 101, 242, 0.4);  
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+
+/* ==========================================================
+   4. ESTILOS INTERNOS DOS FORMULÁRIOS DINÂMICOS
+   ========================================================== */
+
+/* Cabeçalho do formulário */
+.cabecalho-form {
+    margin-bottom: 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 20px;
+}
+
+.titulo-interno-form {
+    font-size: 2rem;
+    font-weight: 300;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+    color: #ffffff;
+    text-align: center;
+}
+
+.texto-boas-vindas {
+    color: #cccccc;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+/* Caixa de avisos/regras (Fundo preto forte) */
+.caixa-regras-aviso {
+    background-color: rgba(12, 12, 12, 0.9); 
+    border: 1px solid rgba(109, 40, 217, 0.3); /* Borda roxa escura sutil */
+    border-radius: 8px;
+    padding: 20px;
+}
+
+/* Título com Roxo Forte e Levemente Escuro */
+.aviso-destaque {
+    color: #6d28d9; /* Roxo forte e imponente */
+    font-weight: bold;
+    display: block;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(109, 40, 217, 0.4); /* Leve brilho sombrio */
+}
+
+.caixa-regras-aviso ul {
+    margin-left: 20px;
+    color: #a3a3a3; 
+    font-size: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Estrutura de cada grupo de pergunta */
+.grupo-pergunta {
+    margin-bottom: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.grupo-pergunta label {
+    font-size: 1rem;
+    color: #ffffff;
+    font-weight: 500;
+}
+
+/* Campos de entrada de texto (Inputs e Textareas) */
+.campo-resposta, .campo-resposta-longa {
+    width: 100%;
+    background-color: rgba(20, 20, 20, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: #ffffff;
+    padding: 12px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: all 0.3s ease;
+}
+
+.campo-resposta:focus, .campo-resposta-longa:focus {
+    outline: none;
+    border-color: #5865F2; 
+    background-color: rgba(15, 23, 42, 0.8);
+}
+
+.campo-resposta-longa {
+    resize: vertical; 
+}
+
+/* Ajusta a cor da borda para Roxo Forte quando o usuário tenta enviar o campo vazio */
+.campo-resposta:invalid:focus, .campo-resposta-longa:invalid:focus {
+    border-color: #6d28d9; /* Roxo forte alerta */
+    box-shadow: 0 0 8px rgba(109, 40, 217, 0.5);
+}
+
+/* Cor do texto de exemplo (Placeholder) */
+::placeholder {
+    color: #555565;
+    opacity: 1;
+}
+
+/* Container para organizar as caixas de múltipla escolha */
+.container-checkboxes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    background-color: rgba(20, 20, 20, 0.3);
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.opcao-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95rem !important;
+    color: #cccccc !important;
+    cursor: pointer;
+}
+
+.opcao-checkbox input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: #5865F2; 
+}
+
+/* Botões no fim do formulário */
+.botoes-acoes-form {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 35px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 20px;
+}
+
+.btn-voltar {
+    background-color: transparent;
+    color: #b3b3b3;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 12px 25px;
+    font-size: 0.95rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-voltar:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.btn-enviar-form {
+    background-color: #5865F2;
+    color: #ffffff;
+    border: none;
+    padding: 12px 30px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(88, 101, 242, 0.2);
+}
+
+.btn-enviar-form:hover {
+    background-color: #4752c4;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(88, 101, 242, 0.3);
+}
+
+/* Estilização da barra de rolagem interna da caixinha (Scrollbar) */
+.caixa-conteudo::-webkit-scrollbar {
+    width: 8px;
+}
+
+.caixa-conteudo::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
+}
+
+.caixa-conteudo::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+}
+
+.caixa-conteudo::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Container exclusivo para o termo de aceite final ocupando largura total */
+.container-termo-unico {
+    display: block !important; 
+    width: 100%;
+    background-color: rgba(109, 40, 217, 0.05); 
+    border: 1px solid rgba(109, 40, 217, 0.2);
+    padding: 15px 20px;
+    border-radius: 6px;
+}
+
+.termo-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 0.95rem;
+    color: #cccccc;
+    cursor: pointer;
+    line-height: 1.5;
+    text-align: left;
+}
+
+.termo-checkbox input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin-top: 3px;
+    cursor: pointer;
+    accent-color: #5865F2;
+    flex-shrink: 0; 
+}
+
+
+/* ==========================================================
+   5. ESTILOS DA ABA CONHEÇA A STAFF (Rolagem Horizontal)
+   ========================================================== */
+
+/* Remove totalmente a rolagem para baixo e foca nas laterais */
+.conteudo-staff-horizontal {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    padding: 40px;
+    height: 100vh;
+    overflow-x: auto; 
+    overflow-y: hidden; 
+    width: 100%;
+}
+
+/* Container que segura as caixas uma ao lado da outra */
+.carrossel-staff {
+    display: flex;
+    gap: 30px; 
+    padding-bottom: 10px;
+    min-width: max-content; 
+}
+
+/* Estrutura base de cada Card (Fundo Preto Forte) */
+.card-staff-box {
+    background-color: rgba(15, 15, 15, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    width: 280px;
+    height: 500px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6);
+    transition: all 0.3s ease;
+}
+
+.card-staff-box:hover {
+    transform: translateY(-8px);
+    border-color: rgba(109, 40, 217, 0.4);
+    box-shadow: 0 15px 40px rgba(109, 40, 217, 0.2);
+}
+
+/* Imagem ou cor decorativa no topo do card */
+.topo-card-decorativo {
+    width: 100%;
+    height: 140px;
+    background: linear-gradient(135deg, #10101a, #2d105c); 
+    border-bottom: 3px solid rgba(109, 40, 217, 0.4);
+}
+
+/* Parte interna onde ficam as informações textuais */
+.conteudo-card-staff {
+    padding: 25px 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+/* Nome padrão do Staffer (Sem a caixa especial) */
+.nome-staff {
+    font-size: 1.6rem;
+    font-weight: 500;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    color: #ffffff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 12px;
+    text-align: center;
+}
+
+/* Classe exclusiva para o seu nome com a MOLDURA AZUL Alinhada à Esquerda */
+.nome-destaque-azul {
+    display: block;
+    color: #38bdf8 !important; 
+    background-color: rgba(56, 189, 248, 0.08); 
+    border: 2px solid rgba(56, 189, 248, 0.3); 
+    padding: 12px 15px; 
+    border-radius: 10px; 
+    font-weight: 600;
+    text-shadow: 0 0 12px rgba(56, 189, 248, 0.6); 
+    width: 100%; 
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+    text-align: left; 
+}
+
+/* Lista de funções (Alinhadas uma abaixo da outra) */
+.tags-staff {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Estilo padrão de cada linha/função */
+.tag-funcao {
+    background-color: rgba(25, 25, 25, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: #cccccc;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    text-align: left;
+    font-weight: 500;
+}
+
+/* Destaque especial para Criador */
+.tag-funcao.badge-criador {
+    background-color: rgba(109, 40, 217, 0.15);
+    border-color: rgba(109, 40, 217, 0.4);
+    color: #a78bfa;
+}
+
+/* Deixa os cards de teste ligeiramente transparentes */
+.card-exemplo-teste {
+    opacity: 0.5;
+}
+.card-exemplo-teste:hover {
+    opacity: 0.9;
+}
+
+/* Customização do Scrollbar horizontal */
+.conteudo-staff-horizontal::-webkit-scrollbar {
+    height: 6px;
+}
+.conteudo-staff-horizontal::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+}
+.conteudo-staff-horizontal::-webkit-scrollbar-thumb {
+    background: #6d28d9;
+    border-radius: 10px;
+}
+.botao-admin-oculto {
+    display: none !important;
+}

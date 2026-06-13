@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Withered - Painel</title>
+    <link rel="stylesheet" href="style.css">
+   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="corpo-painel">    
+
+    <div class="overlay"></div>
+
+    <div class="container-painel">
+        
+        <aside class="sidebar">
+            <div class="logo-sidebar">The Withered</div>
+            <nav class="menu-nav">
+                <a href="index.html" class="item-menu">Início</a>
+                <a href="#" id="menu-perfil" class="item-menu" onclick="alternarAbas('perfil')">Perfil</a>
+                <a href="#" id="menu-form" class="item-menu ativo" onclick="alternarAbas('formularios')">Formulários</a>
+                <a href="#" id="menu-staff" class="item-menu" onclick="alternarAbas('staff')">Conheça a Staff</a>
+                <a href="#" class="item-menu item-menu-sair" onclick="fazerLogout()">Sair</a>
+            </nav>
+        </aside>
+
+        <main class="conteudo-painel" id="painel-conteudo-principal">
+            
+            <div class="caixa-conteudo" id="caixa-principal-formularios">
+                
+                <div id="tela-selecao">
+                    <h2 class="subtitulo-painel">Selecione um Formulário</h2>
+                    <p class="instrucao-painel">Escolha uma das opções abaixo para iniciar o preenchimento:</p>
+                    
+                    <div class="botoes-formularios">
+                        <button class="btn-tipo-form" onclick="abrirFormulario('Players')">Formulário para Players</button>
+                        <button class="btn-tipo-form" onclick="abrirFormulario('Staff')">Formulário para Staff</button>
+                        <button class="btn-tipo-form" onclick="abrirFormulario('Crianças')">Formulário para Crianças</button>
+                    </div>
+                </div>
+
+                <div id="area-formulario-dinamico" style="display: none;"></div>
+
+            </div>
+
+            <div id="aba-staff-painel" class="conteudo-staff-horizontal" style="display: none;">
+                <div class="carrossel-staff">
+                    
+                    <div class="card-staff-box">
+                        <div class="topo-card-decorativo"></div>
+                        <div class="conteudo-card-staff">
+                            <span class="nome-destaque-azul">Jess</span>
+                            <div class="tags-staff">
+                                <span class="tag-funcao badge-criador">Criador do servidor</span>
+                                <span class="tag-funcao">Desenvolvedor</span>
+                                <span class="tag-funcao">Entrevistador</span>
+                                <span class="tag-funcao">Lore Maker</span>
+                                <span class="tag-funcao">Autista de suporte 1</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-staff-box card-exemplo-teste">
+                        <div class="topo-card-decorativo"></div>
+                        <div class="conteudo-card-staff">
+                            <h2 class="nome-staff">Membro Teste</h2>
+                            <div class="tags-staff">
+                                <span class="tag-funcao">Moderador</span>
+                                <span class="tag-funcao">Designer</span>
+                                <span class="tag-funcao">Teste</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-staff-box card-exemplo-teste">
+                        <div class="topo-card-decorativo"></div>
+                        <div class="conteudo-card-staff">
+                            <h2 class="nome-staff">Membro Teste</h2>
+                            <div class="tags-staff">
+                                <span class="tag-funcao">Helper</span>
+                                <span class="tag-funcao">Construção</span>
+                                <span class="tag-funcao">Teste</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="caixa-conteudo" id="caixa-principal-perfil" style="display: none;">
+                <div class="perfil-usuario-container">
+                    <div class="avatar-perfil-wrapper">
+                        <img src="https://cdn.discordapp.com/embed/avatars/0.png" alt="Avatar do Discord" class="avatar-perfil-imagem">
+                    </div>
+                    
+                    <h2 class="nome-usuario-perfil">NomeDoUsuario</h2>
+                    <p class="tag-usuario-perfil">@usuario_discord</p>
+                    
+                    <div class="info-perfil-status-box">
+                        <div class="info-linha-perfil">
+                            <span class="info-titulo">Status da Whitelist:</span>
+                            <span class="info-valor status-pendente">Aguardando Formulário</span>
+                        </div>
+                        <div class="info-linha-perfil">
+                            <span class="info-titulo">Cargos no Servidor:</span>
+                            <span class="info-valor">Nenhum</span>
+                        </div>
+                        <div class="info-linha-perfil">
+                            <span class="info-titulo">Conta Vinculada:</span>
+                            <span class="info-valor ID-discord">ID: 1234567890123456</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+    </div>
+
+    <script>
+        // ==========================================
+        // 1. INICIALIZAÇÃO DO SUPABASE (ÚNICA E CORRIGIDA)
+        // ==========================================
+        const SUPABASE_URL = "https://zkdfzxlwpedhoblrsjdr.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InprZGZ6eGx3cGVkaG9ibHJzamRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMDMxNTIsImV4cCI6MjA5NjY3OTE1Mn0.vJIxWeEOUymBp8ySeGS0vM9FVocABr8ucEmGNodacs4";
+        const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const listaAdmins = ['780382546542198816', '670361096707768340'];
+        let usuarioAtual = null; // Guardará os dados do Discord globalmente
+        let submissaoEfetuada = false;
+
+        // LÓGICA DE CARREGAMENTO DA PÁGINA (CONECTADA AO SUPABASE)
+        window.onload = async function() {
+            const { data: { session }, error } = await supabase.auth.getSession();
+
+            if (error || !session) {
+                window.location.href = "index.html";
+                return;
+            }
+
+            const user = session.user;
+            usuarioAtual = {
+                id: user.id, 
+                discord_id: user.user_metadata.provider_id, 
+                nome: user.user_metadata.full_name || user.user_metadata.name,
+                tag: "@" + (user.user_metadata.custom_claims?.global_name || user.user_metadata.name),
+                avatar: user.user_metadata.avatar_url || "https://cdn.discordapp.com/embed/avatars/0.png"
+            };
+
+            carregarPerfil(usuarioAtual);
+
+            // Controle do botão de Administrador no Menu
+            const nav = document.querySelector('.menu-nav');
+            const botaoSair = document.querySelector('.item-menu-sair');
+            
+            let linkAdmin = document.getElementById('botao-admin-feito');
+            if (!linkAdmin) {
+                linkAdmin = document.createElement('a');
+                linkAdmin.id = 'botao-admin-feito';
+                linkAdmin.href = "admin.html";
+                linkAdmin.className = "item-menu";
+                linkAdmin.innerText = "Formulários Feitos";
+                nav.insertBefore(linkAdmin, botaoSair);
+            }
+
+            if (!listaAdmins.includes(usuarioAtual.discord_id)) {
+                linkAdmin.style.display = "none";
+                linkAdmin.style.pointerEvents = "none";
+            } else {
+                linkAdmin.style.display = "block";
+                linkAdmin.style.pointerEvents = "auto";
+            }
+        };
+
+        // FUNÇÃO PARA TROCAR AS ABAS DE FORMA FLUIDA (SPA)
+        function alternarAbas(abaAlvo) {
+            const caixaFormularios = document.getElementById('caixa-principal-formularios');
+            const abaStaff = document.getElementById('aba-staff-painel');
+            const caixaPerfil = document.getElementById('caixa-principal-perfil');
+            const mainContainer = document.getElementById('painel-conteudo-principal');
+            
+            const btnPerfil = document.getElementById('menu-perfil');
+            const btnForm = document.getElementById('menu-form');
+            const btnStaff = document.getElementById('menu-staff');
+
+            btnPerfil.classList.remove('ativo');
+            btnForm.classList.remove('ativo');
+            btnStaff.classList.remove('ativo');
+
+            caixaFormularios.style.display = 'none';
+            abaStaff.style.display = 'none';
+            caixaPerfil.style.display = 'none';
+
+            if (abaAlvo === 'formularios') {
+                btnForm.classList.add('ativo');
+                caixaFormularios.style.display = 'block';
+                mainContainer.className = "conteudo-painel";
+                voltarParaSelecao();
+            } else if (abaAlvo === 'staff') {
+                btnStaff.classList.add('ativo');
+                abaStaff.style.display = 'flex';
+                mainContainer.className = "conteudo-staff-horizontal";
+            } else if (abaAlvo === 'perfil') {
+                btnPerfil.classList.add('ativo');
+                caixaPerfil.style.display = 'block';
+                mainContainer.className = "conteudo-painel";
+            }
+        }
+
+        // FUNÇÃO DE ABRIR FORMULÁRIOS
+        function abrirFormulario(tipo) {
+            const telaSelecao = document.getElementById('tela-selecao');
+            const areaFormulario = document.getElementById('area-formulario-dinamico');
+            const caixaPrincipal = document.getElementById('caixa-principal-formularios');
+
+            telaSelecao.style.display = 'none';
+            caixaPrincipal.style.textAlign = 'left';
+
+            if (tipo === 'Players') {
+                areaFormulario.innerHTML = `
+                    <div class="cabecalho-form">
+                        <h2 class="titulo-interno-form">Formulário de Players</h2>
+                        <p class="texto-boas-vindas">
+                            Olá, sejam muito bem-vindos ao processo seletivo do <strong>The Withered RP</strong>, somos um servidor HardRP de Minecraft que conta com Lore própria feita do zero, raças para que seu personagem se torne único e um mundo cheio de mistérios e novidades.<br><br>
+                            Lembrando, caso você não seja aprovado de imediato, não se preocupe pois estamos sempre abrindo vagas para novos jogadores, sinta-se livre para refazer o formulário na próxima convocação! Nós sempre utilizaremos o formulário mais recente para aprovação.
+                        </p>
+                        
+                        <div class="caixa-regras-aviso">
+                            <span class="aviso-destaque">Antes de responder as perguntas, deixaremos algumas coisas claras:</span>
+                            <ul>
+                                <li>Por favor responda as perguntas sempre com sinceridade, não iremos aceitar respostas forjadas por IA ou com informações que se provem falsas.</li>
+                                <li>Tente sempre responder as perguntas com mais detalhes, evitando respostas rasas e fracas.</li>
+                                <li>A idade mínima para o formulário é de 14 anos.</li>
+                                <li>É obrigatório possuir um microfone para conversas in-game.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <form id="form-player-real" onsubmit="enviarFormulario(event)">
+                        <div class="grupo-pergunta">
+                            <label>Como deseja que a Staff te chame? (nome ou apelido)</label>
+                            <input type="text" class="campo-resposta" placeholder="Ex: Me chamo Gabriel, mas meus amigos costumam me chamar de Biel." required>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Quais seus pronomes?</label>
+                            <input type="text" class="campo-resposta" placeholder="Ex: Ele/Dele, Ela/Dela, Elu/Delu..." required>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Quantos anos você tem? | (dd/mm/aaaa)</label>
+                            <input type="text" class="campo-resposta" placeholder="Ex: 17 anos | 24/09/2008" required>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Quais dias você estará disponível para jogar? Em quais horários?</label>
+                            <textarea class="campo-resposta-longa" rows="3" placeholder="Ex: Segunda a sexta das 18h às 22h. Finais de semana fico livre o dia todo." required></textarea>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Por que deveríamos te aprovar?</label>
+                            <textarea class="campo-resposta-longa" rows="4" placeholder="Fale um pouco sobre sua experiência, suas intenções no servidor e o que você busca agregar ao nosso Roleplay..." required></textarea>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Cite a regra do servidor que você considera mais importante e o porquê</label>
+                            <textarea class="campo-resposta-longa" rows="4" placeholder="Justifique sua escolha com base em como essa regra impacta a jogabilidade geral..." required></textarea>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Dentre os campos abaixo, você prefere:</label>
+                            <div class="container-checkboxes">
+                                <label class="opcao-checkbox"><input type="checkbox" value="Roleplay"> Roleplay</label>
+                                <label class="opcao-checkbox"><input type="checkbox" value="Lore"> Lore</label>
+                                <label class="opcao-checkbox"><input type="checkbox" value="Modpack"> Modpack</label>
+                                <label class="opcao-checkbox"><input type="checkbox" value="Cuidar de crianças"> Cuidar de crianças</label>
+                                <label class="opcao-checkbox"><input type="checkbox" value="Construir"> Construir</label>
+                                <label class="opcao-checkbox"><input type="checkbox" value="Explorar"> Explorar</label>
+                            </div>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Você teria algum meio de divulgar o servidor? Se sim, qual?</label>
+                            <input type="text" class="campo-resposta" placeholder="Indique se possui canais, redes sociais ou pretende convidar amigos.">
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Dite com suas palavras o que é Anti-RP</label>
+                            <textarea class="campo-resposta-longa" rows="3" required></textarea>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Dite com suas palavras o que é Metagaming</label>
+                            <textarea class="campo-resposta-longa" rows="3" required></textarea>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Dite com suas palavras o que é HardRP</label>
+                            <textarea class="campo-resposta-longa" rows="3" required></textarea>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Qual o nome e idade do seu personagem? E qual o significado do nome dele?</label>
+                            <textarea class="campo-resposta-longa" rows="3" required></textarea>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Qual a história do seu personagem?</label>
+                            <textarea class="campo-resposta-longa" rows="6" required></textarea>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Do que seu personagem mais gosta? | E do que odeia?</label>
+                            <textarea class="campo-resposta-longa" rows="3" required></textarea>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Quais os medos do seu personagem?</label>
+                            <textarea class="campo-resposta-longa" rows="3" required></textarea>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Qual a personalidade do seu personagem?</label>
+                            <textarea class="campo-resposta-longa" rows="3" required></textarea>
+                        </div>
+                        <div class="botoes-acoes-form">
+                            <button type="button" class="btn-voltar" onclick="voltarParaSelecao()">Voltar</button>
+                            <button type="submit" class="btn-enviar-form">Enviar Formulário</button>
+                        </div>
+                    </form>
+                `;
+                areaFormulario.style.display = 'block';
+
+            } else if (tipo === 'Staff') {
+                areaFormulario.innerHTML = `
+                    <div class="cabecalho-form">
+                        <h2 class="titulo-interno-form">Formulário de Staff</h2>
+                        <p class="texto-boas-vindas">
+                            Olá, sejam muito bem-vindos ao processo seletivo do <strong>The Withered RP</strong>, somos um servidor HardRP de Minecraft que conta com Lore própria feita do zero, raças para que seu personagem se torne único e um mundo cheio de mistérios e novidades.<br><br>
+                            Lembrando, caso você não seja aprovado de imediato, não se preocupe pois estamos sempre abrindo vagas para novos Staffs, sinta-se livre para refazer o formulário na próxima convocação! Nós sempre utilizaremos o formulário mais recente para aprovação.
+                        </p>
+                        
+                        <div class="caixa-regras-aviso">
+                            <span class="aviso-destaque">Antes de responder as perguntas, deixaremos algumas coisas claras:</span>
+                            <ul>
+                                <li>Por favor responda as perguntas sempre com sinceridade, não iremos aceitar respostas forjadas por IA ou com informações que se provem falsas.</li>
+                                <li>Tente sempre responder as perguntas com mais detalhes, evitando respostas rasas and fracas.</li>
+                                <li>A idade mínima para o formulário é de 14 anos.</li>
+                                <li>É obrigatório possuir um microfone para conversas com a staff.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <form id="form-staff-real" onsubmit="enviarFormulario(event)">
+                        <div class="grupo-pergunta">
+                            <label>Como deseja que a Staff te chame? (nome ou apelido)</label>
+                            <input type="text" class="campo-resposta" placeholder="Ex: Me chamo Gabriel, mas meus amigos costumam me chamar de Biel." required>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Quais seus pronomes?</label>
+                            <input type="text" class="campo-resposta" placeholder="Ex: Ele/Dele, Ela/Dela, Elu/Delu..." required>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Quantos anos você tem? | (dd/mm/aaaa)</label>
+                            <input type="text" class="campo-resposta" placeholder="Ex: 17 anos | 24/09/2008" required>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Em quais áreas você gostaria de auxiliar?</label>
+                            <div class="container-checkboxes">
+                                <label class="opcao-checkbox"><input type="checkbox" value="Helper"> Helper</label>
+                                <label class="opcao-checkbox"><input type="checkbox" value="Designer"> Designer</label>
+                                <label class="opcao-checkbox"><input type="checkbox" value="Construtor"> Construtor</label>
+                                <label class="opcao-checkbox"><input type="checkbox" value="Desenvolvedor"> Desenvolvedor</label>
+                                <label class="opcao-checkbox"><input type="checkbox" value="Moderador"> Moderador</label>
+                                <label class="opcao-checkbox"><input type="checkbox" value="Modelador"> Modelador</label>
+                                <label class="opcao-checkbox"><input type="checkbox" value="Lore Maker"> Lore Maker</label>
+                                <label class="opcao-checkbox"><input type="checkbox" value="Enigma"> Enigma</label>
+                                <label class="opcao-checkbox"><input type="checkbox" value="Entrevistador"> Entrevistador</label>
+                                <label class="opcao-checkbox"><input type="checkbox" value="Marketing"> Marketing</label>
+                                <label class="opcao-checkbox"><input type="checkbox" value="Editor de vídeo"> Editor de vídeo</label>
+                                <label class="opcao-checkbox"><input type="checkbox" value="Outro"> Outro</label>
+                            </div>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Nos conte um pouco sobre suas qualificações e experiencias nas áreas que marcou acima</label>
+                            <textarea class="campo-resposta-longa" rows="4" placeholder="Detalhe programas que domina, funções parecidas que já exerceu..." required></textarea>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Em que dias e horários estaria disponível para trabalhar no projeto?</label>
+                            <textarea class="campo-resposta-longa" rows="3" placeholder="Ex: Segunda a sexta das 18h às 22h. Finais de semana fico livre o dia todo." required></textarea>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Conseguiria entregar seus trabalhos com prazo de entrega?</label>
+                            <input type="text" class="campo-resposta" placeholder="Fale sobre sua organização com prazos e entregas..." required>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>O que te despertou interesse no projeto?</label>
+                            <textarea class="campo-resposta-longa" rows="3" placeholder="Fale sobre o que mais chamou sua atenção no The Withered..." required></textarea>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Já participou de algum SMP antes? Possui experiência como staff? Cite as experiências e caso necessário punições.</label>
+                            <textarea class="campo-resposta-longa" rows="4" placeholder="Mencione outros servidores onde trabalhou ou jogou, se já levou bans e os motivos..." required></textarea>
+                        </div>
+                        <div class="grupo-pergunta" style="margin-top: 30px;">
+                            <div class="container-termo-unico">
+                                <label class="termo-checkbox">
+                                    <input type="checkbox" required>
+                                    <span>Ao enviar esse formulário, você estará ciente de que caso permaneça muito tempo inativo sem uma explicação plausível, poderá ser removido da nossa equipe. Isso vale pro cargo de Jogadores também.</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="botoes-acoes-form">
+                            <button type="button" class="btn-voltar" onclick="voltarParaSelecao()">Voltar</button>
+                            <button type="submit" class="btn-enviar-form">Enviar Formulário</button>
+                        </div>
+                    </form>
+                `;
+                areaFormulario.style.display = 'block';
+
+            } else if (tipo === 'Crianças') {
+                areaFormulario.innerHTML = `
+                    <div class="cabecalho-form">
+                        <h2 class="titulo-interno-form">Formulário de Crianças</h2>
+                        <p class="texto-boas-vindas">
+                            Olá, sejam muito bem-vindos ao processo seletivo do <strong>The Withered RP</strong>, somos um servidor HardRP de Minecraft que conta com Lore própria feita do zero, raças para que seu personagem se torne único e um mundo cheio de mistérios e novidades.<br><br>
+                            Lembrando, caso você não seja aprovado de imediato, não se preocupe pois abriremos o formulário novamente em breve, sinta-se livre para refazer o formulário na próxima convocação! Nós sempre utilizaremos o formulário mais recente para aprovação.
+                        </p>
+                        
+                        <div class="caixa-regras-aviso">
+                            <span class="aviso-destaque">Antes de responder as perguntas, deixaremos algumas coisas claras:</span>
+                            <ul>
+                                <li>Por favor responda as perguntas sempre com sinceridade, não iremos aceitar respostas forjadas por IA ou com informações que se provem falsas.</li>
+                                <li>Tente sempre responder as perguntas com mais detalhes, evitando respostas rasas e fracas.</li>
+                                <li>A idade mínima para o formulário é de 14 anos.</li>
+                                <li>É obrigatório possuir um microfone para conversas com a staff.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <form id="form-criancas-real" onsubmit="enviarFormulario(event)">
+                        <div class="grupo-pergunta">
+                            <label>Como deseja que a Staff te chame? (nome ou apelido)</label>
+                            <input type="text" class="campo-resposta" placeholder="Ex: Me chamo Gabriel, mas meus amigos costumam me chamar de Biel." required>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Quais seus pronomes?</label>
+                            <input type="text" class="campo-resposta" placeholder="Ex: Ele/Dele, Ela/Dela, Elu/Delu..." required>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Quantos anos você tem? | (dd/mm/aaaa)</label>
+                            <input type="text" class="campo-resposta" placeholder="Ex: 17 anos | 24/09/2008" required>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Quais dias você estará disponível para jogar? Em quais horários?</label>
+                            <textarea class="campo-resposta-longa" rows="3" placeholder="Ex: Segunda a sexta das 18h às 22h. Finais de semana fico livre o dia todo." required></textarea>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Nos conte um pouco sobre você, seus gostos, desgostos e qualquer possível gatilho ou questão que deveríamos saber sobre você, inclua caso possua algum laudo médico (TDAH, Ansiedade, TEA, problemas do coração ou outros)</label>
+                            <textarea class="campo-resposta-longa" rows="4" placeholder="Sinta-se confortável para compartilhar apenas o necessário para sua segurança e boa convivência..." required></textarea>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Por que deveríamos te aprovar?</label>
+                            <textarea class="campo-resposta-longa" rows="4" placeholder="Fale um pouco sobre suas intenções no servidor e o que busca agregar interpretando uma criança..." required></textarea>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Já participou de algum SMP antes? Cite quais e como foi a experiência</label>
+                            <textarea class="campo-resposta-longa" rows="3" placeholder="Mencione outros projetos se houver..." required></textarea>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Cite a regra do servidor que você considera mais importante e o porquê</label>
+                            <textarea class="campo-resposta-longa" rows="4" placeholder="Justifique sua escolha com base em como essa regra impacta o ambiente de jogo..." required></textarea>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Algum conhecido seu está no servidor? Se sim, quem?</label>
+                            <input type="text" class="campo-resposta" placeholder="Indique o nome ou apelido de amigos/conhecidos que já fazem parte da comunidade.">
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Dite com suas palavras o que é Anti-RP</label>
+                            <textarea class="campo-resposta-longa" rows="3" required></textarea>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Dite com suas palavras o que é Metagaming</label>
+                            <textarea class="campo-resposta-longa" rows="3" required></textarea>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Dite com suas palavras o que é HardRP</label>
+                            <textarea class="campo-resposta-longa" rows="3" required></textarea>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Qual personalidade você gostaria de interpretar como criança?</label>
+                            <textarea class="campo-resposta-longa" rows="3" required></textarea>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>Crie uma história, ela pode conter qualquer coisa e servirá somente para avaliarmos seu esforço e criatividade!</label>
+                            <textarea class="campo-resposta-longa" rows="6" required></textarea>
+                        </div>
+                        <div class="grupo-pergunta">
+                            <label>A lore das crianças é decidida pela staff, seria um problema para você interpretar e desenvolver um personagem com uma lore e aparência definidas?</label>
+                            <textarea class="campo-resposta-longa" rows="3" required></textarea>
+                        </div>
+                        <div class="botoes-acoes-form">
+                            <button type="button" class="btn-voltar" onclick="voltarParaSelecao()">Voltar</button>
+                            <button type="submit" class="btn-enviar-form">Enviar Formulário</button>
+                        </div>
+                    </form>
+                `;
+                areaFormulario.style.display = 'block';
+            }
+
+            caixaPrincipal.scrollTop = 0;
+        }
+
+        function voltarParaSelecao() {
+            const telaSelecao = document.getElementById('tela-selecao');
+            const areaFormulario = document.getElementById('area-formulario-dinamico');
+            const caixaPrincipal = document.getElementById('caixa-principal-formularios');
+
+            areaFormulario.style.display = 'none';
+            telaSelecao.style.display = 'block';
+            
+            if (caixaPrincipal) {
+                caixaPrincipal.style.textAlign = 'center';
+            }
+        }
+
+        // FUNÇÃO PARA PREENCHER O PERFIL VISUAL
+        function carregarPerfil(dados) {
+            document.querySelector('.nome-usuario-perfil').innerText = dados.nome;
+            document.querySelector('.tag-usuario-perfil').innerText = dados.tag;
+            document.querySelector('.ID-discord').innerText = "ID: " + dados.discord_id;
+            document.querySelector('.avatar-perfil-imagem').src = dados.avatar;
+        }
+
+        // LOGOUT LIMPENDO OS DADOS
+        async function fazerLogout() {
+            await supabase.auth.signOut();
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>

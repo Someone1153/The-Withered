@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - The Withered</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="corpo-painel">
+    <div class="container-painel">
+        <aside class="sidebar">
+            <div class="logo-sidebar">Admin Panel</div>
+            <a href="home.html" class="item-menu">Voltar ao Painel</a>
+        </aside>
+        
+        <main class="conteudo-painel">
+            <div class="caixa-conteudo">
+                <h2>Formulários Recebidos</h2>
+                <div id="grid-formularios" style="display: grid; gap: 10px; margin-top: 20px;">
+                    </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+    const admins = ["780382546542198816", "670361096707768340", "1234567890123456"];
+
+    window.onload = function() {
+        const usuarioStorage = localStorage.getItem('usuarioLogado');
+        
+        // Verifica se existe usuário E se o ID está na lista
+        if (!usuarioStorage || !admins.includes(JSON.parse(usuarioStorage).id)) {
+            alert("Acesso Negado!");
+            window.location.href = "home.html"; // Manda de volta para o painel principal
+            return;
+        }
+        
+        carregarFormularios();
+    };
+
+    function carregarFormularios() {
+        const container = document.getElementById('grid-formularios');
+        const dados = JSON.parse(localStorage.getItem('bancoFormularios') || "[]");
+        
+        dados.forEach((form, index) => {
+            container.innerHTML += `<button onclick="abrirForm(${index})">Formulário #${index + 1}</button>`;
+        });
+    }
+</script>
+</body>
+</html>
