@@ -43,15 +43,15 @@
         ];
 
         // ===== AGUARDAR SUPABASE CARREGAR =====
-        async function aguardarSupabase(maxTentativas = 30) {
+        async function aguardarSupabase(maxTentativas = 100) {
             for (let i = 0; i < maxTentativas; i++) {
-                if (window.Supabase) {
-                    console.log("✓ Supabase carregou após " + (i * 100) + "ms");
+                if (window.Supabase && window.Supabase.createClient) {
+                    console.log("✓ Supabase carregou após " + (i * 50) + "ms");
                     return true;
                 }
-                await new Promise(resolve => setTimeout(resolve, 100));
+                await new Promise(resolve => setTimeout(resolve, 50));
             }
-            console.error("✗ Supabase não carregou após 3 segundos");
+            console.error("✗ Supabase não carregou após 5 segundos");
             return false;
         }
 
@@ -78,9 +78,21 @@
             console.log("▶ Clicou no botão de login");
             
             if (!supabaseClient) {
-                console.error("✗ Supabase não está inicializado");
-                alert("Erro: Supabase não está pronto. Tente recarregar a página.");
-                return;
+                console.warn("⚠ Supabase ainda está sendo carregado, aguarde...");
+                
+                // Tenta aguardar mais um pouco
+                for (let i = 0; i < 20; i++) {
+                    await new Promise(resolve => setTimeout(resolve, 250));
+                    if (supabaseClient) {
+                        console.log("✓ Supabase agora está disponível!");
+                        break;
+                    }
+                }
+                
+                if (!supabaseClient) {
+                    alert("Supabase ainda não está pronto. Por favor, tente novamente em alguns segundos.");
+                    return;
+                }
             }
 
             try {
@@ -157,18 +169,22 @@
         document.addEventListener('DOMContentLoaded', async function() {
             console.log("=== INICIANDO THE WITHERED ===");
             
-            // 1. Inicializar Supabase
-            if (!await inicializarSupabase()) {
-                console.error("✗ Falha ao inicializar Supabase");
-                alert("Erro ao carregar o sistema de autenticação. Tente recarregar.");
-                return;
+            // 1. Inicializar Supabase (sem interrupção)
+            const supabaseOk = await inicializarSupabase();
+            
+            if (!supabaseOk) {
+                console.warn("⚠ Supabase não foi inicializado, continuando sem autenticação...");
+            } else {
+                console.log("✓ Supabase está pronto");
             }
 
-            // 2. Aguardar um pouco para Supabase ficar pronto
-            await new Promise(resolve => setTimeout(resolve, 500));
+            // 2. Aguardar um pouco
+            await new Promise(resolve => setTimeout(resolve, 300));
 
             // 3. Verificar se há sessão ativa
-            await verificarSessao();
+            if (supabaseOk) {
+                await verificarSessao();
+            }
 
             // 4. Exibir citação
             exibirCitacao();
