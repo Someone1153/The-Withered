@@ -108,6 +108,23 @@
                             <span class="info-valor ID-discord">ID: 1234567890123456</span>
                         </div>
                     </div>
+
+                    <div class="bloco-formulario-usuario">
+                        <div class="cabecalho-bloco-formulario">
+                            <div>
+                                <h3 class="titulo-bloco-formulario">Formulário enviado</h3>
+                                <p class="texto-bloco-formulario">Acompanhe o estado do seu envio.</p>
+                            </div>
+                            <button type="button" id="btn-visualizar-formulario" class="btn-visualizar-formulario" onclick="alternarDetalhesFormulario()">Visualizar</button>
+                        </div>
+
+                        <div class="linha-status-formulario">
+                            <span id="status-badge-formulario" class="status-badge status-em-analise">Em análise</span>
+                        </div>
+
+                        <p id="texto-status-formulario" class="texto-status-formulario">Nenhum formulário foi enviado ainda.</p>
+                        <div id="detalhes-formulario-usuario" class="detalhes-formulario-usuario" style="display: none;"></div>
+                    </div>
                 </div>
             </div>
 
@@ -181,6 +198,7 @@
 
                 console.log("✓ Usuário logado:", usuarioAtual);
                 carregarPerfil(usuarioAtual);
+                carregarStatusFormulario(usuarioAtual);
 
                 // Controle do botão de Administrador no Menu
                 const nav = document.querySelector('.menu-nav');
@@ -559,6 +577,55 @@
             document.querySelector('.avatar-perfil-imagem').src = dados.avatar;
         }
 
+        function getStatusClass(status) {
+            if (status === 'Aprovado') return 'status-aprovado';
+            if (status === 'Reprovado') return 'status-reprovado';
+            return 'status-em-analise';
+        }
+
+        function carregarStatusFormulario(usuario) {
+            const botao = document.getElementById('btn-visualizar-formulario');
+            const badge = document.getElementById('status-badge-formulario');
+            const texto = document.getElementById('texto-status-formulario');
+            const detalhes = document.getElementById('detalhes-formulario-usuario');
+
+            const chave = `formulariosUsuario:${usuario?.id || usuario?.discord_id || 'anon'}`;
+            const historico = JSON.parse(localStorage.getItem(chave) || '[]');
+            const envio = historico.length > 0 ? historico[historico.length - 1] : null;
+
+            if (!envio) {
+                badge.textContent = 'Sem envio';
+                badge.className = 'status-badge status-em-analise';
+                texto.textContent = 'Nenhum formulário foi enviado ainda.';
+                if (botao) botao.disabled = true;
+                if (detalhes) detalhes.style.display = 'none';
+                return;
+            }
+
+            badge.textContent = envio.status || 'Em análise';
+            badge.className = `status-badge ${getStatusClass(envio.status || 'Em análise')}`;
+            texto.textContent = `Seu formulário de ${envio.tipo} foi enviado em ${envio.enviadoEm}.`;
+
+            if (botao) {
+                botao.disabled = false;
+            }
+
+            if (detalhes) {
+                detalhes.innerHTML = envio.respostas.map(item => `
+                    <div class="item-detalhe-formulario">
+                        <strong>${item.pergunta}</strong>
+                        <p>${item.resposta}</p>
+                    </div>
+                `).join('');
+            }
+        }
+
+        window.alternarDetalhesFormulario = function() {
+            const detalhes = document.getElementById('detalhes-formulario-usuario');
+            if (!detalhes) return;
+            detalhes.style.display = detalhes.style.display === 'block' ? 'none' : 'block';
+        };
+
         // FUNÇÃO PARA ENVIAR FORMULÁRIO
         window.enviarFormulario = async function(event) {
             event.preventDefault();
@@ -569,7 +636,36 @@
                 return;
             }
 
-            // TODO: Implementar envio para Supabase
+            const form = event.target;
+            const tipo = form.id.includes('staff') ? 'Staff' : form.id.includes('criancas') ? 'Crianças' : 'Players';
+            const respostas = Array.from(form.querySelectorAll('.grupo-pergunta')).map(grupo => {
+                const pergunta = grupo.querySelector('label')?.textContent?.trim() || 'Pergunta';
+                const campos = Array.from(grupo.querySelectorAll('input, textarea'));
+                const valores = campos.map(campo => {
+                    if (campo.type === 'checkbox') {
+                        return campo.checked ? campo.value : null;
+                    }
+                    return campo.value?.trim() || null;
+                }).filter(Boolean);
+
+                const respostaTexto = valores.length > 0 ? valores.join(' | ') : 'Sem resposta';
+                return { pergunta, resposta: respostaTexto };
+            }).filter(item => item.resposta && item.resposta !== 'Sem resposta');
+
+            const envio = {
+                id: Date.now(),
+                tipo,
+                status: 'Em análise',
+                respostas,
+                enviadoEm: new Date().toLocaleString('pt-BR')
+            };
+
+            const chave = `formulariosUsuario:${usuarioAtual?.id || usuarioAtual?.discord_id || 'anon'}`;
+            const historico = JSON.parse(localStorage.getItem(chave) || '[]');
+            historico.push(envio);
+            localStorage.setItem(chave, JSON.stringify(historico));
+
+            carregarStatusFormulario(usuarioAtual);
             alert("✓ Formulário enviado com sucesso!");
             window.voltarParaSelecao();
         };
