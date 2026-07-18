@@ -774,18 +774,18 @@ body {
 
 /* Admin modal: larger reading area */
 .admin-modal-conteudo {
-    width: 100%;
+   width: 100%;
     max-width: 920px;
     background: rgba(15, 18, 30, 0.98);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 40px;
     padding: 80px 40px 80px; 
-    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5); 
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
     color: #e5e7eb;
     position: relative;
-    height: 85vh;
-    max-height: 85vh;
-    overflow-y: auto;
+    height: 92vh;        /* Força o modal a ter sempre 92% da altura da tela */
+    max-height: 92vh;    /* Garante que ele não passe disso */
+    overflow-y: auto;    /* Mantém a rolagem interna funcionando */
     box-sizing: border-box;
 }
 
