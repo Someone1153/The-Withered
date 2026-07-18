@@ -645,19 +645,9 @@
             };
 
             try {
-                let { data, error } = await supabase.from('formulario_players')
+                const { data, error } = await supabase.from('formulario_players')
                     .select('*')
-                    .eq('user_id', usuario.id)
                     .order('created_at', { ascending: false });
-
-                if (error && error.code === '42703') {
-                    const fallback = await supabase.from('formulario_players')
-                        .select('*')
-                        .eq('discord_id', usuario.discord_id)
-                        .order('created_at', { ascending: false });
-                    data = fallback.data;
-                    error = fallback.error;
-                }
 
                 if (error) {
                     console.error('Erro ao buscar formulário no Supabase:', error);
@@ -670,7 +660,24 @@
                     return;
                 }
 
-                renderFormularios(data);
+                const chave = `formulariosUsuario:${usuario?.id || usuario?.discord_id || 'anon'}`;
+                const localHistorico = JSON.parse(localStorage.getItem(chave) || '[]');
+                const ultimoLocal = localHistorico.length > 0 ? localHistorico[localHistorico.length - 1] : null;
+
+                if (ultimoLocal) {
+                    const encontrados = data.filter(registro => {
+                        return registro.nome_apelido === ultimoLocal.nome_apelido
+                            && registro.idade_data_nascimento === ultimoLocal.idade_data_nascimento
+                            && (registro.meio_divulgacao || '') === (ultimoLocal.meio_divulgacao || '');
+                    });
+
+                    if (encontrados.length > 0) {
+                        renderFormularios(encontrados);
+                        return;
+                    }
+                }
+
+                renderVazio();
             } catch (err) {
                 console.error('Erro inesperado ao carregar formulários:', err);
                 renderVazio();

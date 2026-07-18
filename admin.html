@@ -25,13 +25,16 @@
     <script>
         const SUPABASE_URL = "https://zkdfzxlwpedhoblrsjdr.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_XrlHqqACgEz_OqAHyVIVag_wC55nwsB";
-        const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        if (typeof window.supabase === 'undefined') {
+            window.supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+        const supabaseClient = window.supabase;
         
         const admins = ["780382546542198816"];
 
         window.onload = async function() {
             try {
-                const { data: { session } } = await supabase.auth.getSession();
+                const { data: { session } } = await supabaseClient.auth.getSession();
                 
                 if (!session || !session.user) {
                     alert("Você não está autenticado!");
@@ -59,7 +62,7 @@
             const container = document.getElementById('grid-formularios');
             container.innerHTML = '<p class="admin-loading">Carregando formulários...</p>';
 
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
                 .from('formulario_players')
                 .select('*')
                 .order('created_at', { ascending: false });
