@@ -485,52 +485,52 @@
                     <form id="form-staff-real" onsubmit="enviarFormulario(event)">
                         <div class="grupo-pergunta">
                             <label>Como deseja que a Staff te chame? (nome ou apelido)</label>
-                            <input type="text" class="campo-resposta" placeholder="Ex: Me chamo Gabriel, mas meus amigos costumam me chamar de Biel." required>
+                            <input id="staff_nome_apelido" type="text" class="campo-resposta" placeholder="Ex: Me chamo Gabriel, mas meus amigos costumam me chamar de Biel." required>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Quais seus pronomes?</label>
-                            <input type="text" class="campo-resposta" placeholder="Ex: Ele/Dele, Ela/Dela, Elu/Delu..." required>
+                            <input id="staff_pronomes" type="text" class="campo-resposta" placeholder="Ex: Ele/Dele, Ela/Dela, Elu/Delu..." required>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Quantos anos você tem? | (dd/mm/aaaa)</label>
-                            <input type="text" class="campo-resposta" placeholder="Ex: 17 anos | 24/09/2008" required>
+                            <input id="staff_idade_data_nascimento" type="text" class="campo-resposta" placeholder="Ex: 17 anos | 24/09/2008" required>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Em quais áreas você gostaria de auxiliar?</label>
                             <div class="container-checkboxes">
-                                <label class="opcao-checkbox"><input type="checkbox" value="Helper"> Helper</label>
-                                <label class="opcao-checkbox"><input type="checkbox" value="Designer"> Designer</label>
-                                <label class="opcao-checkbox"><input type="checkbox" value="Construtor"> Construtor</label>
-                                <label class="opcao-checkbox"><input type="checkbox" value="Desenvolvedor"> Desenvolvedor</label>
-                                <label class="opcao-checkbox"><input type="checkbox" value="Moderador"> Moderador</label>
-                                <label class="opcao-checkbox"><input type="checkbox" value="Modelador"> Modelador</label>
-                                <label class="opcao-checkbox"><input type="checkbox" value="Lore Maker"> Lore Maker</label>
-                                <label class="opcao-checkbox"><input type="checkbox" value="Enigma"> Enigma</label>
-                                <label class="opcao-checkbox"><input type="checkbox" value="Entrevistador"> Entrevistador</label>
-                                <label class="opcao-checkbox"><input type="checkbox" value="Marketing"> Marketing</label>
-                                <label class="opcao-checkbox"><input type="checkbox" value="Editor de vídeo"> Editor de vídeo</label>
-                                <label class="opcao-checkbox"><input type="checkbox" value="Outro"> Outro</label>
+                                <label class="opcao-checkbox"><input name="areas_auxilio" type="checkbox" value="Helper"> Helper</label>
+                                <label class="opcao-checkbox"><input name="areas_auxilio" type="checkbox" value="Designer"> Designer</label>
+                                <label class="opcao-checkbox"><input name="areas_auxilio" type="checkbox" value="Construtor"> Construtor</label>
+                                <label class="opcao-checkbox"><input name="areas_auxilio" type="checkbox" value="Desenvolvedor"> Desenvolvedor</label>
+                                <label class="opcao-checkbox"><input name="areas_auxilio" type="checkbox" value="Moderador"> Moderador</label>
+                                <label class="opcao-checkbox"><input name="areas_auxilio" type="checkbox" value="Modelador"> Modelador</label>
+                                <label class="opcao-checkbox"><input name="areas_auxilio" type="checkbox" value="Lore Maker"> Lore Maker</label>
+                                <label class="opcao-checkbox"><input name="areas_auxilio" type="checkbox" value="Enigma"> Enigma</label>
+                                <label class="opcao-checkbox"><input name="areas_auxilio" type="checkbox" value="Entrevistador"> Entrevistador</label>
+                                <label class="opcao-checkbox"><input name="areas_auxilio" type="checkbox" value="Marketing"> Marketing</label>
+                                <label class="opcao-checkbox"><input name="areas_auxilio" type="checkbox" value="Editor de vídeo"> Editor de vídeo</label>
+                                <label class="opcao-checkbox"><input name="areas_auxilio" type="checkbox" value="Outro"> Outro</label>
                             </div>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Nos conte um pouco sobre suas qualificações e experiencias nas áreas que marcou acima</label>
-                            <textarea class="campo-resposta-longa" rows="4" placeholder="Detalhe programas que domina, funções parecidas que já exerceu..." required></textarea>
+                            <textarea id="staff_qualificacoes_experiencias" class="campo-resposta-longa" rows="4" placeholder="Detalhe programas que domina, funções parecidas que já exerceu..." required></textarea>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Em que dias e horários estaria disponível para trabalhar no projeto?</label>
-                            <textarea class="campo-resposta-longa" rows="3" placeholder="Ex: Segunda a sexta das 18h às 22h. Finais de semana fico livre o dia todo." required></textarea>
+                            <textarea id="staff_disponibilidade_horarios" class="campo-resposta-longa" rows="3" placeholder="Ex: Segunda a sexta das 18h às 22h. Finais de semana fico livre o dia todo." required></textarea>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Conseguiria entregar seus trabalhos com prazo de entrega?</label>
-                            <input type="text" class="campo-resposta" placeholder="Fale sobre sua organização com prazos e entregas..." required>
+                            <input id="staff_prazos_entrega" type="text" class="campo-resposta" placeholder="Fale sobre sua organização com prazos e entregas..." required>
                         </div>
                         <div class="grupo-pergunta">
                             <label>O que te despertou interesse no projeto?</label>
-                            <textarea class="campo-resposta-longa" rows="3" placeholder="Fale sobre o que mais chamou sua atenção no The Withered..." required></textarea>
+                            <textarea id="staff_interesse_projeto" class="campo-resposta-longa" rows="3" placeholder="Fale sobre o que mais chamou sua atenção no The Withered..." required></textarea>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Já participou de algum SMP antes? Possui experiência como staff? Cite as experiências e caso necessário punições.</label>
-                            <textarea class="campo-resposta-longa" rows="4" placeholder="Mencione outros servidores onde trabalhou ou jogou, se já levou bans e os motivos..." required></textarea>
+                            <textarea id="staff_experiencia_smp_punicoes" class="campo-resposta-longa" rows="4" placeholder="Mencione outros servidores onde trabalhou ou jogou, se já levou bans e os motivos..." required></textarea>
                         </div>
                         <div class="grupo-pergunta" style="margin-top: 30px;">
                             <div class="container-termo-unico">
@@ -540,6 +540,7 @@
                                 </label>
                             </div>
                         </div>
+                        <div id="mensagem-envio-staff" class="mensagem-envio"></div>
                         <div class="botoes-acoes-form">
                             <button type="button" class="btn-voltar" onclick="voltarParaSelecao()">Voltar</button>
                             <button type="submit" class="btn-enviar-form">Enviar Formulário</button>
@@ -669,8 +670,8 @@
             return 'status-em-analise';
         }
 
-        function mostrarMensagemEnvio(tipo, mensagem) {
-            const container = document.getElementById('mensagem-envio-player');
+        function mostrarMensagemEnvio(tipo, mensagem, containerId = 'mensagem-envio-player') {
+            const container = document.getElementById(containerId);
             if (!container) return;
             container.textContent = mensagem;
             container.className = `mensagem-envio mensagem-${tipo}`;
@@ -889,6 +890,33 @@
                 return;
             }
 
+            async function tryInsertWithFallback(table, obj) {
+                // make a shallow copy we can mutate
+                const p = JSON.parse(JSON.stringify(obj));
+                // remove null/undefined keys
+                Object.keys(p).forEach(k => {
+                    if (p[k] === undefined || p[k] === null) delete p[k];
+                });
+
+                for (let attempt = 0; attempt < 8; attempt++) {
+                    const { data, error } = await supabase.from(table).insert([p]);
+                    if (!error) return { data };
+
+                    const msg = (error.message || '').toString();
+                    const m = msg.match(/Could not find the '(.*?)' column/);
+                    if (m && m[1]) {
+                        const col = m[1];
+                        console.warn('Supabase schema missing column, removing from payload and retrying:', col);
+                        if (col in p) delete p[col];
+                        continue;
+                    }
+
+                    return { error };
+                }
+
+                return { error: new Error('Falha ao inserir após múltiplas tentativas de sanitização') };
+            }
+
             if (form.id === 'form-player-real') {
                 const nome_apelido = document.getElementById('nome_apelido')?.value.trim();
                 const pronomes = document.getElementById('pronomes')?.value.trim();
@@ -930,35 +958,6 @@
                     personagem_personalidade
                 };
 
-                async function tryInsertWithFallback(table, obj) {
-                    // make a shallow copy we can mutate
-                    const p = JSON.parse(JSON.stringify(obj));
-                    // remove null/undefined keys
-                    Object.keys(p).forEach(k => {
-                        if (p[k] === undefined || p[k] === null) delete p[k];
-                    });
-
-                    for (let attempt = 0; attempt < 8; attempt++) {
-                        const { data, error } = await supabase.from(table).insert([p]);
-                        if (!error) return { data };
-
-                        const msg = (error.message || '').toString();
-                        const m = msg.match(/Could not find the '(.*?)' column/);
-                        if (m && m[1]) {
-                            const col = m[1];
-                            console.warn('Supabase schema missing column, removing from payload and retrying:', col);
-                            if (col in p) delete p[col];
-                            // continue next attempt
-                            continue;
-                        }
-
-                        // other errors: stop and return
-                        return { error };
-                    }
-
-                    return { error: new Error('Falha ao inserir após múltiplas tentativas de sanitização') };
-                }
-
                 const resultInsert = await tryInsertWithFallback('formulario_players', payload);
                 if (resultInsert.error) {
                     console.error('Erro ao enviar formulário para Supabase:', resultInsert.error);
@@ -981,6 +980,45 @@
 
                 form.reset();
                 mostrarMensagemEnvio('success', 'Formulário enviado com sucesso! Seus dados foram salvos.');
+                return;
+            }
+
+            if (form.id === 'form-staff-real') {
+                const nome_apelido = document.getElementById('staff_nome_apelido')?.value.trim();
+                const pronomes = document.getElementById('staff_pronomes')?.value.trim();
+                const idade_data_nascimento = document.getElementById('staff_idade_data_nascimento')?.value.trim();
+                const qualificacoes_experiencias = document.getElementById('staff_qualificacoes_experiencias')?.value.trim();
+                const disponibilidade_horarios = document.getElementById('staff_disponibilidade_horarios')?.value.trim();
+                const prazos_entrega = document.getElementById('staff_prazos_entrega')?.value.trim();
+                const interesse_projeto = document.getElementById('staff_interesse_projeto')?.value.trim();
+                const experiencia_smp_punicoes = document.getElementById('staff_experiencia_smp_punicoes')?.value.trim();
+
+                const areasSelecionadas = Array.from(form.querySelectorAll('input[name="areas_auxilio"]:checked')).map(el => el.value);
+                const areas_auxilio = areasSelecionadas.join(', ');
+
+                const payloadStaff = {
+                    user_id: usuarioAtual?.id,
+                    discord_id: usuarioAtual?.discord_id,
+                    nome_apelido,
+                    pronomes,
+                    idade_data_nascimento,
+                    areas_auxilio,
+                    qualificacoes_experiencias,
+                    disponibilidade_horarios,
+                    prazos_entrega,
+                    interesse_projeto,
+                    experiencia_smp_punicoes
+                };
+
+                const resultStaff = await tryInsertWithFallback('formulario_staff', payloadStaff);
+                if (resultStaff.error) {
+                    console.error('Erro ao enviar formulário de Staff para Supabase:', resultStaff.error);
+                    mostrarMensagemEnvio('error', 'Falha ao enviar o formulário de Staff. Tente novamente em alguns instantes.', 'mensagem-envio-staff');
+                    return;
+                }
+
+                form.reset();
+                mostrarMensagemEnvio('success', 'Formulário enviado com sucesso! Seus dados foram salvos.', 'mensagem-envio-staff');
                 return;
             }
 
