@@ -13,19 +13,21 @@
         </aside>
         
         <main class="conteudo-painel">
-            <div class="caixa-conteudo">
-                <h2>Painel Administrativo</h2>
-                <div id="colunas-formularios" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 30px; width: 100%;">
+            <!-- 🛠️ REMOVEMOS A CLASSE .caixa-conteudo E ADICIONAMOS UM WRAPPER TOTALMENTE EXPANSÍVEL -->
+            <div class="admin-wrapper-global" style="width: 100%; max-width: 1600px; margin: 0 auto; padding: 20px;">
+                <h2 style="color: #fff; margin-bottom: 10px;">Painel Administrativo</h2>
+                
+                <div id="colunas-formularios" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-top: 20px; width: 100%;">
                     <div class="coluna-formularios" id="col-players">
-                        <h3 style="margin-bottom:10px">Players</h3>
+                        <h3 style="margin-bottom:15px">Players</h3>
                         <div id="lista-players"></div>
                     </div>
                     <div class="coluna-formularios" id="col-staff">
-                        <h3 style="margin-bottom:10px">Staff</h3>
+                        <h3 style="margin-bottom:15px">Staff</h3>
                         <div id="lista-staff"></div>
                     </div>
                     <div class="coluna-formularios" id="col-criancas">
-                        <h3 style="margin-bottom:10px">Crianças</h3>
+                        <h3 style="margin-bottom:15px">Crianças</h3>
                         <div id="lista-criancas"></div>
                     </div>
                 </div>
@@ -125,7 +127,6 @@
             const content = document.getElementById('modal-admin-conteudo');
             if (!modal || !content) return;
 
-            // build ordered view similar to home.verFormulario
             const fieldsOrder = [
                 { label: 'Como deseja que a Staff te chame? (nome ou apelido)', key: 'nome_apelido' },
                 { label: 'Quais seus pronomes?', key: 'pronomes' },
@@ -241,7 +242,6 @@
                 return;
             }
 
-            // agrupar por tipo e numerar por grupo
             const players = [];
             const staff = [];
             const criancas = [];
@@ -268,11 +268,12 @@
 
                     const row = document.createElement('div');
                     row.className = 'admin-compact-row';
-                    row.style = 'display:flex;align-items:center;gap:12px;padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;';
+                    
+                    /* 🛠️ MUDANÇA IMPORTANTE: Removemos larguras fixas de texto por style e transformamos em colunas flexíveis */
                     row.innerHTML = `
-                        <div style="width:40px;font-weight:700;color:#c8d2ff">${numero}</div>
-                        <div style="flex:1;color:#fff">${nome}</div>
-                        <div style="width:180px;color:#a3a3a3">${dataEnvio}</div>
+                        <span style="min-width:30px; font-weight:700; color:#c8d2ff">${numero}</span>
+                        <span style="flex:1; font-weight:600; color:#fff; overflow:hidden; text-overflow:ellipsis; padding-right:10px;">${nome}</span>
+                        <span style="color:#a3a3a3; font-size:0.85rem; white-space:nowrap;">${dataEnvio}</span>
                     `;
                     row.addEventListener('click', () => abrirModalAdmin(form));
                     container.appendChild(row);
@@ -284,5 +285,3 @@
             renderList(listaCriancas, criancas, 'C');
         }
     </script>
-</body>
-</html>

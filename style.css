@@ -192,12 +192,11 @@ body {
 
 /* Área central onde ficam os formulários */
 .conteudo-painel {
-    flex-grow: 1;
+    width: 100%;
     display: flex;
     justify-content: center;
-    align-items: center;
     padding: 20px;
-    height: 100vh;
+    box-sizing: border-box;
 }
 
 /* Caixinha central de vidro */
@@ -1137,13 +1136,13 @@ body {
 
 /* Admin columns styling */
 .coluna-formularios {
-    background: rgba(20, 20, 25, 0.85); /* Mantém o fundo escuro individual de cada coluna */
+    background: rgba(20, 20, 25, 0.85);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 24px;                      /* Mais espaço interno para não colar nos textos */
-    border-radius: 24px;                /* Borda arredondada bonita e moderna */
-    max-height: 80vh;
+    padding: 24px;
+    border-radius: 24px;
+    height: 75vh;
+    max-height: 75vh;
     overflow-y: auto;
-    width: 100%;                        /* Força a coluna a usar todo o espaço que o Grid der a ela */
     box-sizing: border-box;
 }
 
@@ -1153,21 +1152,24 @@ body {
     font-size: 1.05rem;
 }
 
-.admin-compact-row:hover { background: rgba(255,255,255,0.02); }
-
 .admin-compact-row {
-    min-height: 48px;
+    min-height: 52px;
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 10px 14px;
+    justify-content: space-between;
+    padding: 12px 16px;
     font-size: 0.95rem;
-    line-height: 1.4;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.02);
-    margin-bottom: 8px; /* Dá uma distância entre um formulário e outro na lista */
-    white-space: normal; /* Permite que o texto se ajuste se a tela diminuir */
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: background 0.2s ease;
 }
+
+.admin-compact-row:hover {
+    background: rgba(255, 255, 255, 0.08);
+    }
 
 .admin-compact-row div {
     overflow: hidden;
