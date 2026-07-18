@@ -150,7 +150,6 @@
         let supabase = null;
 
         const listaAdmins = ['780382546542198816'];
-        const adminAccessKey = 'theWitheredAdminAccess';
         let usuarioAtual = null;
         let submissaoEfetuada = false;
         let formulariosExibidos = [];
@@ -250,14 +249,14 @@
                     nav.insertBefore(linkAdmin, botaoSair);
                 }
 
-                linkAdmin.style.display = "block";
-                linkAdmin.style.pointerEvents = "auto";
-                linkAdmin.title = "Abrir painel administrativo";
-
                 if (listaAdmins.includes(usuarioAtual.discord_id)) {
-                    localStorage.setItem(adminAccessKey, 'true');
+                    linkAdmin.style.display = "block";
+                    linkAdmin.style.pointerEvents = "auto";
+                    linkAdmin.title = "Abrir painel administrativo";
                 } else {
-                    localStorage.removeItem(adminAccessKey);
+                    linkAdmin.style.display = "none";
+                    linkAdmin.style.pointerEvents = "none";
+                    linkAdmin.title = ""
                 }
 
             } catch (err) {
@@ -738,25 +737,55 @@
             const data = formulario.created_at || formulario.enviadoEm || 'Data não informada';
             const tipo = formulario.tipo || 'Players';
             const status = formulario.status || 'Em análise';
+            const nome = formulario.nome_apelido || formulario.tag || 'Sem nome';
+            const pronomes = formulario.pronomes || 'Sem pronomes';
+            const idade = formulario.idade_data_nascimento || 'Não informado';
+            const disponibilidade = formulario.disponibilidade_horarios || 'Não informado';
+            const porQueAprovar = formulario.por_que_aprovar || formulario.respostas?.find(r => r.pergunta?.includes('aprovar'))?.resposta || '-';
+            const regraMaisImportante = formulario.regra_mais_importante || '-';
+            const meioDivulgacao = formulario.meio_divulgacao || '-';
+            const antiRp = formulario.definicao_anti_rp || '-';
+            const metagaming = formulario.definicao_metagaming || '-';
+            const hardRp = formulario.definicao_hard_rp || '-';
+            const personagem = formulario.personagem_nome_idade || '-';
+            const historia = formulario.personagem_historia || '-';
+            const gostos = formulario.personagem_gostos || '-';
+            const medos = formulario.personagem_medos || '-';
+            const personalidade = formulario.personagem_personalidade || '-';
 
-            const detalhes = `
-                <div class="modal-row">
-                    <span class="modal-label">Tipo</span>
-                    <span>${tipo}</span>
-                </div>
-                <div class="modal-row">
-                    <span class="modal-label">Status</span>
-                    <span>${status}</span>
-                </div>
-                <div class="modal-row">
-                    <span class="modal-label">Enviado em</span>
-                    <span>${data}</span>
-                </div>
-                <div class="modal-row">
-                    <span class="modal-label">Preferências</span>
-                    <span>${preferencias}</span>
-                </div>
+            let detalhes = `
+                <div class="modal-row"><span class="modal-label">Tipo</span><span>${tipo}</span></div>
+                <div class="modal-row"><span class="modal-label">Status</span><span>${status}</span></div>
+                <div class="modal-row"><span class="modal-label">Enviado em</span><span>${data}</span></div>
+                <div class="modal-row"><span class="modal-label">Nome / Apelido</span><span>${nome}</span></div>
+                <div class="modal-row"><span class="modal-label">Pronomes</span><span>${pronomes}</span></div>
+                <div class="modal-row"><span class="modal-label">Idade / Nascimento</span><span>${idade}</span></div>
+                <div class="modal-row"><span class="modal-label">Disponibilidade</span><span>${disponibilidade}</span></div>
+                <div class="modal-row"><span class="modal-label">Por que aprovar</span><span>${porQueAprovar}</span></div>
+                <div class="modal-row"><span class="modal-label">Regra mais importante</span><span>${regraMaisImportante}</span></div>
+                <div class="modal-row"><span class="modal-label">Preferências</span><span>${preferencias}</span></div>
+                <div class="modal-row"><span class="modal-label">Meio de divulgação</span><span>${meioDivulgacao}</span></div>
+                <div class="modal-row"><span class="modal-label">Anti-RP</span><span>${antiRp}</span></div>
+                <div class="modal-row"><span class="modal-label">Metagaming</span><span>${metagaming}</span></div>
+                <div class="modal-row"><span class="modal-label">HardRP</span><span>${hardRp}</span></div>
+                <div class="modal-row"><span class="modal-label">Personagem</span><span>${personagem}</span></div>
+                <div class="modal-row"><span class="modal-label">História</span><span>${historia}</span></div>
+                <div class="modal-row"><span class="modal-label">Gostos / Odeia</span><span>${gostos}</span></div>
+                <div class="modal-row"><span class="modal-label">Medos</span><span>${medos}</span></div>
+                <div class="modal-row"><span class="modal-label">Personalidade</span><span>${personalidade}</span></div>
             `;
+
+            if (Array.isArray(formulario.respostas) && formulario.respostas.length > 0) {
+                detalhes += `<div class="modal-row modal-row-titulo"><span class="modal-label">Respostas adicionais</span><span></span></div>`;
+                formulario.respostas.forEach(item => {
+                    detalhes += `
+                        <div class="modal-row">
+                            <span class="modal-label">${item.pergunta}</span>
+                            <span>${item.resposta}</span>
+                        </div>
+                    `;
+                });
+            }
 
             document.getElementById('modal-formulario-conteudo').innerHTML = detalhes;
             document.getElementById('modal-formulario').classList.add('modal-aberto');
@@ -887,13 +916,15 @@
 
             try {
                 if (supabase) {
-                    await supabase.auth.signOut();
+                    const { error } = await supabase.auth.signOut();
+                    if (error) {
+                        console.error('Erro ao deslogar:', error);
+                    }
                 }
             } catch (err) {
                 console.error('Erro ao deslogar:', err);
             }
 
-            localStorage.removeItem(adminAccessKey);
             window.location.href = "index.html";
         };
     </script>

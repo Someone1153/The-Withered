@@ -69,9 +69,9 @@
 
                 const isAdmin = discordCandidates.some(id => admins.includes(id));
                 if (!isAdmin) {
-                    const container = document.getElementById('grid-formularios');
-                    container.innerHTML = '<p class="admin-error">Acesso Negado! Você não possui permissão administrativa.</p>';
+                    alert("Acesso negado. Você não possui permissão administrativa.");
                     console.warn('Acesso admin negado para IDs:', discordCandidates);
+                    window.location.href = "index.html";
                     return;
                 }
 
@@ -80,6 +80,23 @@
                 console.error("Erro ao verificar permissões:", err);
                 window.location.href = "index.html";
             }
+        };
+
+        window.fazerLogout = async function(event) {
+            if (event && event.preventDefault) {
+                event.preventDefault();
+            }
+
+            try {
+                const { error } = await supabaseClient.auth.signOut();
+                if (error) {
+                    console.error('Erro ao deslogar:', error);
+                }
+            } catch (err) {
+                console.error('Erro ao deslogar:', err);
+            }
+
+            window.location.href = 'index.html';
         };
 
         async function carregarFormularios() {
