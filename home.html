@@ -180,6 +180,28 @@
             };
         }
 
+        function formatValueForDisplay(val) {
+            if (val === undefined || val === null) return '-';
+            if (typeof val === 'string') {
+                const s = val.trim();
+                if (s === '' || s.toLowerCase() === 'null') return '-';
+                return s;
+            }
+            if (Array.isArray(val)) {
+                if (val.length === 0) return '-';
+                return val.map(v => (v === null || v === undefined) ? '-' : String(v)).join(' • ');
+            }
+            if (typeof val === 'object') {
+                try {
+                    // If object has meaningful text fields, try to stringify nicely
+                    return JSON.stringify(val);
+                } catch (e) {
+                    return '-';
+                }
+            }
+            return String(val);
+        }
+
         // ==========================================
         // CARREGAR SUPABASE VIA ESM
         // ==========================================
@@ -709,6 +731,9 @@
                     })
                     : [];
 
+                console.debug('carregarStatusFormulario - registrosUsuario (raw):', registrosUsuario);
+                console.debug('carregarStatusFormulario - localHistorico (raw):', localHistorico);
+
                 // Try to merge DB records with local history to fill missing fields
                 const mergedRecords = registrosUsuario.map(registro => {
                     const match = localHistorico.find(h => (
@@ -719,10 +744,12 @@
                     if (match) {
                         // prefer DB values but fill missing ones from local raw payload
                         const source = match.raw_payload || match;
-                        return Object.assign({}, source, registro);
+                        return Object.assign({}, registro, source, registro);
                     }
                     return registro;
                 });
+
+                console.debug('carregarStatusFormulario - mergedRecords:', mergedRecords);
 
                 if (mergedRecords.length > 0) {
                     renderFormularios(mergedRecords);
@@ -776,11 +803,11 @@
 
             fieldsOrder.forEach(f => {
                 let val = formulario[f.key];
-                if (f.key === 'preferencias_jogo') {
-                    val = Array.isArray(val) ? val.join(' • ') : (val || '-');
+                if (f.key === 'preferencias_jogo' && Array.isArray(val)) {
+                    // keep as array for formatValueForDisplay
                 }
-                if (val === undefined || val === null || val === '') val = '-';
-                detalhes += `<div class="modal-row"><strong>${f.label}</strong><div>${val}</div></div>`;
+                const disp = formatValueForDisplay(val);
+                detalhes += `<div class="modal-row"><strong>${f.label}</strong><div>${disp}</div></div>`;
             });
 
             if (Array.isArray(formulario.respostas) && formulario.respostas.length > 0) {

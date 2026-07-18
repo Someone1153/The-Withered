@@ -149,11 +149,26 @@
             html += `<div class="modal-row"><strong>Status</strong><div>${form.status || '-'}</div></div>`;
             html += `<div class="modal-row"><strong>Enviado em</strong><div>${form.created_at ? new Date(form.created_at).toLocaleString('pt-BR') : '-'}</div></div>`;
 
+            function formatValueForDisplayAdmin(val) {
+                if (val === undefined || val === null) return '-';
+                if (typeof val === 'string') {
+                    const s = val.trim();
+                    if (s === '' || s.toLowerCase() === 'null') return '-';
+                    return s;
+                }
+                if (Array.isArray(val)) {
+                    if (val.length === 0) return '-';
+                    return val.map(v => (v === null || v === undefined) ? '-' : String(v)).join(' • ');
+                }
+                if (typeof val === 'object') {
+                    try { return JSON.stringify(val); } catch (e) { return '-'; }
+                }
+                return String(val);
+            }
+
             fieldsOrder.forEach(f => {
-                let val = form[f.key];
-                if (f.key === 'preferencias_jogo') val = Array.isArray(val) ? val.join(' • ') : (val || '-');
-                if (val === undefined || val === null || val === '') val = '-';
-                html += `<div class="modal-row"><strong>${f.label}</strong><div>${val}</div></div>`;
+                const disp = formatValueForDisplayAdmin(form[f.key]);
+                html += `<div class="modal-row"><strong>${f.label}</strong><div>${disp}</div></div>`;
             });
 
             if (Array.isArray(form.respostas) && form.respostas.length > 0) {
