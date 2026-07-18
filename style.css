@@ -927,10 +927,13 @@ body {
 }
 
 .conteudo-painel.conteudo-perfil .caixa-conteudo {
-    max-width: 1000px;
+    max-width: 1400px; /* Aumentamos muito o limite para as colunas poderem esticar */
     width: 100%;
     height: auto;
-    padding: 40px;
+    padding: 20px;
+    background: none; /* REMOVE o fundo do quadradão */
+    border: none;     /* REMOVE qualquer borda que estivesse juntando elas */
+    box-shadow: none; /* REMOVE a sombra do quadradão anterior */
 }
 
 .status-badge {
@@ -1134,12 +1137,14 @@ body {
 
 /* Admin columns styling */
 .coluna-formularios {
-    background: rgba(20,20,25,0.6);
-    border: 1px solid rgba(255,255,255,0.04);
-    padding: 14px;
-    border-radius: 12px;
-    max-height: 78vh;
-    overflow: auto;
+    background: rgba(20, 20, 25, 0.85); /* Mantém o fundo escuro individual de cada coluna */
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 24px;                      /* Mais espaço interno para não colar nos textos */
+    border-radius: 24px;                /* Borda arredondada bonita e moderna */
+    max-height: 80vh;
+    overflow-y: auto;
+    width: 100%;                        /* Força a coluna a usar todo o espaço que o Grid der a ela */
+    box-sizing: border-box;
 }
 
 .coluna-formularios h3 {
@@ -1151,16 +1156,17 @@ body {
 .admin-compact-row:hover { background: rgba(255,255,255,0.02); }
 
 .admin-compact-row {
-    min-height: 42px;
+    min-height: 48px;
     display: flex;
     align-items: center;
     gap: 14px;
-    padding: 8px 10px;
-    font-size: 0.92rem;
-    line-height: 1.3;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.02);
+    margin-bottom: 8px; /* Dá uma distância entre um formulário e outro na lista */
+    white-space: normal; /* Permite que o texto se ajuste se a tela diminuir */
 }
 
 .admin-compact-row div {
