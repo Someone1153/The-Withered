@@ -672,22 +672,49 @@ body {
 }
 
 .card-formulario-usuario {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 14px;
-    padding: 18px;
-    min-height: 120px;
+    background: linear-gradient(180deg, rgba(30, 30, 40, 0.95) 0%, rgba(20, 20, 30, 0.95) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 18px;
+    padding: 20px 20px 18px;
+    min-height: 140px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    gap: 14px;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.18);
 }
 
 .card-topo {
     display: flex;
     justify-content: space-between;
-    gap: 12px;
+    gap: 16px;
     align-items: flex-start;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
+}
+
+.card-topo > div {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.card-tipo {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 0.4px;
+}
+
+.card-data {
+    color: #adb4c6;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.card-resumo {
+    color: #d1d5db;
+    font-size: 0.94rem;
+    line-height: 1.6;
 }
 
 .card-tipo {

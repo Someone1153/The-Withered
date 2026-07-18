@@ -634,11 +634,15 @@
                     return `
                         <div class="card-formulario-usuario">
                             <div class="card-topo">
-                                <span class="card-tipo">${tipo}</span>
+                                <div>
+                                    <span class="card-tipo">${tipo}</span>
+                                    <p class="card-data">${data}</p>
+                                </div>
                                 <span class="card-status ${getStatusClass(status)}">${status}</span>
                             </div>
-                            <p class="card-data">${data}</p>
-                            <p class="card-resumo"><strong>Preferências:</strong> ${preferencias}</p>
+                            <div class="card-resumo">
+                                <p><strong>Preferências:</strong> ${preferencias}</p>
+                            </div>
                         </div>
                     `;
                 }).join('');

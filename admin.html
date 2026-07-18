@@ -37,6 +37,31 @@
         
         const admins = ["780382546542198816"];
 
+        function getDiscordCandidates(session) {
+            const user = session?.user;
+            if (!user) return [];
+
+            const candidates = new Set();
+            if (user.user_metadata?.provider_id) candidates.add(user.user_metadata.provider_id);
+            if (user.user_metadata?.sub) candidates.add(user.user_metadata.sub);
+            if (user.id) candidates.add(user.id);
+
+            if (Array.isArray(user.identities)) {
+                user.identities.forEach(identity => {
+                    if (identity?.provider === 'discord' && identity?.identity_data?.id) {
+                        candidates.add(identity.identity_data.id);
+                    }
+                    if (identity?.identity_data) {
+                        Object.values(identity.identity_data).forEach(value => {
+                            if (typeof value === 'string') candidates.add(value);
+                        });
+                    }
+                });
+            }
+
+            return Array.from(candidates).filter(Boolean);
+        }
+
         window.onload = async function() {
             try {
                 const { data: { session } } = await supabaseClient.auth.getSession();
@@ -47,15 +72,16 @@
                     return;
                 }
 
-                const discord_id = session.user.user_metadata.provider_id;
-                
-                // Verifica se o usuário é admin
-                if (!admins.includes(discord_id)) {
+                const discordCandidates = getDiscordCandidates(session);
+                console.log('IDs detectados para admin:', discordCandidates);
+
+                const isAdmin = discordCandidates.some(id => admins.includes(id));
+                if (!isAdmin) {
                     alert("Acesso Negado! Você não é administrador.");
                     window.location.href = "home.html";
                     return;
                 }
-                
+
                 await carregarFormularios();
             } catch (err) {
                 console.error("Erro ao verificar permissões:", err);
