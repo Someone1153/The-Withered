@@ -778,9 +778,9 @@ body {
     max-width: 920px;
     background: rgba(15, 18, 30, 0.98);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 20px;
+    border-radius: 40px;
     padding: 28px 28px 22px;
-    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0);
     color: #e5e7eb;
     position: relative;
     max-height: 90vh;
@@ -789,8 +789,8 @@ body {
 
 .modal-fechar-btn {
     position: absolute;
-    top: 16px;
-    right: 16px;
+    top: 24px;
+    right: 23px;
     width: 38px;
     height: 38px;
     border: none;
@@ -802,18 +802,18 @@ body {
 }
 
 .modal-titulo {
-    margin: 0 0 20px;
+    margin: 1 0 20px;
     color: #ffffff;
     font-size: 1.35rem;
 }
 
 .modal-formulario-conteudo {
     display: grid;
-    gap: 10px;
+    gap: 16px;
 }
 
 .admin-modal-conteudo .modal-formulario-conteudo {
-    gap: 8px;
+    gap: 5px;
 }
 
 .modal-row {
