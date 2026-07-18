@@ -1215,29 +1215,62 @@ body {
 
 /* 1. Força a caixa a se encerrar logo após os botões (sem aquele vazio gigante) */
 #caixa-principal-formularios {
-    height: 520px !important;
-    min-height: 520px !important;
-    max-height: 520px !important;
-   display: flex !important;
+    width: 100% !important;
+    max-width: 650px !important;     /* Aumentamos a largura para dar mais presença */
+    height: 580px !important;        /* Altura proporcional recalibrada */
+    min-height: 580px !important;
+    max-height: 580px !important;
+    
+    /* Centralização Absoluta (Horizontal e Vertical) */
+    margin: 40px auto !important;    /* Centraliza na horizontal e desgruda do topo */
+    display: flex !important;
     flex-direction: column !important;
-    justify-content: center !important; /* Centraliza o conteúdo verticalmente para ficar simétrico */
-    padding: 40px !important;
+    justify-content: center !important; /* Centraliza o conteúdo verticalmente */
+    align-items: center !important;     /* Centraliza o conteúdo horizontalmente */
+    
+    padding: 45px !important;
     box-sizing: border-box;
 }
 
-/* 2. Deixa os botões maiores, mais imponentes e bem espaçados */
-#tela-selecao .btn-tipo-form {
-    font-size: 1.15rem !important;        /* Texto maior e mais legível */
-    font-weight: 600 !important;
-    padding: 18px 24px !important;        /* Botões mais encorpados e fáceis de clicar */
-    margin-bottom: 16px !important;       /* Distância ideal entre eles */
-    width: 100% !important;               /* Garante que preencham a largura corretamente */
-    transition: all 0.2s ease-in-out !important; /* Animação suave ao passar o mouse */
+/* 2. Centraliza e amplia os textos do cabeçalho */
+#tela-selecao {
+    width: 100% !important;
+    text-align: center !important;
 }
 
-/* 3. Feedback visual moderno quando o usuário passa o mouse */
+#tela-selecao .subtitulo-painel {
+    font-size: 1.75rem !important;   /* Título maior */
+    margin-bottom: 10px !important;
+}
+
+#tela-selecao .instrucao-painel {
+    font-size: 1.05rem !important;   /* Subtítulo maior */
+    margin-bottom: 35px !important;  /* Mais espaço antes dos botões */
+}
+
+/* 3. Container dos botões ocupando a largura interna correta */
+#tela-selecao .botoes-formularios {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+}
+
+/* 4. Botões maiores, mais robustos e imponentes */
+#tela-selecao .btn-tipo-form {
+    font-size: 1.25rem !important;        /* Texto do botão maior e com mais destaque */
+    font-weight: 600 !important;
+    padding: 20px 28px !important;        /* Botões mais altos e largos */
+    margin-bottom: 18px !important;       /* Espaçamento proporcional entre eles */
+    width: 100% !important;               /* Preenche toda a largura da nova caixa expandida */
+    max-width: 520px !important;          /* Limita a largura do botão para ficar elegante */
+    border-radius: 16px !important;       /* Bordas um pouco mais arredondadas acompanhando o tamanho */
+    transition: all 0.2s ease-in-out !important;
+}
+
+/* Efeito Hover mantido e calibrado */
 #tela-selecao .btn-tipo-form:hover {
-    background: rgba(26, 115, 232, 0.12) !important; /* Leve fundo azulado */
-    border-color: #1a73e8 !important;                  /* Borda azul do Gemini acesa */
-    transform: translateY(-1px);                       /* Leve efeito de elevação */
+    background: rgba(26, 115, 232, 0.12) !important;
+    border-color: #1a73e8 !important;
+    transform: translateY(-2px);          /* Efeito de elevação levemente mais nítido */
 }
