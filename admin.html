@@ -52,6 +52,33 @@
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const admins = ["780382546542198816"];
 
+        function formatDateTime(v) {
+            if (!v) return '-';
+            try {
+                const d = new Date(v);
+                if (!isNaN(d.getTime())) {
+                    const pad = n => String(n).padStart(2, '0');
+                    const day = pad(d.getDate());
+                    const month = pad(d.getMonth() + 1);
+                    const year = d.getFullYear();
+                    const hours = pad(d.getHours());
+                    const minutes = pad(d.getMinutes());
+                    return `${day}/${month}/${year} ${hours}:${minutes}`;
+                }
+            } catch (e) {}
+            // Fallback: try to extract from common pt-BR string
+            const m = String(v).match(/(\d{1,2})\D(\d{1,2})\D(\d{2,4}).*(\d{1,2}):(\d{2})/);
+            if (m) {
+                const day = String(m[1]).padStart(2, '0');
+                const month = String(m[2]).padStart(2, '0');
+                const year = m[3].length === 2 ? ('20' + m[3]) : m[3];
+                const hours = String(m[4]).padStart(2, '0');
+                const minutes = String(m[5]).padStart(2, '0');
+                return `${day}/${month}/${year} ${hours}:${minutes}`;
+            }
+            return String(v);
+        }
+
         function getDiscordCandidates(session) {
             const user = session?.user;
             if (!user) return [];
@@ -149,7 +176,8 @@
             let html = '';
             html += `<div class="modal-row"><strong>Tipo</strong><div>${form.tipo || '-'}</div></div>`;
             html += `<div class="modal-row"><strong>Status</strong><div>${form.status || '-'}</div></div>`;
-            html += `<div class="modal-row"><strong>Enviado em</strong><div>${form.created_at ? new Date(form.created_at).toLocaleString('pt-BR') : '-'}</div></div>`;
+            const formattedCreated = formatDateTime(form.created_at || form.enviadoEm);
+            html += `<div class="modal-row"><strong>Enviado em</strong><div>${formattedCreated}</div></div>`;
 
             function getRespostaAdmin(formulario, key) {
                 const directValue = formulario[key] ?? formulario.raw_payload?.[key];
@@ -263,7 +291,7 @@
                 container.innerHTML = '';
                 items.forEach((form, idx) => {
                     const numero = idx + 1;
-                    const dataEnvio = form.created_at ? new Date(form.created_at).toLocaleString('pt-BR') : 'Data não informada';
+                    const dataEnvio = formatDateTime(form.created_at || form.enviadoEm) || 'Data não informada';
                     const nome = form.nome_apelido || form.tag || 'Sem nome';
 
                     const row = document.createElement('div');
