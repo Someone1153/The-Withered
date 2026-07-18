@@ -149,6 +149,30 @@
             html += `<div class="modal-row"><strong>Status</strong><div>${form.status || '-'}</div></div>`;
             html += `<div class="modal-row"><strong>Enviado em</strong><div>${form.created_at ? new Date(form.created_at).toLocaleString('pt-BR') : '-'}</div></div>`;
 
+            function getRespostaAdmin(formulario, key) {
+                const directValue = formulario[key] ?? formulario.raw_payload?.[key];
+                if (directValue !== undefined && directValue !== null && directValue !== '') {
+                    return directValue;
+                }
+
+                if (Array.isArray(formulario.respostas)) {
+                    const item = formulario.respostas.find(r => {
+                        const pergunta = (r.pergunta || '').trim().toLowerCase();
+                        return pergunta.includes(key.replace(/_/g, ' '))
+                            || key.replace(/_/g, ' ').includes(pergunta)
+                            || (pergunta.includes('por que') && key === 'por_que_aprovar')
+                            || (pergunta.includes('regra') && key === 'regra_mais_importante')
+                            || (pergunta.includes('pronomes') && key === 'pronomes')
+                            || (pergunta.includes('disponibilidade') && key === 'disponibilidade_horarios');
+                    });
+                    if (item) {
+                        return item.resposta ?? item.answer ?? item.value ?? directValue;
+                    }
+                }
+
+                return directValue;
+            }
+
             function formatValueForDisplayAdmin(val) {
                 if (val === undefined || val === null) return '-';
                 if (typeof val === 'string') {
@@ -167,7 +191,8 @@
             }
 
             fieldsOrder.forEach(f => {
-                const disp = formatValueForDisplayAdmin(form[f.key]);
+                const value = getRespostaAdmin(form, f.key);
+                const disp = formatValueForDisplayAdmin(value);
                 html += `<div class="modal-row"><strong>${f.label}</strong><div>${disp}</div></div>`;
             });
 

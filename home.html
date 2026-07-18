@@ -687,9 +687,10 @@
                 lista.innerHTML = formularios.map((formulario, index) => {
                     const tipo = formulario.tipo || 'Players';
                     const status = formulario.status || 'Em análise';
-                    const preferencias = Array.isArray(formulario.preferencias_jogo)
-                        ? formulario.preferencias_jogo.join(' • ')
-                        : formulario.preferencias_jogo || 'Sem preferência definida';
+                    const preferenciasRaw = getRespostaParaCampo(formulario, 'preferencias_jogo');
+                    const preferencias = Array.isArray(preferenciasRaw)
+                        ? preferenciasRaw.join(' • ')
+                        : preferenciasRaw || 'Sem preferência definida';
                     const data = formulario.created_at || formulario.enviadoEm || 'Data não informada';
 
                     return `
@@ -734,7 +735,6 @@
                 console.debug('carregarStatusFormulario - registrosUsuario (raw):', registrosUsuario);
                 console.debug('carregarStatusFormulario - localHistorico (raw):', localHistorico);
 
-                // Try to merge DB records with local history to fill missing fields
                 const mergedRecords = registrosUsuario.map(registro => {
                     const match = localHistorico.find(h => (
                         (h.created_at && registro.created_at && h.created_at === registro.created_at) ||
@@ -742,7 +742,6 @@
                         (h.raw_payload && h.raw_payload.nome_apelido && registro.nome_apelido && h.raw_payload.nome_apelido === registro.nome_apelido)
                     ));
                     if (match) {
-                        // prefer DB values but fill missing ones from local raw payload
                         const source = match.raw_payload || match;
                         return Object.assign({}, registro, source, registro);
                     }
@@ -766,6 +765,30 @@
                 console.error('Erro inesperado ao carregar formulários:', err);
                 renderVazio();
             }
+        }
+
+        function getRespostaParaCampo(formulario, key) {
+            const directValue = formulario[key] ?? formulario.raw_payload?.[key];
+            if (directValue !== undefined && directValue !== null && directValue !== '') {
+                return directValue;
+            }
+
+            if (Array.isArray(formulario.respostas)) {
+                const item = formulario.respostas.find(r => {
+                    const pergunta = (r.pergunta || '').trim().toLowerCase();
+                    return pergunta.includes(key.replace(/_/g, ' '))
+                        || key.replace(/_/g, ' ').includes(pergunta)
+                        || (pergunta.includes('por que') && key === 'por_que_aprovar')
+                        || (pergunta.includes('regra') && key === 'regra_mais_importante')
+                        || (pergunta.includes('pronomes') && key === 'pronomes')
+                        || (pergunta.includes('disponibilidade') && key === 'disponibilidade_horarios');
+                });
+                if (item) {
+                    return item.resposta ?? item.answer ?? item.value ?? directValue;
+                }
+            }
+
+            return directValue;
         }
 
         window.verFormulario = function(index) {
@@ -802,7 +825,7 @@
             detalhes += `<div class="modal-row"><strong>Enviado em</strong><div>${data}</div></div>`;
 
             fieldsOrder.forEach(f => {
-                let val = formulario[f.key];
+                let val = getRespostaParaCampo(formulario, f.key);
                 if (f.key === 'preferencias_jogo' && Array.isArray(val)) {
                     // keep as array for formatValueForDisplay
                 }
