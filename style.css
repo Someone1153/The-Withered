@@ -751,6 +751,7 @@ body {
 
 .modal-formulario.modal-aberto {
     display: flex;
+    overflow: hidden;
 }
 
 .modal-conteudo-formulario {
@@ -804,7 +805,11 @@ body {
 
 .modal-formulario-conteudo {
     display: grid;
-    gap: 14px;
+    gap: 12px;
+}
+
+.admin-modal-conteudo .modal-formulario-conteudo {
+    gap: 10px;
 }
 
 .modal-row {
@@ -815,6 +820,11 @@ body {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 12px;
+}
+
+.admin-modal-conteudo .modal-row {
+    gap: 6px;
+    padding: 10px 12px;
 }
 
 .modal-back-btn {
@@ -833,9 +843,9 @@ body {
 
 /* Close button fixed outside scrollable content so it's always reachable */
 .modal-close-outside {
-    position: absolute;
-    right: 22px;
-    top: 8px;
+    position: fixed;
+    top: 18px;
+    right: 18px;
     width: 52px;
     height: 52px;
     border: none;
