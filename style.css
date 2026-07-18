@@ -857,20 +857,27 @@ body {
 
 /* Close button fixed outside scrollable content so it's always reachable */
 .modal-close-outside {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 10001;
-    width: 52px;
-    height: 52px;
+    position: fixed; /* Fixa o botão na tela, ele não sai do lugar se você rolar a página */
+    top: 24px;       /* Distância do topo da tela */
+    right: 24px;     /* Distância do canto direito da tela */
+    z-index: 99999;  /* Altera a camada para o valor máximo, garantindo que ele fique ACIMA de qualquer fundo */
+    width: 50px;
+    height: 50px;
     border: none;
     border-radius: 50%;
-    background: rgba(255,255,255,0.18);
-    color: #fff;
-    font-size: 1.4rem;
+    background: rgba(255, 255, 255, 0.2); /* Fundo sutil para sabermos onde clicar */
+    color: #ffffff;
+    font-size: 1.8rem;
     cursor: pointer;
-    pointer-events: auto;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.modal-close-outside:hover {
+    background: rgba(255, 255, 255, 0.35);
+    transform: scale(1.05); /* Dá um leve zoom no botão */
 }
 
 .modal-label {
