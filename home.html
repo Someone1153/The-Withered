@@ -665,7 +665,7 @@
                 const personagem_personalidade = document.getElementById('personagem_personalidade')?.value.trim();
 
                 const preferenciaCheckboxes = Array.from(document.querySelectorAll('input[name="preferencias_jogo"]:checked'));
-                const preferencias_jogo = preferenciaCheckboxes.map(checkbox => checkbox.value).join(' | ');
+                const preferencias_jogo = preferenciaCheckboxes.map(checkbox => checkbox.value);
 
                 const payload = {
                     nome_apelido,
