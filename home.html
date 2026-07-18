@@ -18,7 +18,7 @@
                 <a href="#" id="menu-perfil" class="item-menu" onclick="alternarAbas('perfil')">Perfil</a>
                 <a href="#" id="menu-form" class="item-menu ativo" onclick="alternarAbas('formularios')">Formulários</a>
                 <a href="#" id="menu-staff" class="item-menu" onclick="alternarAbas('staff')">Conheça a Staff</a>
-                <a href="#" class="item-menu item-menu-sair" onclick="fazerLogout()">Sair</a>
+                <a href="javascript:void(0)" class="item-menu item-menu-sair" onclick="fazerLogout(event)">Sair</a>
             </nav>
         </aside>
 
@@ -131,6 +131,14 @@
 
     </div>
 
+    <div id="modal-formulario" class="modal-formulario">
+        <div class="modal-conteudo-formulario">
+            <button type="button" class="modal-fechar-btn" onclick="fecharModalFormulario()">×</button>
+            <h3 class="modal-titulo">Visualizar formulário</h3>
+            <div id="modal-formulario-conteudo" class="modal-formulario-conteudo"></div>
+        </div>
+    </div>
+
     <script type="module">
         console.log("🚀 Iniciando home.html");
 
@@ -142,8 +150,36 @@
         let supabase = null;
 
         const listaAdmins = ['780382546542198816'];
+        const adminAccessKey = 'theWitheredAdminAccess';
         let usuarioAtual = null;
         let submissaoEfetuada = false;
+        let formulariosExibidos = [];
+
+        function extrairDiscordInfo(user) {
+            if (!user) return { discord_id: null, display_name: null };
+
+            const discordIdentity = (Array.isArray(user.identities)
+                ? user.identities.find(identity => identity?.provider === 'discord')
+                : null);
+
+            const discordId = discordIdentity?.identity_data?.id
+                || user.user_metadata?.provider_id
+                || user.user_metadata?.sub
+                || user.id;
+
+            const username = discordIdentity?.identity_data?.user_name
+                || discordIdentity?.identity_data?.username
+                || user.user_metadata?.nickname
+                || user.user_metadata?.full_name
+                || user.user_metadata?.name
+                || user.email
+                || 'Usuário';
+
+            return {
+                discord_id: discordId,
+                display_name: username
+            };
+        }
 
         // ==========================================
         // CARREGAR SUPABASE VIA ESM
@@ -187,12 +223,13 @@
 
                 // Carrega dados do usuário
                 const user = session.user;
+                const discordInfo = extrairDiscordInfo(user);
                 usuarioAtual = {
-                    id: user.id, 
-                    discord_id: user.user_metadata.provider_id, 
-                    nome: user.user_metadata.full_name || user.user_metadata.name || "Usuário",
-                    tag: "@" + (user.user_metadata.custom_claims?.global_name || user.user_metadata.name || user.email),
-                    avatar: user.user_metadata.avatar_url || "https://cdn.discordapp.com/embed/avatars/0.png"
+                    id: user.id,
+                    discord_id: discordInfo.discord_id,
+                    nome: discordInfo.display_name || "Usuário",
+                    tag: "@" + (discordInfo.display_name || user.email || 'usuario'),
+                    avatar: user.user_metadata?.avatar_url || "https://cdn.discordapp.com/embed/avatars/0.png"
                 };
 
                 console.log("✓ Usuário logado:", usuarioAtual);
@@ -213,12 +250,14 @@
                     nav.insertBefore(linkAdmin, botaoSair);
                 }
 
-                if (!listaAdmins.includes(usuarioAtual.discord_id)) {
-                    linkAdmin.style.display = "none";
-                    linkAdmin.style.pointerEvents = "none";
+                linkAdmin.style.display = "block";
+                linkAdmin.style.pointerEvents = "auto";
+                linkAdmin.title = "Abrir painel administrativo";
+
+                if (listaAdmins.includes(usuarioAtual.discord_id)) {
+                    localStorage.setItem(adminAccessKey, 'true');
                 } else {
-                    linkAdmin.style.display = "block";
-                    linkAdmin.style.pointerEvents = "auto";
+                    localStorage.removeItem(adminAccessKey);
                 }
 
             } catch (err) {
@@ -617,13 +656,14 @@
             };
 
             const renderFormularios = (formularios) => {
+                formulariosExibidos = formularios;
                 const envio = formularios[0];
                 badge.textContent = envio.status || 'Em análise';
                 badge.className = `status-badge ${getStatusClass(envio.status || 'Em análise')}`;
                 const dataEnvio = envio.created_at || envio.enviadoEm || '';
                 resumo.textContent = dataEnvio ? `Último envio: ${dataEnvio}` : '';
 
-                lista.innerHTML = formularios.map(formulario => {
+                lista.innerHTML = formularios.map((formulario, index) => {
                     const tipo = formulario.tipo || 'Players';
                     const status = formulario.status || 'Em análise';
                     const preferencias = Array.isArray(formulario.preferencias_jogo)
@@ -642,6 +682,9 @@
                             </div>
                             <div class="card-resumo">
                                 <p><strong>Preferências:</strong> ${preferencias}</p>
+                            </div>
+                            <div class="card-actions">
+                                <button type="button" class="card-visualizar-btn" onclick="verFormulario(${index})">Ver formulário</button>
                             </div>
                         </div>
                     `;
@@ -683,6 +726,47 @@
                 renderVazio();
             }
         }
+
+        window.verFormulario = function(index) {
+            const formulario = formulariosExibidos[index];
+            if (!formulario) return;
+
+            const preferencias = Array.isArray(formulario.preferencias_jogo)
+                ? formulario.preferencias_jogo.join(' • ')
+                : formulario.preferencias_jogo || 'Sem preferência definida';
+
+            const data = formulario.created_at || formulario.enviadoEm || 'Data não informada';
+            const tipo = formulario.tipo || 'Players';
+            const status = formulario.status || 'Em análise';
+
+            const detalhes = `
+                <div class="modal-row">
+                    <span class="modal-label">Tipo</span>
+                    <span>${tipo}</span>
+                </div>
+                <div class="modal-row">
+                    <span class="modal-label">Status</span>
+                    <span>${status}</span>
+                </div>
+                <div class="modal-row">
+                    <span class="modal-label">Enviado em</span>
+                    <span>${data}</span>
+                </div>
+                <div class="modal-row">
+                    <span class="modal-label">Preferências</span>
+                    <span>${preferencias}</span>
+                </div>
+            `;
+
+            document.getElementById('modal-formulario-conteudo').innerHTML = detalhes;
+            document.getElementById('modal-formulario').classList.add('modal-aberto');
+        };
+
+        window.fecharModalFormulario = function() {
+            const modal = document.getElementById('modal-formulario');
+            if (!modal) return;
+            modal.classList.remove('modal-aberto');
+        };
 
         // FUNÇÃO PARA ENVIAR FORMULÁRIO
         window.enviarFormulario = async function(event) {
@@ -796,10 +880,20 @@
         };
 
         // LOGOUT LIMPENDO OS DADOS
-        window.fazerLogout = async function() {
-            if (supabase) {
-                await supabase.auth.signOut();
+        window.fazerLogout = async function(event) {
+            if (event && event.preventDefault) {
+                event.preventDefault();
             }
+
+            try {
+                if (supabase) {
+                    await supabase.auth.signOut();
+                }
+            } catch (err) {
+                console.error('Erro ao deslogar:', err);
+            }
+
+            localStorage.removeItem(adminAccessKey);
             window.location.href = "index.html";
         };
     </script>

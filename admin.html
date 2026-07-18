@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>Admin - The Withered</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="corpo-painel">
     <div class="container-painel">
@@ -22,19 +21,12 @@
         </main>
     </div>
 
-    <script>
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.2/+esm';
+
         const SUPABASE_URL = "https://zkdfzxlwpedhoblrsjdr.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_XrlHqqACgEz_OqAHyVIVag_wC55nwsB";
-        let supabaseClient;
-
-        if (typeof window.supabase !== 'undefined') {
-            supabaseClient = window.supabase;
-        } else if (typeof Supabase !== 'undefined') {
-            supabaseClient = window.supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        } else {
-            throw new Error('Supabase não foi carregado corretamente');
-        }
-        
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const admins = ["780382546542198816"];
 
         function getDiscordCandidates(session) {
@@ -77,8 +69,9 @@
 
                 const isAdmin = discordCandidates.some(id => admins.includes(id));
                 if (!isAdmin) {
-                    alert("Acesso Negado! Você não é administrador.");
-                    window.location.href = "home.html";
+                    const container = document.getElementById('grid-formularios');
+                    container.innerHTML = '<p class="admin-error">Acesso Negado! Você não possui permissão administrativa.</p>';
+                    console.warn('Acesso admin negado para IDs:', discordCandidates);
                     return;
                 }
 
