@@ -25,10 +25,15 @@
     <script>
         const SUPABASE_URL = "https://zkdfzxlwpedhoblrsjdr.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_XrlHqqACgEz_OqAHyVIVag_wC55nwsB";
-        if (typeof window.supabase === 'undefined') {
-            window.supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let supabaseClient;
+
+        if (typeof window.supabase !== 'undefined') {
+            supabaseClient = window.supabase;
+        } else if (typeof Supabase !== 'undefined') {
+            supabaseClient = window.supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } else {
+            throw new Error('Supabase não foi carregado corretamente');
         }
-        const supabaseClient = window.supabase;
         
         const admins = ["780382546542198816"];
 

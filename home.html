@@ -651,30 +651,26 @@
 
                 if (error) {
                     console.error('Erro ao buscar formulário no Supabase:', error);
-                    renderVazio();
-                    return;
-                }
-
-                if (!data || data.length === 0) {
-                    renderVazio();
-                    return;
                 }
 
                 const chave = `formulariosUsuario:${usuario?.id || usuario?.discord_id || 'anon'}`;
                 const localHistorico = JSON.parse(localStorage.getItem(chave) || '[]');
-                const ultimoLocal = localHistorico.length > 0 ? localHistorico[localHistorico.length - 1] : null;
 
-                if (ultimoLocal) {
-                    const encontrados = data.filter(registro => {
-                        return registro.nome_apelido === ultimoLocal.nome_apelido
-                            && registro.idade_data_nascimento === ultimoLocal.idade_data_nascimento
-                            && (registro.meio_divulgacao || '') === (ultimoLocal.meio_divulgacao || '');
-                    });
+                const registrosUsuario = Array.isArray(data)
+                    ? data.filter(registro => {
+                        return registro.user_id === usuario?.id
+                            || registro.discord_id === usuario?.discord_id;
+                    })
+                    : [];
 
-                    if (encontrados.length > 0) {
-                        renderFormularios(encontrados);
-                        return;
-                    }
+                if (registrosUsuario.length > 0) {
+                    renderFormularios(registrosUsuario);
+                    return;
+                }
+
+                if (localHistorico.length > 0) {
+                    renderFormularios(localHistorico.slice().reverse());
+                    return;
                 }
 
                 renderVazio();
@@ -716,6 +712,8 @@
                 const preferencias_jogo = preferenciaCheckboxes.map(checkbox => checkbox.value);
 
                 const payload = {
+                    user_id: usuarioAtual?.id,
+                    discord_id: usuarioAtual?.discord_id,
                     nome_apelido,
                     pronomes,
                     idade_data_nascimento,
@@ -740,6 +738,20 @@
                     mostrarMensagemEnvio('error', 'Falha ao enviar o formulário. Tente novamente em alguns instantes.');
                     return;
                 }
+
+                const chave = `formulariosUsuario:${usuarioAtual?.id || usuarioAtual?.discord_id || 'anon'}`;
+                const historico = JSON.parse(localStorage.getItem(chave) || '[]');
+                historico.push({
+                    tipo: 'Players',
+                    status: 'Em análise',
+                    nome_apelido,
+                    idade_data_nascimento,
+                    meio_divulgacao,
+                    preferencias_jogo,
+                    enviadoEm: new Date().toLocaleString('pt-BR'),
+                    created_at: new Date().toISOString()
+                });
+                localStorage.setItem(chave, JSON.stringify(historico));
 
                 form.reset();
                 mostrarMensagemEnvio('success', 'Formulário enviado com sucesso! Seus dados foram salvos.');
