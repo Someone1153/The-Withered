@@ -1215,10 +1215,14 @@ body {
 
 /* 1. Força a caixa a se encerrar logo após os botões (sem aquele vazio gigante) */
 #caixa-principal-formularios {
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    padding-bottom: 35px !important; /* Espaço elegante de respiro no final */
+    height: 520px !important;
+    min-height: 520px !important;
+    max-height: 520px !important;
+   display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important; /* Centraliza o conteúdo verticalmente para ficar simétrico */
+    padding: 40px !important;
+    box-sizing: border-box;
 }
 
 /* 2. Deixa os botões maiores, mais imponentes e bem espaçados */
