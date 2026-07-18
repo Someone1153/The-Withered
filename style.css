@@ -834,17 +834,18 @@ body {
 /* Close button fixed outside scrollable content so it's always reachable */
 .modal-close-outside {
     position: absolute;
-    right: 18px;
-    top: 18px;
-    width: 40px;
-    height: 40px;
+    right: 22px;
+    top: 8px;
+    width: 52px;
+    height: 52px;
     border: none;
-    border-radius: 10px;
-    background: rgba(255,255,255,0.04);
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
     color: #fff;
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     cursor: pointer;
-    z-index: 1100;
+    z-index: 1200;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.6);
 }
 
 .modal-label {

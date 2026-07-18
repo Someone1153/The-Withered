@@ -134,7 +134,6 @@
     <div id="modal-formulario" class="modal-formulario">
         <button type="button" class="modal-close-outside" onclick="fecharModalFormulario()">×</button>
         <div class="modal-conteudo-formulario">
-            <button type="button" class="modal-back-btn" onclick="fecharModalFormulario()">←</button>
             <h3 class="modal-titulo">Visualizar formulário</h3>
             <div id="modal-formulario-conteudo" class="modal-formulario-conteudo"></div>
         </div>
@@ -710,8 +709,23 @@
                     })
                     : [];
 
-                if (registrosUsuario.length > 0) {
-                    renderFormularios(registrosUsuario);
+                // Try to merge DB records with local history to fill missing fields
+                const mergedRecords = registrosUsuario.map(registro => {
+                    const match = localHistorico.find(h => (
+                        (h.created_at && registro.created_at && h.created_at === registro.created_at) ||
+                        (h.enviadoEm && registro.enviadoEm && h.enviadoEm === registro.enviadoEm) ||
+                        (h.raw_payload && h.raw_payload.nome_apelido && registro.nome_apelido && h.raw_payload.nome_apelido === registro.nome_apelido)
+                    ));
+                    if (match) {
+                        // prefer DB values but fill missing ones from local raw payload
+                        const source = match.raw_payload || match;
+                        return Object.assign({}, source, registro);
+                    }
+                    return registro;
+                });
+
+                if (mergedRecords.length > 0) {
+                    renderFormularios(mergedRecords);
                     return;
                 }
 
@@ -878,16 +892,15 @@
 
                 const chave = `formulariosUsuario:${usuarioAtual?.id || usuarioAtual?.discord_id || 'anon'}`;
                 const historico = JSON.parse(localStorage.getItem(chave) || '[]');
-                historico.push({
+                // save full payload locally to ensure we can display all fields even if DB stripped columns
+                const localItem = {
                     tipo: 'Players',
                     status: 'Em análise',
-                    nome_apelido,
-                    idade_data_nascimento,
-                    meio_divulgacao,
-                    preferencias_jogo,
                     enviadoEm: new Date().toLocaleString('pt-BR'),
-                    created_at: new Date().toISOString()
-                });
+                    created_at: new Date().toISOString(),
+                    raw_payload: payload
+                };
+                historico.push(localItem);
                 localStorage.setItem(chave, JSON.stringify(historico));
 
                 form.reset();
