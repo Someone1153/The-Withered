@@ -753,6 +753,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 0;
     overflow: hidden;
 }
 
@@ -762,11 +763,12 @@ body {
     background: rgba(15, 18, 30, 0.98);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 24px;
-    padding: 28px 28px 22px;
+    padding: 24px 24px 18px;
     box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
     color: #e5e7eb;
     position: relative;
-    max-height: 90vh;
+    height: calc(100vh - 40px);
+    max-height: calc(100vh - 40px);
     overflow-y: auto;
 }
 
