@@ -239,7 +239,7 @@
             modal.classList.add('modal-aberto');
         }
 
-        function fecharModalAdmin() {
+        window.fecharModalAdmin = function() {
             const modal = document.getElementById('modal-admin-form');
             if (!modal) return;
             modal.classList.remove('modal-aberto');
