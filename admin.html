@@ -48,25 +48,71 @@
                     return;
                 }
                 
-                carregarFormularios();
+                await carregarFormularios();
             } catch (err) {
                 console.error("Erro ao verificar permissões:", err);
                 window.location.href = "index.html";
             }
         };
 
-        function carregarFormularios() {
+        async function carregarFormularios() {
             const container = document.getElementById('grid-formularios');
-            const dados = JSON.parse(localStorage.getItem('bancoFormularios') || "[]");
-            
-            if (dados.length === 0) {
-                container.innerHTML = "<p>Nenhum formulário recebido ainda.</p>";
+            container.innerHTML = '<p class="admin-loading">Carregando formulários...</p>';
+
+            const { data, error } = await supabase
+                .from('formulario_players')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Erro ao buscar formulários no Supabase:', error);
+                container.innerHTML = '<p class="admin-error">Erro ao carregar formulários. Tente novamente mais tarde.</p>';
                 return;
             }
-            
-            dados.forEach((form, index) => {
-                container.innerHTML += `<button onclick="abrirForm(${index})">Formulário #${index + 1}</button>`;
-            });
+
+            if (!data || data.length === 0) {
+                container.innerHTML = '<p>Nenhum formulário recebido ainda.</p>';
+                return;
+            }
+
+            container.innerHTML = data.map(form => {
+                const preferencias = Array.isArray(form.preferencias_jogo)
+                    ? form.preferencias_jogo.join(' • ')
+                    : (form.preferencias_jogo || 'Sem preferência definida');
+
+                const dataEnvio = form.created_at
+                    ? new Date(form.created_at).toLocaleString('pt-BR')
+                    : 'Data não informada';
+
+                return `
+                    <article class="admin-card">
+                        <header class="admin-card-header">
+                            <div>
+                                <h3 class="admin-card-title">${form.nome_apelido || 'Sem nome'}</h3>
+                                <p class="admin-card-meta">${form.pronomes || 'Sem pronomes'} • ${dataEnvio}</p>
+                            </div>
+                            <span class="admin-card-badge">${form.status || 'Em análise'}</span>
+                        </header>
+
+                        <div class="admin-card-grid">
+                            <div class="admin-card-field"><strong>Idade / Nascimento</strong><p>${form.idade_data_nascimento || '-'}</p></div>
+                            <div class="admin-card-field"><strong>Disponibilidade</strong><p>${form.disponibilidade_horarios || '-'}</p></div>
+                            <div class="admin-card-field"><strong>Por que aprovar</strong><p>${form.por_que_aprovar || '-'}</p></div>
+                            <div class="admin-card-field"><strong>Regra mais importante</strong><p>${form.regra_mais_importante || '-'}</p></div>
+                            <div class="admin-card-field"><strong>Preferências</strong><p>${preferencias}</p></div>
+                            <div class="admin-card-field"><strong>Meio de divulgação</strong><p>${form.meio_divulgacao || '-'}</p></div>
+                            <div class="admin-card-field admin-card-field-full"><strong>Anti-RP</strong><p>${form.definicao_anti_rp || '-'}</p></div>
+                            <div class="admin-card-field admin-card-field-full"><strong>Metagaming</strong><p>${form.definicao_metagaming || '-'}</p></div>
+                            <div class="admin-card-field admin-card-field-full"><strong>HardRP</strong><p>${form.definicao_hard_rp || '-'}</p></div>
+                            <div class="admin-card-field admin-card-field-full"><strong>Personagem</strong><p>${form.personagem_nome_idade || '-'}</p></div>
+                            <div class="admin-card-field admin-card-field-full"><strong>História</strong><p>${form.personagem_historia || '-'}</p></div>
+                            <div class="admin-card-field"><strong>Gostos / Odie</strong><p>${form.personagem_gostos || '-'}</p></div>
+                            <div class="admin-card-field"><strong>Medos</strong><p>${form.personagem_medos || '-'}</p></div>
+                            <div class="admin-card-field admin-card-field-full"><strong>Personalidade</strong><p>${form.personagem_personalidade || '-'}</p></div>
+                        </div>
+                    </article>
+                `;
+            }).join('');
         }
     </script>
 </body>

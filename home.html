@@ -197,7 +197,7 @@
 
                 console.log("✓ Usuário logado:", usuarioAtual);
                 carregarPerfil(usuarioAtual);
-                carregarStatusFormulario(usuarioAtual);
+                await carregarStatusFormulario(usuarioAtual);
 
                 // Controle do botão de Administrador no Menu
                 const nav = document.querySelector('.menu-nav');
@@ -598,17 +598,14 @@
             }, 6000);
         }
 
-        function carregarStatusFormulario(usuario) {
+        async function carregarStatusFormulario(usuario) {
             const badge = document.getElementById('status-badge-formulario');
             const resumo = document.getElementById('status-resumo-formulario');
             const lista = document.getElementById('lista-formularios-usuario');
 
-            const chave = `formulariosUsuario:${usuario?.id || usuario?.discord_id || 'anon'}`;
-            const historico = JSON.parse(localStorage.getItem(chave) || '[]');
-
             if (!lista) return;
 
-            if (historico.length === 0) {
+            const renderVazio = () => {
                 badge.textContent = 'Sem formulário';
                 badge.className = 'status-badge status-vazio';
                 resumo.textContent = '';
@@ -617,23 +614,67 @@
                         Está meio vazio por aqui... Envie um formulário e ele irá aparecer aqui!
                     </div>
                 `;
-                return;
+            };
+
+            const renderFormularios = (formularios) => {
+                const envio = formularios[0];
+                badge.textContent = envio.status || 'Em análise';
+                badge.className = `status-badge ${getStatusClass(envio.status || 'Em análise')}`;
+                const dataEnvio = envio.created_at || envio.enviadoEm || '';
+                resumo.textContent = dataEnvio ? `Último envio: ${dataEnvio}` : '';
+
+                lista.innerHTML = formularios.map(formulario => {
+                    const tipo = formulario.tipo || 'Players';
+                    const status = formulario.status || 'Em análise';
+                    const preferencias = Array.isArray(formulario.preferencias_jogo)
+                        ? formulario.preferencias_jogo.join(' • ')
+                        : formulario.preferencias_jogo || 'Sem preferência definida';
+                    const data = formulario.created_at || formulario.enviadoEm || 'Data não informada';
+
+                    return `
+                        <div class="card-formulario-usuario">
+                            <div class="card-topo">
+                                <span class="card-tipo">${tipo}</span>
+                                <span class="card-status ${getStatusClass(status)}">${status}</span>
+                            </div>
+                            <p class="card-data">${data}</p>
+                            <p class="card-resumo"><strong>Preferências:</strong> ${preferencias}</p>
+                        </div>
+                    `;
+                }).join('');
+            };
+
+            try {
+                let { data, error } = await supabase.from('formulario_players')
+                    .select('*')
+                    .eq('user_id', usuario.id)
+                    .order('created_at', { ascending: false });
+
+                if (error && error.code === '42703') {
+                    const fallback = await supabase.from('formulario_players')
+                        .select('*')
+                        .eq('discord_id', usuario.discord_id)
+                        .order('created_at', { ascending: false });
+                    data = fallback.data;
+                    error = fallback.error;
+                }
+
+                if (error) {
+                    console.error('Erro ao buscar formulário no Supabase:', error);
+                    renderVazio();
+                    return;
+                }
+
+                if (!data || data.length === 0) {
+                    renderVazio();
+                    return;
+                }
+
+                renderFormularios(data);
+            } catch (err) {
+                console.error('Erro inesperado ao carregar formulários:', err);
+                renderVazio();
             }
-
-            const envio = historico[historico.length - 1];
-            badge.textContent = envio.status || 'Em análise';
-            badge.className = `status-badge ${getStatusClass(envio.status || 'Em análise')}`;
-            resumo.textContent = `Último envio: ${envio.enviadoEm}`;
-
-            lista.innerHTML = historico.map(envio => `
-                <div class="card-formulario-usuario">
-                    <div class="card-topo">
-                        <span class="card-tipo">${envio.tipo}</span>
-                        <span class="card-status ${getStatusClass(envio.status || 'Em análise')}">${envio.status || 'Em análise'}</span>
-                    </div>
-                    <p class="card-data">Enviado em ${envio.enviadoEm}</p>
-                </div>
-            `).join('');
         }
 
         // FUNÇÃO PARA ENVIAR FORMULÁRIO
