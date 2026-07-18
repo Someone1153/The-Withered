@@ -298,75 +298,76 @@
                     <form id="form-player-real" onsubmit="enviarFormulario(event)">
                         <div class="grupo-pergunta">
                             <label>Como deseja que a Staff te chame? (nome ou apelido)</label>
-                            <input type="text" class="campo-resposta" placeholder="Ex: Me chamo Gabriel, mas meus amigos costumam me chamar de Biel." required>
+                            <input id="nome_apelido" type="text" class="campo-resposta" placeholder="Ex: Me chamo Gabriel, mas meus amigos costumam me chamar de Biel." required>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Quais seus pronomes?</label>
-                            <input type="text" class="campo-resposta" placeholder="Ex: Ele/Dele, Ela/Dela, Elu/Delu..." required>
+                            <input id="pronomes" type="text" class="campo-resposta" placeholder="Ex: Ele/Dele, Ela/Dela, Elu/Delu..." required>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Quantos anos você tem? | (dd/mm/aaaa)</label>
-                            <input type="text" class="campo-resposta" placeholder="Ex: 17 anos | 24/09/2008" required>
+                            <input id="idade_data_nascimento" type="text" class="campo-resposta" placeholder="Ex: 17 anos | 24/09/2008" required>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Quais dias você estará disponível para jogar? Em quais horários?</label>
-                            <textarea class="campo-resposta-longa" rows="3" placeholder="Ex: Segunda a sexta das 18h às 22h. Finais de semana fico livre o dia todo." required></textarea>
+                            <textarea id="disponibilidade_horarios" class="campo-resposta-longa" rows="3" placeholder="Ex: Segunda a sexta das 18h às 22h. Finais de semana fico livre o dia todo." required></textarea>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Por que deveríamos te aprovar?</label>
-                            <textarea class="campo-resposta-longa" rows="4" placeholder="Fale um pouco sobre sua experiência, suas intenções no servidor e o que você busca agregar ao nosso Roleplay..." required></textarea>
+                            <textarea id="por_que_aprovar" class="campo-resposta-longa" rows="4" placeholder="Fale um pouco sobre sua experiência, suas intenções no servidor e o que você busca agregar ao nosso Roleplay..." required></textarea>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Cite a regra do servidor que você considera mais importante e o porquê</label>
-                            <textarea class="campo-resposta-longa" rows="4" placeholder="Justifique sua escolha com base em como essa regra impacta a jogabilidade geral..." required></textarea>
+                            <textarea id="regra_mais_importante" class="campo-resposta-longa" rows="4" placeholder="Justifique sua escolha com base em como essa regra impacta a jogabilidade geral..." required></textarea>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Dentre os campos abaixo, você prefere:</label>
-                            <div class="container-checkboxes">
-                                <label class="opcao-checkbox"><input type="checkbox" value="Roleplay"> Roleplay</label>
-                                <label class="opcao-checkbox"><input type="checkbox" value="Lore"> Lore</label>
-                                <label class="opcao-checkbox"><input type="checkbox" value="Modpack"> Modpack</label>
-                                <label class="opcao-checkbox"><input type="checkbox" value="Cuidar de crianças"> Cuidar de crianças</label>
-                                <label class="opcao-checkbox"><input type="checkbox" value="Construir"> Construir</label>
-                                <label class="opcao-checkbox"><input type="checkbox" value="Explorar"> Explorar</label>
+                            <div class="container-checkboxes" id="preferencias_jogo_container">
+                                <label class="opcao-checkbox"><input name="preferencias_jogo" type="checkbox" value="Roleplay"> Roleplay</label>
+                                <label class="opcao-checkbox"><input name="preferencias_jogo" type="checkbox" value="Lore"> Lore</label>
+                                <label class="opcao-checkbox"><input name="preferencias_jogo" type="checkbox" value="Modpack"> Modpack</label>
+                                <label class="opcao-checkbox"><input name="preferencias_jogo" type="checkbox" value="Cuidar de crianças"> Cuidar de crianças</label>
+                                <label class="opcao-checkbox"><input name="preferencias_jogo" type="checkbox" value="Construir"> Construir</label>
+                                <label class="opcao-checkbox"><input name="preferencias_jogo" type="checkbox" value="Explorar"> Explorar</label>
                             </div>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Você teria algum meio de divulgar o servidor? Se sim, qual?</label>
-                            <input type="text" class="campo-resposta" placeholder="Indique se possui canais, redes sociais ou pretende convidar amigos.">
+                            <input id="meio_divulgacao" type="text" class="campo-resposta" placeholder="Indique se possui canais, redes sociais ou pretende convidar amigos.">
                         </div>
                         <div class="grupo-pergunta">
                             <label>Dite com suas palavras o que é Anti-RP</label>
-                            <textarea class="campo-resposta-longa" rows="3" required></textarea>
+                            <textarea id="definicao_anti_rp" class="campo-resposta-longa" rows="3" required></textarea>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Dite com suas palavras o que é Metagaming</label>
-                            <textarea class="campo-resposta-longa" rows="3" required></textarea>
+                            <textarea id="definicao_metagaming" class="campo-resposta-longa" rows="3" required></textarea>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Dite com suas palavras o que é HardRP</label>
-                            <textarea class="campo-resposta-longa" rows="3" required></textarea>
+                            <textarea id="definicao_hard_rp" class="campo-resposta-longa" rows="3" required></textarea>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Qual o nome e idade do seu personagem? E qual o significado do nome dele?</label>
-                            <textarea class="campo-resposta-longa" rows="3" required></textarea>
+                            <textarea id="personagem_nome_idade" class="campo-resposta-longa" rows="3" required></textarea>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Qual a história do seu personagem?</label>
-                            <textarea class="campo-resposta-longa" rows="6" required></textarea>
+                            <textarea id="personagem_historia" class="campo-resposta-longa" rows="6" required></textarea>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Do que seu personagem mais gosta? | E do que odeia?</label>
-                            <textarea class="campo-resposta-longa" rows="3" required></textarea>
+                            <textarea id="personagem_gostos" class="campo-resposta-longa" rows="3" required></textarea>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Quais os medos do seu personagem?</label>
-                            <textarea class="campo-resposta-longa" rows="3" required></textarea>
+                            <textarea id="personagem_medos" class="campo-resposta-longa" rows="3" required></textarea>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Qual a personalidade do seu personagem?</label>
-                            <textarea class="campo-resposta-longa" rows="3" required></textarea>
+                            <textarea id="personagem_personalidade" class="campo-resposta-longa" rows="3" required></textarea>
                         </div>
+                        <div id="mensagem-envio-player" class="mensagem-envio"></div>
                         <div class="botoes-acoes-form">
                             <button type="button" class="btn-voltar" onclick="voltarParaSelecao()">Voltar</button>
                             <button type="submit" class="btn-enviar-form">Enviar Formulário</button>
@@ -582,6 +583,21 @@
             return 'status-em-analise';
         }
 
+        function mostrarMensagemEnvio(tipo, mensagem) {
+            const container = document.getElementById('mensagem-envio-player');
+            if (!container) return;
+            container.textContent = mensagem;
+            container.className = `mensagem-envio mensagem-${tipo}`;
+            container.style.opacity = '1';
+            container.style.transform = 'translateY(0)';
+
+            clearTimeout(container.hideTimeout);
+            container.hideTimeout = setTimeout(() => {
+                container.style.opacity = '0';
+                container.style.transform = 'translateY(-10px)';
+            }, 6000);
+        }
+
         function carregarStatusFormulario(usuario) {
             const badge = document.getElementById('status-badge-formulario');
             const resumo = document.getElementById('status-resumo-formulario');
@@ -625,12 +641,63 @@
             event.preventDefault();
             console.log("▶ Enviando formulário...");
             
+            const form = event.target;
             if (!supabase) {
-                alert("Erro: Supabase não está inicializado");
+                mostrarMensagemEnvio('error', 'Erro: Supabase não está inicializado. Atualize a página e tente novamente.');
                 return;
             }
 
-            const form = event.target;
+            if (form.id === 'form-player-real') {
+                const nome_apelido = document.getElementById('nome_apelido')?.value.trim();
+                const pronomes = document.getElementById('pronomes')?.value.trim();
+                const idade_data_nascimento = document.getElementById('idade_data_nascimento')?.value.trim();
+                const disponibilidade_horarios = document.getElementById('disponibilidade_horarios')?.value.trim();
+                const por_que_aprovar = document.getElementById('por_que_aprovar')?.value.trim();
+                const regra_mais_importante = document.getElementById('regra_mais_importante')?.value.trim();
+                const meio_divulgacao = document.getElementById('meio_divulgacao')?.value.trim();
+                const definicao_anti_rp = document.getElementById('definicao_anti_rp')?.value.trim();
+                const definicao_metagaming = document.getElementById('definicao_metagaming')?.value.trim();
+                const definicao_hard_rp = document.getElementById('definicao_hard_rp')?.value.trim();
+                const personagem_nome_idade = document.getElementById('personagem_nome_idade')?.value.trim();
+                const personagem_historia = document.getElementById('personagem_historia')?.value.trim();
+                const personagem_gostos = document.getElementById('personagem_gostos')?.value.trim();
+                const personagem_medos = document.getElementById('personagem_medos')?.value.trim();
+                const personagem_personalidade = document.getElementById('personagem_personalidade')?.value.trim();
+
+                const preferenciaCheckboxes = Array.from(document.querySelectorAll('input[name="preferencias_jogo"]:checked'));
+                const preferencias_jogo = preferenciaCheckboxes.map(checkbox => checkbox.value).join(' | ');
+
+                const payload = {
+                    nome_apelido,
+                    pronomes,
+                    idade_data_nascimento,
+                    disponibilidade_horarios,
+                    por_que_aprovar,
+                    regra_mais_importante,
+                    preferencias_jogo,
+                    meio_divulgacao,
+                    definicao_anti_rp,
+                    definicao_metagaming,
+                    definicao_hard_rp,
+                    personagem_nome_idade,
+                    personagem_historia,
+                    personagem_gostos,
+                    personagem_medos,
+                    personagem_personalidade
+                };
+
+                const { data, error } = await supabase.from('formulario_players').insert([payload]);
+                if (error) {
+                    console.error('Erro ao enviar formulário para Supabase:', error);
+                    mostrarMensagemEnvio('error', 'Falha ao enviar o formulário. Tente novamente em alguns instantes.');
+                    return;
+                }
+
+                form.reset();
+                mostrarMensagemEnvio('success', 'Formulário enviado com sucesso! Seus dados foram salvos.');
+                return;
+            }
+
             const tipo = form.id.includes('staff') ? 'Staff' : form.id.includes('criancas') ? 'Crianças' : 'Players';
             const respostas = Array.from(form.querySelectorAll('.grupo-pergunta')).map(grupo => {
                 const pergunta = grupo.querySelector('label')?.textContent?.trim() || 'Pergunta';
@@ -660,8 +727,8 @@
             localStorage.setItem(chave, JSON.stringify(historico));
 
             carregarStatusFormulario(usuarioAtual);
-            alert("✓ Formulário enviado com sucesso!");
-            window.voltarParaSelecao();
+            mostrarMensagemEnvio('success', 'Formulário salvo localmente com sucesso!');
+            return;
         };
 
         // LOGOUT LIMPENDO OS DADOS
