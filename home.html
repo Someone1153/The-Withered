@@ -112,18 +112,17 @@
                     <div class="bloco-formulario-usuario">
                         <div class="cabecalho-bloco-formulario">
                             <div>
-                                <h3 class="titulo-bloco-formulario">Formulário enviado</h3>
-                                <p class="texto-bloco-formulario">Acompanhe o estado do seu envio.</p>
+                                <h3 class="titulo-bloco-formulario">Formulários enviados</h3>
+                                <p class="texto-bloco-formulario">Acompanhe os formulários enviados para a whitelist.</p>
                             </div>
-                            <button type="button" id="btn-visualizar-formulario" class="btn-visualizar-formulario" onclick="alternarDetalhesFormulario()">Visualizar</button>
                         </div>
 
                         <div class="linha-status-formulario">
                             <span id="status-badge-formulario" class="status-badge status-em-analise">Em análise</span>
+                            <span id="status-resumo-formulario" class="status-resumo-formulario"></span>
                         </div>
 
-                        <p id="texto-status-formulario" class="texto-status-formulario">Sem formulários entregues.</p>
-                        <div id="detalhes-formulario-usuario" class="detalhes-formulario-usuario" style="display: none;"></div>
+                        <div id="lista-formularios-usuario" class="lista-formularios-usuario"></div>
                     </div>
                 </div>
             </div>
@@ -261,7 +260,7 @@
             } else if (abaAlvo === 'perfil') {
                 btnPerfil.classList.add('ativo');
                 caixaPerfil.style.display = 'block';
-                mainContainer.className = "conteudo-painel";
+                mainContainer.className = "conteudo-painel conteudo-perfil";
             }
         };
 
@@ -584,53 +583,42 @@
         }
 
         function carregarStatusFormulario(usuario) {
-            const botao = document.getElementById('btn-visualizar-formulario');
             const badge = document.getElementById('status-badge-formulario');
-            const texto = document.getElementById('texto-status-formulario');
-            const detalhes = document.getElementById('detalhes-formulario-usuario');
+            const resumo = document.getElementById('status-resumo-formulario');
+            const lista = document.getElementById('lista-formularios-usuario');
 
             const chave = `formulariosUsuario:${usuario?.id || usuario?.discord_id || 'anon'}`;
             const historico = JSON.parse(localStorage.getItem(chave) || '[]');
-            const envio = historico.length > 0 ? historico[historico.length - 1] : null;
 
-            if (!envio) {
+            if (!lista) return;
+
+            if (historico.length === 0) {
                 badge.textContent = 'Sem formulário';
                 badge.className = 'status-badge status-vazio';
-                texto.textContent = 'Sem formulários entregues.';
-                if (botao) {
-                    botao.disabled = true;
-                    botao.textContent = 'Visualizar';
-                }
-                if (detalhes) {
-                    detalhes.innerHTML = '<p class="texto-vazio">Ainda não há um formulário entregue para este perfil.</p>';
-                    detalhes.style.display = 'block';
-                }
+                resumo.textContent = '';
+                lista.innerHTML = `
+                    <div class="card-formulario-vazio">
+                        Está meio vazio por aqui... Envie um formulário e ele irá aparecer aqui!
+                    </div>
+                `;
                 return;
             }
 
+            const envio = historico[historico.length - 1];
             badge.textContent = envio.status || 'Em análise';
             badge.className = `status-badge ${getStatusClass(envio.status || 'Em análise')}`;
-            texto.textContent = `Seu formulário de ${envio.tipo} foi enviado em ${envio.enviadoEm}.`;
+            resumo.textContent = `Último envio: ${envio.enviadoEm}`;
 
-            if (botao) {
-                botao.disabled = false;
-            }
-
-            if (detalhes) {
-                detalhes.innerHTML = envio.respostas.map(item => `
-                    <div class="item-detalhe-formulario">
-                        <strong>${item.pergunta}</strong>
-                        <p>${item.resposta}</p>
+            lista.innerHTML = historico.map(envio => `
+                <div class="card-formulario-usuario">
+                    <div class="card-topo">
+                        <span class="card-tipo">${envio.tipo}</span>
+                        <span class="card-status ${getStatusClass(envio.status || 'Em análise')}">${envio.status || 'Em análise'}</span>
                     </div>
-                `).join('');
-            }
+                    <p class="card-data">Enviado em ${envio.enviadoEm}</p>
+                </div>
+            `).join('');
         }
-
-        window.alternarDetalhesFormulario = function() {
-            const detalhes = document.getElementById('detalhes-formulario-usuario');
-            if (!detalhes) return;
-            detalhes.style.display = detalhes.style.display === 'block' ? 'none' : 'block';
-        };
 
         // FUNÇÃO PARA ENVIAR FORMULÁRIO
         window.enviarFormulario = async function(event) {
