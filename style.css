@@ -767,6 +767,21 @@ body {
     overflow-y: auto;
 }
 
+/* Admin modal: larger reading area */
+.admin-modal-conteudo {
+    width: 100%;
+    max-width: 920px;
+    background: rgba(15, 18, 30, 0.98);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 28px 28px 22px;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+    color: #e5e7eb;
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
 .modal-fechar-btn {
     position: absolute;
     top: 16px;
@@ -814,6 +829,22 @@ body {
     color: #fff;
     font-size: 1.1rem;
     cursor: pointer;
+}
+
+/* Close button fixed outside scrollable content so it's always reachable */
+.modal-close-outside {
+    position: absolute;
+    right: 18px;
+    top: 18px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.04);
+    color: #fff;
+    font-size: 1.2rem;
+    cursor: pointer;
+    z-index: 1100;
 }
 
 .modal-label {
@@ -1067,3 +1098,34 @@ body {
 .botao-admin-oculto {
     display: none !important;
 }
+
+/* Admin columns styling */
+.coluna-formularios {
+    background: rgba(20,20,25,0.6);
+    border: 1px solid rgba(255,255,255,0.04);
+    padding: 14px;
+    border-radius: 12px;
+    max-height: 78vh;
+    overflow: auto;
+}
+
+.coluna-formularios h3 {
+    margin: 6px 0 12px 0;
+    color: #dbe2ff;
+    font-size: 1.05rem;
+}
+
+.admin-compact-row:hover { background: rgba(255,255,255,0.02); }
+
+.admin-compact-row {
+    height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.admin-compact-row div { overflow: hidden; text-overflow: ellipsis; }
