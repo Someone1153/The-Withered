@@ -15,8 +15,29 @@
         <main class="conteudo-painel">
             <div class="caixa-conteudo">
                 <h2>Painel Administrativo</h2>
-                <div id="grid-formularios" style="display: grid; gap: 10px; margin-top: 20px;">
+                <div id="colunas-formularios" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 20px;">
+                    <div class="coluna-formularios" id="col-players">
+                        <h3 style="margin-bottom:10px">Players</h3>
+                        <div id="lista-players"></div>
                     </div>
+                    <div class="coluna-formularios" id="col-staff">
+                        <h3 style="margin-bottom:10px">Staff</h3>
+                        <div id="lista-staff"></div>
+                    </div>
+                    <div class="coluna-formularios" id="col-criancas">
+                        <h3 style="margin-bottom:10px">Crianças</h3>
+                        <div id="lista-criancas"></div>
+                    </div>
+                </div>
+
+                <div id="modal-admin-form" class="modal-formulario">
+                    <div class="modal-conteudo-formulario">
+                        <button type="button" class="modal-back-btn" onclick="fecharModalAdmin()">←</button>
+                        <button type="button" class="modal-fechar-btn" onclick="fecharModalAdmin()">×</button>
+                        <h3 class="modal-titulo">Formulário</h3>
+                        <div id="modal-admin-conteudo" class="modal-formulario-conteudo"></div>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
@@ -99,64 +120,111 @@
             window.location.href = 'index.html';
         };
 
+        function abrirModalAdmin(form) {
+            const modal = document.getElementById('modal-admin-form');
+            const content = document.getElementById('modal-admin-conteudo');
+            if (!modal || !content) return;
+
+            let html = '';
+            html += `<div class="modal-row"><strong>Nome / Apelido</strong><div>${form.nome_apelido || 'Sem nome'}</div></div>`;
+            html += `<div class="modal-row"><strong>Pronomes</strong><div>${form.pronomes || '-'}</div></div>`;
+            html += `<div class="modal-row"><strong>Idade / Nascimento</strong><div>${form.idade_data_nascimento || '-'}</div></div>`;
+            html += `<div class="modal-row"><strong>Disponibilidade</strong><div>${form.disponibilidade_horarios || '-'}</div></div>`;
+            html += `<div class="modal-row"><strong>Por que aprovar</strong><div>${form.por_que_aprovar || '-'}</div></div>`;
+            html += `<div class="modal-row"><strong>Regra mais importante</strong><div>${form.regra_mais_importante || '-'}</div></div>`;
+            html += `<div class="modal-row"><strong>Preferências</strong><div>${Array.isArray(form.preferencias_jogo) ? form.preferencias_jogo.join(' • ') : (form.preferencias_jogo || '-')}</div></div>`;
+            html += `<div class="modal-row"><strong>Meio de divulgação</strong><div>${form.meio_divulgacao || '-'}</div></div>`;
+
+            // respostas array (pergunta/resposta) - exibir cada pergunta completa em sua própria linha
+            if (Array.isArray(form.respostas) && form.respostas.length > 0) {
+                html += `<div class="modal-row"><strong>Respostas adicionais</strong></div>`;
+                form.respostas.forEach(item => {
+                    html += `<div class="modal-row"><strong>${item.pergunta}</strong><div>${item.resposta}</div></div>`;
+                });
+            }
+
+            // campos livres de personagem
+            if (form.personagem_nome_idade || form.personagem_historia) {
+                html += `<div class="modal-row"><strong>Personagem</strong><div>${form.personagem_nome_idade || '-'}</div></div>`;
+                html += `<div class="modal-row"><strong>História</strong><div>${form.personagem_historia || '-'}</div></div>`;
+            }
+
+            content.innerHTML = html;
+            modal.classList.add('modal-aberto');
+        }
+
+        function fecharModalAdmin() {
+            const modal = document.getElementById('modal-admin-form');
+            if (!modal) return;
+            modal.classList.remove('modal-aberto');
+        }
+
         async function carregarFormularios() {
-            const container = document.getElementById('grid-formularios');
-            container.innerHTML = '<p class="admin-loading">Carregando formulários...</p>';
+            const listaPlayers = document.getElementById('lista-players');
+            const listaStaff = document.getElementById('lista-staff');
+            const listaCriancas = document.getElementById('lista-criancas');
+
+            listaPlayers.innerHTML = '<p class="admin-loading">Carregando...</p>';
+            listaStaff.innerHTML = '';
+            listaCriancas.innerHTML = '';
 
             const { data, error } = await supabaseClient
                 .from('formulario_players')
                 .select('*')
-                .order('created_at', { ascending: false });
+                .order('created_at', { ascending: true });
 
             if (error) {
                 console.error('Erro ao buscar formulários no Supabase:', error);
-                container.innerHTML = '<p class="admin-error">Erro ao carregar formulários. Tente novamente mais tarde.</p>';
+                listaPlayers.innerHTML = '<p class="admin-error">Erro ao carregar formulários. Tente novamente mais tarde.</p>';
                 return;
             }
 
             if (!data || data.length === 0) {
-                container.innerHTML = '<p>Nenhum formulário recebido ainda.</p>';
+                listaPlayers.innerHTML = '<p>Nenhum formulário recebido ainda.</p>';
                 return;
             }
 
-            container.innerHTML = data.map(form => {
-                const preferencias = Array.isArray(form.preferencias_jogo)
-                    ? form.preferencias_jogo.join(' • ')
-                    : (form.preferencias_jogo || 'Sem preferência definida');
+            // agrupar por tipo e numerar por grupo
+            const players = [];
+            const staff = [];
+            const criancas = [];
 
-                const dataEnvio = form.created_at
-                    ? new Date(form.created_at).toLocaleString('pt-BR')
-                    : 'Data não informada';
+            data.forEach(item => {
+                const tipo = (item.tipo || '').toString().toLowerCase();
+                if (tipo.includes('staff')) staff.push(item);
+                else if (tipo.includes('crian')) criancas.push(item);
+                else players.push(item);
+            });
 
-                return `
-                    <article class="admin-card">
-                        <header class="admin-card-header">
-                            <div>
-                                <h3 class="admin-card-title">${form.nome_apelido || 'Sem nome'}</h3>
-                                <p class="admin-card-meta">${form.pronomes || 'Sem pronomes'} • ${dataEnvio}</p>
-                            </div>
-                            <span class="admin-card-badge">${form.status || 'Em análise'}</span>
-                        </header>
+            function renderList(container, items, prefix) {
+                if (!container) return;
+                if (!items || items.length === 0) {
+                    container.innerHTML = '<p class="texto-vazio">Nenhum formulário nesta categoria.</p>';
+                    return;
+                }
 
-                        <div class="admin-card-grid">
-                            <div class="admin-card-field"><strong>Idade / Nascimento</strong><p>${form.idade_data_nascimento || '-'}</p></div>
-                            <div class="admin-card-field"><strong>Disponibilidade</strong><p>${form.disponibilidade_horarios || '-'}</p></div>
-                            <div class="admin-card-field"><strong>Por que aprovar</strong><p>${form.por_que_aprovar || '-'}</p></div>
-                            <div class="admin-card-field"><strong>Regra mais importante</strong><p>${form.regra_mais_importante || '-'}</p></div>
-                            <div class="admin-card-field"><strong>Preferências</strong><p>${preferencias}</p></div>
-                            <div class="admin-card-field"><strong>Meio de divulgação</strong><p>${form.meio_divulgacao || '-'}</p></div>
-                            <div class="admin-card-field admin-card-field-full"><strong>Anti-RP</strong><p>${form.definicao_anti_rp || '-'}</p></div>
-                            <div class="admin-card-field admin-card-field-full"><strong>Metagaming</strong><p>${form.definicao_metagaming || '-'}</p></div>
-                            <div class="admin-card-field admin-card-field-full"><strong>HardRP</strong><p>${form.definicao_hard_rp || '-'}</p></div>
-                            <div class="admin-card-field admin-card-field-full"><strong>Personagem</strong><p>${form.personagem_nome_idade || '-'}</p></div>
-                            <div class="admin-card-field admin-card-field-full"><strong>História</strong><p>${form.personagem_historia || '-'}</p></div>
-                            <div class="admin-card-field"><strong>Gostos / Odie</strong><p>${form.personagem_gostos || '-'}</p></div>
-                            <div class="admin-card-field"><strong>Medos</strong><p>${form.personagem_medos || '-'}</p></div>
-                            <div class="admin-card-field admin-card-field-full"><strong>Personalidade</strong><p>${form.personagem_personalidade || '-'}</p></div>
-                        </div>
-                    </article>
-                `;
-            }).join('');
+                container.innerHTML = '';
+                items.forEach((form, idx) => {
+                    const numero = idx + 1;
+                    const dataEnvio = form.created_at ? new Date(form.created_at).toLocaleString('pt-BR') : 'Data não informada';
+                    const nome = form.nome_apelido || form.tag || 'Sem nome';
+
+                    const row = document.createElement('div');
+                    row.className = 'admin-compact-row';
+                    row.style = 'display:flex;align-items:center;gap:12px;padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;';
+                    row.innerHTML = `
+                        <div style="width:40px;font-weight:700;color:#c8d2ff">${numero}</div>
+                        <div style="flex:1;color:#fff">${nome}</div>
+                        <div style="width:180px;color:#a3a3a3">${dataEnvio}</div>
+                    `;
+                    row.addEventListener('click', () => abrirModalAdmin(form));
+                    container.appendChild(row);
+                });
+            }
+
+            renderList(listaPlayers, players, 'P');
+            renderList(listaStaff, staff, 'S');
+            renderList(listaCriancas, criancas, 'C');
         }
     </script>
 </body>

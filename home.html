@@ -133,6 +133,7 @@
 
     <div id="modal-formulario" class="modal-formulario">
         <div class="modal-conteudo-formulario">
+            <button type="button" class="modal-back-btn" onclick="fecharModalFormulario()">←</button>
             <button type="button" class="modal-fechar-btn" onclick="fecharModalFormulario()">×</button>
             <h3 class="modal-titulo">Visualizar formulário</h3>
             <div id="modal-formulario-conteudo" class="modal-formulario-conteudo"></div>
@@ -849,9 +850,38 @@
                     personagem_personalidade
                 };
 
-                const { data, error } = await supabase.from('formulario_players').insert([payload]);
-                if (error) {
-                    console.error('Erro ao enviar formulário para Supabase:', error);
+                async function tryInsertWithFallback(table, obj) {
+                    // make a shallow copy we can mutate
+                    const p = JSON.parse(JSON.stringify(obj));
+                    // remove null/undefined keys
+                    Object.keys(p).forEach(k => {
+                        if (p[k] === undefined || p[k] === null) delete p[k];
+                    });
+
+                    for (let attempt = 0; attempt < 8; attempt++) {
+                        const { data, error } = await supabase.from(table).insert([p]);
+                        if (!error) return { data };
+
+                        const msg = (error.message || '').toString();
+                        const m = msg.match(/Could not find the '(.*?)' column/);
+                        if (m && m[1]) {
+                            const col = m[1];
+                            console.warn('Supabase schema missing column, removing from payload and retrying:', col);
+                            if (col in p) delete p[col];
+                            // continue next attempt
+                            continue;
+                        }
+
+                        // other errors: stop and return
+                        return { error };
+                    }
+
+                    return { error: new Error('Falha ao inserir após múltiplas tentativas de sanitização') };
+                }
+
+                const resultInsert = await tryInsertWithFallback('formulario_players', payload);
+                if (resultInsert.error) {
+                    console.error('Erro ao enviar formulário para Supabase:', resultInsert.error);
                     mostrarMensagemEnvio('error', 'Falha ao enviar o formulário. Tente novamente em alguns instantes.');
                     return;
                 }

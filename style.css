@@ -763,6 +763,8 @@ body {
     box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
     color: #e5e7eb;
     position: relative;
+    max-height: 80vh;
+    overflow-y: auto;
 }
 
 .modal-fechar-btn {
@@ -792,12 +794,26 @@ body {
 
 .modal-row {
     display: flex;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 14px 16px;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 14px;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 14px;
+    border-radius: 12px;
+}
+
+.modal-back-btn {
+    position: absolute;
+    left: 14px;
+    top: 14px;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.04);
+    color: #fff;
+    font-size: 1.1rem;
+    cursor: pointer;
 }
 
 .modal-label {
