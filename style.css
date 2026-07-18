@@ -691,6 +691,12 @@ body {
     border-color: #f3d36b;
 }
 
+.status-vazio {
+    background: #ececec;
+    color: #5f5f5f;
+    border-color: #d0d0d0;
+}
+
 .status-aprovado {
     background: #c8f5d0;
     color: #2e6b3a;
@@ -707,6 +713,11 @@ body {
     color: #d8d8d8;
     font-size: 0.95rem;
     line-height: 1.5;
+}
+
+.texto-vazio {
+    color: #c8c8c8;
+    font-style: italic;
 }
 
 .detalhes-formulario-usuario {

@@ -122,7 +122,7 @@
                             <span id="status-badge-formulario" class="status-badge status-em-analise">Em análise</span>
                         </div>
 
-                        <p id="texto-status-formulario" class="texto-status-formulario">Nenhum formulário foi enviado ainda.</p>
+                        <p id="texto-status-formulario" class="texto-status-formulario">Sem formulários entregues.</p>
                         <div id="detalhes-formulario-usuario" class="detalhes-formulario-usuario" style="display: none;"></div>
                     </div>
                 </div>
@@ -594,11 +594,17 @@
             const envio = historico.length > 0 ? historico[historico.length - 1] : null;
 
             if (!envio) {
-                badge.textContent = 'Sem envio';
-                badge.className = 'status-badge status-em-analise';
-                texto.textContent = 'Nenhum formulário foi enviado ainda.';
-                if (botao) botao.disabled = true;
-                if (detalhes) detalhes.style.display = 'none';
+                badge.textContent = 'Sem formulário';
+                badge.className = 'status-badge status-vazio';
+                texto.textContent = 'Sem formulários entregues.';
+                if (botao) {
+                    botao.disabled = true;
+                    botao.textContent = 'Visualizar';
+                }
+                if (detalhes) {
+                    detalhes.innerHTML = '<p class="texto-vazio">Ainda não há um formulário entregue para este perfil.</p>';
+                    detalhes.style.display = 'block';
+                }
                 return;
             }
 
