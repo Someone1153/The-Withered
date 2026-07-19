@@ -251,37 +251,63 @@
             const listaCriancas = document.getElementById('lista-criancas');
 
             listaPlayers.innerHTML = '<p class="admin-loading">Carregando...</p>';
-            listaStaff.innerHTML = '';
-            listaCriancas.innerHTML = '';
+            listaStaff.innerHTML = '<p class="admin-loading">Carregando...</p>';
+            listaCriancas.innerHTML = '<p class="admin-loading">Carregando...</p>';
 
-            const { data, error } = await supabaseClient
-                .from('formulario_players')
-                .select('*')
-                .order('created_at', { ascending: true });
+            let playersData = [];
+            let staffData = [];
+            let playersError = null;
+            let staffError = null;
 
-            if (error) {
-                console.error('Erro ao buscar formulários no Supabase:', error);
-                listaPlayers.innerHTML = '<p class="admin-error">Erro ao carregar formulários. Tente novamente mais tarde.</p>';
-                return;
+            try {
+                const playersResult = await supabaseClient
+                    .from('formulario_players')
+                    .select('*')
+                    .order('created_at', { ascending: true });
+
+                if (playersResult.error) {
+                    playersError = playersResult.error;
+                    console.error('Erro ao buscar formulários de Players no Supabase:', playersResult.error);
+                } else {
+                    playersData = Array.isArray(playersResult.data) ? playersResult.data : [];
+                }
+            } catch (err) {
+                playersError = err;
+                console.error('Erro inesperado ao buscar formularios de Players:', err);
             }
 
-            if (!data || data.length === 0) {
-                listaPlayers.innerHTML = '<p>Nenhum formulário recebido ainda.</p>';
-                return;
+            try {
+                const staffResult = await supabaseClient
+                    .from('formulario_staff')
+                    .select('*')
+                    .order('created_at', { ascending: true });
+
+                if (staffResult.error) {
+                    staffError = staffResult.error;
+                    console.error('Erro ao buscar formulários de Staff no Supabase:', staffResult.error);
+                } else {
+                    staffData = Array.isArray(staffResult.data) ? staffResult.data : [];
+                }
+            } catch (err) {
+                staffError = err;
+                console.error('Erro inesperado ao buscar formularios de Staff:', err);
             }
 
             const players = [];
             const staff = [];
             const criancas = [];
 
-            data.forEach(item => {
+            playersData.forEach(item => {
                 const tipo = (item.tipo || '').toString().toLowerCase();
                 if (tipo.includes('staff')) staff.push(item);
                 else if (tipo.includes('crian')) criancas.push(item);
                 else players.push(item);
             });
 
-            function renderList(container, items, prefix) {
+            // Adiciona os registros de formulario_staff diretamente na lista de Staff.
+            staff.push(...staffData);
+
+            function renderList(container, items) {
                 if (!container) return;
                 if (!items || items.length === 0) {
                     container.innerHTML = '<p class="texto-vazio">Nenhum formulário nesta categoria.</p>';
@@ -296,8 +322,6 @@
 
                     const row = document.createElement('div');
                     row.className = 'admin-compact-row';
-                    
-                    /* 🛠️ MUDANÇA IMPORTANTE: Removemos larguras fixas de texto por style e transformamos em colunas flexíveis */
                     row.innerHTML = `
                         <span style="min-width:30px; font-weight:700; color:#c8d2ff">${numero}</span>
                         <span style="flex:1; font-weight:600; color:#fff; overflow:hidden; text-overflow:ellipsis; padding-right:10px;">${nome}</span>
@@ -308,8 +332,22 @@
                 });
             }
 
-            renderList(listaPlayers, players, 'P');
-            renderList(listaStaff, staff, 'S');
-            renderList(listaCriancas, criancas, 'C');
+            if (playersError && players.length === 0) {
+                listaPlayers.innerHTML = '<p class="admin-error">Erro ao carregar formulários de Players. Tente novamente mais tarde.</p>';
+            } else {
+                renderList(listaPlayers, players);
+            }
+
+            if (staffError && staff.length === 0) {
+                listaStaff.innerHTML = '<p class="admin-error">Erro ao carregar formulários de Staff. Tente novamente mais tarde.</p>';
+            } else {
+                renderList(listaStaff, staff);
+            }
+
+            if (playersError && criancas.length === 0) {
+                listaCriancas.innerHTML = '<p class="admin-error">Erro ao carregar formulários de Crianças. Tente novamente mais tarde.</p>';
+            } else {
+                renderList(listaCriancas, criancas);
+            }
         }
     </script>

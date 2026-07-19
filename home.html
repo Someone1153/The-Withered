@@ -124,6 +124,20 @@
 
                         <div id="lista-formularios-usuario" class="lista-formularios-usuario"></div>
                     </div>
+
+                    <div class="bloco-formulario-usuario">
+                        <div class="cabecalho-bloco-formulario">
+                            <div>
+                                <h3 class="titulo-bloco-formulario">Formulário de Staff</h3>
+                                <p class="texto-bloco-formulario">Veja aqui as respostas do seu formulário de Staff enviado.</p>
+                            </div>
+                        </div>
+                        <div class="linha-status-formulario">
+                            <span id="status-badge-staff" class="status-badge status-vazio">Sem formulário</span>
+                            <span id="status-resumo-staff" class="status-resumo-formulario"></span>
+                        </div>
+                        <div id="lista-staff-usuario" class="lista-formularios-usuario"></div>
+                    </div>
                 </div>
             </div>
 
@@ -282,6 +296,7 @@
                 console.log("✓ Usuário logado:", usuarioAtual);
                 carregarPerfil(usuarioAtual);
                 await carregarStatusFormulario(usuarioAtual);
+                await carregarStaffNoPerfil(usuarioAtual);
 
                 // Controle do botão de Administrador no Menu
                 const nav = document.querySelector('.menu-nav');
@@ -669,6 +684,111 @@
             if (status === 'Reprovado') return 'status-reprovado';
             return 'status-em-analise';
         }
+
+        function renderStaffProfile(cards) {
+            const lista = document.getElementById('lista-staff-usuario');
+            const statusBadge = document.getElementById('status-badge-staff');
+            const resumo = document.getElementById('status-resumo-staff');
+
+            if (!lista || !statusBadge || !resumo) return;
+            if (!Array.isArray(cards) || cards.length === 0) {
+                statusBadge.textContent = 'Sem formulário';
+                statusBadge.className = 'status-badge status-vazio';
+                resumo.textContent = '';
+                lista.innerHTML = `
+                    <div class="card-formulario-usuario">
+                        <div class="card-resumo">Ainda não encontramos um formulário de Staff para este usuário.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const envio = cards[0];
+            const status = envio.status || 'Em análise';
+            const data = formatDateTime(envio.created_at || envio.created_at || envio.enviadoEm) || 'Data não informada';
+            statusBadge.textContent = status;
+            statusBadge.className = `status-badge ${getStatusClass(status)}`;
+            resumo.textContent = `Último envio: ${data}`;
+
+            lista.innerHTML = cards.map(card => {
+                const areas = formatValueForDisplay(card.areas_auxilio);
+                const qualificacoes = formatValueForDisplay(card.qualificacoes_experiencias);
+                const disponibilidade = formatValueForDisplay(card.disponibilidade_horarios);
+                const prazos = formatValueForDisplay(card.prazos_entrega);
+                const interesse = formatValueForDisplay(card.interesse_projeto);
+                const experiencia = formatValueForDisplay(card.experiencia_smp_punicoes);
+                const dataEnvio = formatDateTime(card.created_at || card.enviadoEm) || 'Data não informada';
+
+                return `
+                    <div class="card-formulario-usuario">
+                        <div class="card-topo">
+                            <div>
+                                <span class="card-tipo">Staff</span>
+                                <p class="card-data">${dataEnvio}</p>
+                            </div>
+                            <span class="card-status ${getStatusClass(status)}">${status}</span>
+                        </div>
+                        <div class="card-resumo">
+                            <p><strong>Nome / Apelido:</strong> ${formatValueForDisplay(card.nome_apelido)}</p>
+                            <p><strong>Pronomes:</strong> ${formatValueForDisplay(card.pronomes)}</p>
+                            <p><strong>Áreas de auxílio:</strong> ${areas}</p>
+                            <p><strong>Qualificações:</strong> ${qualificacoes}</p>
+                            <p><strong>Disponibilidade:</strong> ${disponibilidade}</p>
+                        </div>
+                        <div class="card-actions">
+                            <button type="button" class="card-visualizar-btn" onclick="abrirModalStaff('${encodeURIComponent(JSON.stringify(card))}')">Ver respostas</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function carregarStaffNoPerfil(usuario) {
+            if (!usuario || !usuario.id || !supabase) return;
+            try {
+                const { data, error } = await supabase
+                    .from('formulario_staff')
+                    .select('*')
+                    .eq('user_id', usuario.id)
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    console.error('Erro ao buscar formulário de Staff:', error);
+                    renderStaffProfile([]);
+                    return;
+                }
+
+                renderStaffProfile(Array.isArray(data) ? data : []);
+            } catch (err) {
+                console.error('Erro inesperado ao carregar Staff no perfil:', err);
+                renderStaffProfile([]);
+            }
+        }
+
+        window.abrirModalStaff = function(encodedCard) {
+            try {
+                const card = JSON.parse(decodeURIComponent(encodedCard));
+                const modalContent = document.getElementById('modal-formulario-conteudo');
+                if (!modalContent) return;
+                const rows = [
+                    { label: 'Nome / Apelido', value: card.nome_apelido },
+                    { label: 'Pronomes', value: card.pronomes },
+                    { label: 'Idade / Nascimento', value: card.idade_data_nascimento },
+                    { label: 'Áreas de auxílio', value: card.areas_auxilio },
+                    { label: 'Qualificações e experiências', value: card.qualificacoes_experiencias },
+                    { label: 'Disponibilidade', value: card.disponibilidade_horarios },
+                    { label: 'Prazos de entrega', value: card.prazos_entrega },
+                    { label: 'Interesse no projeto', value: card.interesse_projeto },
+                    { label: 'Experiência / punições', value: card.experiencia_smp_punicoes }
+                ];
+                modalContent.innerHTML = rows.map(item => `
+                    <div class="modal-row"><strong>${item.label}</strong><div>${formatValueForDisplay(item.value)}</div></div>
+                `).join('');
+                document.getElementById('modal-formulario').classList.add('modal-aberto');
+            } catch (err) {
+                console.error('Erro ao abrir modal de Staff:', err);
+            }
+        };
 
         function mostrarMensagemEnvio(tipo, mensagem, containerId = 'mensagem-envio-player') {
             let container = document.getElementById(containerId);
