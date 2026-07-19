@@ -631,7 +631,7 @@
                             <label>A lore das crianças é decidida pela staff, seria um problema para você interpretar e desenvolver um personagem com uma lore e aparência definidas?</label>
                             <textarea id="crianca_lore_definida_problema" class="campo-resposta-longa" rows="3" required></textarea>
                         </div>
-                        <div id="mensagem-envio-crianca" style="margin-top: 15px; font-weight: bold; text-align: center;"></div>
+                        <div id="mensagem-envio-crianca" class="mensagem-envio"></div>
                         <div class="botoes-acoes-form">
                             <button type="button" class="btn-voltar" onclick="voltarParaSelecao()">Voltar</button>
                             <button type="submit" class="btn-enviar-form">Enviar Formulário</button>
@@ -1203,7 +1203,7 @@
     
             const form = event.target;
             if (!supabase) {
-                mostrarMensagemEnvio('error', 'Erro: Supabase não está inicializado. Atualize a página e tente novamente.');
+                mostrarMensagemEnvio('error', 'Erro: Supabase não está inicializado. Atualize a página e tente novamente.', 'mensagem-envio-crianca');
                 return;
             }
 
@@ -1279,7 +1279,7 @@
                 const resultInsert = await tryInsertWithFallback('formulario_criancas', payload);
                 if (resultInsert.error) {
                     console.error('Erro ao enviar formulário de criança para Supabase:', resultInsert.error);
-                    mostrarMensagemEnvio('error', 'Falha ao enviar o formulário. Tente novamente em alguns instantes.');
+                    mostrarMensagemEnvio('error', 'Falha ao enviar o formulário. Tente novamente em alguns instantes.', 'mensagem-envio-crianca');
                     return;
                 }
 
@@ -1297,17 +1297,18 @@
                 localStorage.setItem(chave, JSON.stringify(historico));
 
                 form.reset();
-                mostrarMensagemEnvio('success', 'Formulário enviado com sucesso! Seus dados foram salvos.');
+                mostrarMensagemEnvio('success', 'Formulário enviado com sucesso! Seus dados foram salvos.', 'mensagem-envio-crianca');
+                if (typeof carregarTodosFormulariosUsuario === 'function') {
+                    await carregarTodosFormulariosUsuario(usuarioAtual);
+                }
                 return;
             }
-    
-    mostrarMensagemEnvio('success', 'Formulário enviado com sucesso! Seus dados foram salvos.');
-    
-    // Atualiza a listagem se a função de carregamento global existir
-    if (typeof carregarTodosFormulariosUsuario === 'function') {
-        await carregarTodosFormulariosUsuario(usuarioAtual);
-    }
-};
+
+            mostrarMensagemEnvio('success', 'Formulário enviado com sucesso! Seus dados foram salvos.');
+            if (typeof carregarTodosFormulariosUsuario === 'function') {
+                await carregarTodosFormulariosUsuario(usuarioAtual);
+            }
+        };
 
          // ==========================================================
          // 🔄 FUNÇÃO MÁGICA: Puxa TUDO do banco e unifica perfeitamente

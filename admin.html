@@ -276,8 +276,10 @@
 
             let playersData = [];
             let staffData = [];
+            let criancasData = [];
             let playersError = null;
             let staffError = null;
+            let criancasError = null;
 
             try {
                 const playersResult = await supabaseClient
@@ -313,6 +315,23 @@
                 console.error('Erro inesperado ao buscar formularios de Staff:', err);
             }
 
+            try {
+                const criancasResult = await supabaseClient
+                    .from('formulario_criancas')
+                    .select('*')
+                    .order('created_at', { ascending: true });
+
+                if (criancasResult.error) {
+                    criancasError = criancasResult.error;
+                    console.error('Erro ao buscar formulários de Crianças no Supabase:', criancasResult.error);
+                } else {
+                    criancasData = Array.isArray(criancasResult.data) ? criancasResult.data : [];
+                }
+            } catch (err) {
+                criancasError = err;
+                console.error('Erro inesperado ao buscar formularios de Crianças:', err);
+            }
+
             const players = [];
             const staff = [];
             const criancas = [];
@@ -326,6 +345,9 @@
 
             // Adiciona os registros de formulario_staff diretamente na lista de Staff.
             staff.push(...staffData);
+
+            // Adiciona os registros de formulario_criancas diretamente na lista de Crianças.
+            criancas.push(...criancasData);
 
             function renderList(container, items) {
                 if (!container) return;
@@ -364,7 +386,7 @@
                 renderList(listaStaff, staff);
             }
 
-            if (playersError && criancas.length === 0) {
+            if (criancasError && criancas.length === 0) {
                 listaCriancas.innerHTML = '<p class="admin-error">Erro ao carregar formulários de Crianças. Tente novamente mais tarde.</p>';
             } else {
                 renderList(listaCriancas, criancas);
