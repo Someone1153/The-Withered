@@ -109,7 +109,8 @@
                         </div>
                     </div>
 
-                    <div class="bloco-formulario-usuario">
+                    <!-- 📦 ABA UNIFICADA: Guardará perfeitamente os formulários normais E da Staff juntos -->
+                    <div class="bloco-formulario-usuario" style="width: 100%;">
                         <div class="cabecalho-bloco-formulario">
                             <div>
                                 <h3 class="titulo-bloco-formulario">Formulários enviados</h3>
@@ -123,20 +124,6 @@
                         </div>
 
                         <div id="lista-formularios-usuario" class="lista-formularios-usuario"></div>
-                    </div>
-
-                    <div class="bloco-formulario-usuario">
-                        <div class="cabecalho-bloco-formulario">
-                            <div>
-                                <h3 class="titulo-bloco-formulario">Formulário de Staff</h3>
-                                <p class="texto-bloco-formulario">Veja aqui as respostas do seu formulário de Staff enviado.</p>
-                            </div>
-                        </div>
-                        <div class="linha-status-formulario">
-                            <span id="status-badge-staff" class="status-badge status-vazio">Sem formulário</span>
-                            <span id="status-resumo-staff" class="status-resumo-formulario"></span>
-                        </div>
-                        <div id="lista-staff-usuario" class="lista-formularios-usuario"></div>
                     </div>
                 </div>
             </div>
@@ -295,8 +282,7 @@
 
                 console.log("✓ Usuário logado:", usuarioAtual);
                 carregarPerfil(usuarioAtual);
-                await carregarStatusFormulario(usuarioAtual);
-                await carregarStaffNoPerfil(usuarioAtual);
+                await carregarTodosFormulariosUsuario(usuarioAtual);
 
                 // Controle do botão de Administrador no Menu
                 const nav = document.querySelector('.menu-nav');
@@ -1206,6 +1192,149 @@
             mostrarMensagemEnvio('success', 'Formulário salvo localmente com sucesso!');
             return;
         };
+
+         // ==========================================================
+         // 🔄 FUNÇÃO MÁGICA: Puxa TUDO do banco e unifica perfeitamente
+         // ==========================================================
+         async function carregarTodosFormulariosUsuario(userObj) {
+            const containerUnificado = document.getElementById('lista-formularios-usuario');
+            if (!containerUnificado) return;
+
+            containerUnificado.innerHTML = '<p style="color:#adb4c6;">Carregando seus envios...</p>';
+            let todosFormularios = [];
+
+            // 1. Puxa da tabela de Players
+            try {
+                const { data: dataPlayers } = await supabase
+                    .from('formulario_players')
+                    .select('*')
+                    .eq('user_id', userObj.id)
+                    .order('created_at', { ascending: false });
+                
+                if (dataPlayers) {
+                    dataPlayers.forEach(f => {
+                        todosFormularios.push({ ...f, exibicao_tipo: 'Players', label_resumo: f.preferencias_jogo || 'Roleplay' });
+                    });
+                }
+            } catch(e) { console.error(e); }
+
+            // 2. Puxa da tabela de Staff
+            try {
+                const { data: dataStaff } = await supabase
+                    .from('formulario_staff')
+                    .select('*')
+                    .eq('user_id', userObj.id)
+                    .order('created_at', { ascending: false });
+
+                if (dataStaff) {
+                    dataStaff.forEach(f => {
+                        todosFormularios.push({ ...f, exibicao_tipo: 'Staff', label_resumo: f.areas_auxilio || 'Geral' });
+                    });
+                }
+            } catch(e) { console.error(e); }
+
+            if (todosFormularios.length === 0) {
+                containerUnificado.innerHTML = '<p style="color:#adb4c6; font-size:0.95rem;">Nenhum formulário enviado até o momento.</p>';
+                document.getElementById('status-badge-formulario').className = "status-badge status-vazio";
+                document.getElementById('status-badge-formulario').innerText = "Sem envios";
+                document.getElementById('status-resumo-formulario').innerText = "";
+                document.querySelector(".status-pendente").innerText = "Aguardando Formulário";
+                return;
+            }
+
+            // Ordena pelo envio mais recente de todos
+            todosFormularios.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            formulariosExibidos = todosFormularios;
+
+            // Renderiza lindamente com o mesmo padrão visual compacto
+            containerUnificado.innerHTML = '';
+            todosFormularios.forEach((form, index) => {
+                const card = document.createElement('div');
+                card.className = 'card-formulario-usuario';
+                
+                const dataFormatada = formatDateTime(form.created_at);
+                const statusAtual = form.status || 'Em análise';
+
+                card.innerHTML = `
+                    <div class="card-topo">
+                        <div>
+                            <span class="card-tipo">${form.exibicao_tipo}</span>
+                            <span class="card-data">${dataFormatada}</span>
+                        </div>
+                        <span class="status-badge status-em-analise">${statusAtual}</span>
+                    </div>
+                    <div class="card-resumo">
+                        <strong>Destaques:</strong> ${form.label_resumo}
+                    </div>
+                    <div class="card-actions">
+                        <button class="card-visualizar-btn" onclick="verDetalhesFormUsuario(${index})">Ver formulário</button>
+                    </div>
+                `;
+                containerUnificado.appendChild(card);
+            });
+
+            // Atualiza o status geral do topo da aba baseado no último enviado
+            const ultimoForm = todosFormularios[0];
+            document.getElementById('status-badge-formulario').innerText = ultimoForm.status || 'Em análise';
+            document.getElementById('status-resumo-formulario').innerText = `Último envio: ${formatDateTime(ultimoForm.created_at)}`;
+            document.querySelector(".status-pendente").innerText = ultimoForm.status || 'Em análise';
+        }
+
+        // ==========================================================
+        // 👁️ MODAL DO USUÁRIO DINÂMICO (Preenche as perguntas certas)
+        // ==========================================================
+        window.verDetalhesFormUsuario = function(index) {
+            const form = formulariosExibidos[index];
+            if (!form) return;
+
+            const modal = document.getElementById('modal-formulario');
+            const content = document.getElementById('modal-formulario-conteudo');
+            if (!modal || !content) return;
+
+            let fieldsOrder = [];
+            
+            if (form.exibicao_tipo === 'Staff') {
+                fieldsOrder = [
+                    { label: 'Como deseja que a Staff te chame? (nome ou apelido)', key: 'nome_apelido' },
+                    { label: 'Quais seus pronomes?', key: 'pronomes' },
+                    { label: 'Quantos anos você tem? | (ddmmaaaa)', key: 'idade_data_nascimento' },
+                    { label: 'Em quais áreas você gostaria de auxiliar?', key: 'areas_auxilio' },
+                    { label: 'Nos conte um pouco sobre suas qualificações e experiencias nas áreas que marcou acima', key: 'qualificacoes_experiencias' },
+                    { label: 'Em que dias e horários estaria disponível para trabalhar no projeto?', key: 'disponibilidade_horarios' },
+                    { label: 'Conseguiria entregar seus trabalhos com prazo de entrega?', key: 'prazos_entrega' },
+                    { label: 'O que te despertou interesse no projeto?', key: 'interesse_projeto' },
+                    { label: 'Já participou de algum SMP antes? Possui experiência como staff?', key: 'experiencia_smp_punicoes' }
+                ];
+            } else {
+                fieldsOrder = [
+                    { label: 'Como deseja que a Staff te chame? (nome ou apelido)', key: 'nome_apelido' },
+                    { label: 'Quais seus pronomes?', key: 'pronomes' },
+                    { label: 'Quantos anos você tem? | (ddmmaaaa)', key: 'idade_data_nascimento' },
+                    { label: 'Quais dias você estará disponível para jogar? Em quais horários?', key: 'disponibilidade_horarios' },
+                    { label: 'Por que deveríamos te aprovar?', key: 'por_que_aprovar' },
+                    { label: 'Cite a regra do servidor que você considera mais importante e o porquê', key: 'regra_mais_importante' },
+                    { label: 'Quais suas Preferências?', key: 'preferencias_jogo' },
+                    { label: 'Você teria algum meio de divulgar o servidor? Se sim, qual?', key: 'meio_divulgacao' },
+                    { label: 'Dite com suas palavras o que é Anti-RP', key: 'definicao_anti_rp' },
+                    { label: 'Dite com suas palavras o que é Metagaming', key: 'definicao_metagaming' },
+                    { label: 'Dite com suas palavras o que é HardRP', key: 'definicao_hard_rp' },
+                    { label: 'Qual o nome e idade do seu personagem?', key: 'personagem_nome_idade' },
+                    { label: 'Qual a história do seu personagem?', key: 'personagem_historia' },
+                    { label: 'Do que seu personagem mais gosta? | E do que odeia?', key: 'personagem_gostos' },
+                    { label: 'Quais os medos do seu personagem?', key: 'personagem_medos' },
+                    { label: 'Qual a personalidade do seu personagem?', key: 'personagem_personalidade' }
+                ];
+            }
+
+            let html = '';
+            fieldsOrder.forEach(f => {
+                const val = form[f.key] || '-';
+                html += `<div style="margin-bottom:16px;"><strong style="color:#fff; display:block; margin-bottom:4px;">${f.label}</strong><div style="color:#d1d5db; line-height:1.5;">${val}</div></div>`;
+            });
+
+            content.innerHTML = html;
+            modal.classList.add('modal-aberto');
+        }
 
         // LOGOUT LIMPENDO OS DADOS
         window.fazerLogout = async function(event) {
