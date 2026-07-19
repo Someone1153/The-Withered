@@ -66,7 +66,6 @@
                     return `${day}/${month}/${year} ${hours}:${minutes}`;
                 }
             } catch (e) {}
-            // Fallback: try to extract from common pt-BR string
             const m = String(v).match(/(\d{1,2})\D(\d{1,2})\D(\d{2,4}).*(\d{1,2}):(\d{2})/);
             if (m) {
                 const day = String(m[1]).padStart(2, '0');
@@ -154,27 +153,48 @@
             const content = document.getElementById('modal-admin-conteudo');
             if (!modal || !content) return;
 
-            const fieldsOrder = [
-                { label: 'Como deseja que a Staff te chame? (nome ou apelido)', key: 'nome_apelido' },
-                { label: 'Quais seus pronomes?', key: 'pronomes' },
-                { label: 'Quantos anos você tem? | (ddmmaaaa)', key: 'idade_data_nascimento' },
-                { label: 'Quais dias você estará disponível para jogar? Em quais horários?', key: 'disponibilidade_horarios' },
-                { label: 'Por que deveríamos te aprovar?', key: 'por_que_aprovar' },
-                { label: 'Cite a regra do servidor que você considera mais importante e o porquê    ', key: 'regra_mais_importante' },
-                { label: 'Quais suas Preferências?', key: 'preferencias_jogo' },
-                { label: 'Você teria algum meio de divulgar o servidor? Se sim, qual?', key: 'meio_divulgacao' },
-                { label: 'Dite com suas palavras o que é Anti-RP', key: 'definicao_anti_rp' },
-                { label: 'Dite com suas palavras o que é Metagaming', key: 'definicao_metagaming' },
-                { label: 'Dite com suas palavras o que é HardRP', key: 'definicao_hard_rp' },
-                { label: 'Qual o nome e idade do seu personagem? E qual o significado do nome dele?', key: 'personagem_nome_idade' },
-                { label: 'Qual a história do seu personagem?', key: 'personagem_historia' },
-                { label: 'Do que seu personagem mais gosta? | E do que odeia?', key: 'personagem_gostos' },
-                { label: 'Quais os medos do seu personagem?', key: 'personagem_medos' },
-                { label: 'Qual a personalidade do seu personagem?', key: 'personagem_personalidade' }
-            ];
+            // 🔍 DETECTA O TIPO DO FORMULÁRIO (se veio da tabela formulario_staff ou se tem a flag de tipo)
+            const ehStaff = form.tipo?.toLowerCase().includes('staff') || form.areas_auxilio !== undefined;
+
+            let fieldsOrder = [];
+
+            if (ehStaff) {
+                // 📋 ESTRUTURA EXATA PARA O FORMULÁRIO DE STAFF
+                fieldsOrder = [
+                    { label: 'Como deseja que a Staff te chame? (nome ou apelido)', key: 'nome_apelido' },
+                    { label: 'Quais seus pronomes?', key: 'pronomes' },
+                    { label: 'Quantos anos você tem? | (ddmmaaaa)', key: 'idade_data_nascimento' },
+                    { label: 'Em quais áreas você gostaria de auxiliar?', key: 'areas_auxilio' },
+                    { label: 'Nos conte um pouco sobre suas qualificações e experiencias nas áreas que marcou acima', key: 'qualificacoes_experiencias' },
+                    { label: 'Em que dias e horários estaria disponível para trabalhar no projeto?', key: 'disponibilidade_horarios' },
+                    { label: 'Conseguiria entregar seus trabalhos com prazo de entrega?', key: 'prazos_entrega' },
+                    { label: 'O que te despertou interesse no projeto?', key: 'interesse_projeto' },
+                    { label: 'Já participou de algum SMP antes? Possui experiência como staff? Cite as experiências e caso necessário punições.', key: 'experiencia_smp_punicoes' }
+                ];
+            } else {
+                // 🎮 ESTRUTURA PADRÃO PARA O FORMULÁRIO DE PLAYERS
+                fieldsOrder = [
+                    { label: 'Como deseja que a Staff te chame? (nome ou apelido)', key: 'nome_apelido' },
+                    { label: 'Quais seus pronomes?', key: 'pronomes' },
+                    { label: 'Quantos anos você tem? | (ddmmaaaa)', key: 'idade_data_nascimento' },
+                    { label: 'Quais dias você estará disponível para jogar? Em quais horários?', key: 'disponibilidade_horarios' },
+                    { label: 'Por que deveríamos te aprovar?', key: 'por_que_aprovar' },
+                    { label: 'Cite a regra do servidor que você considera mais importante e o porquê', key: 'regra_mais_importante' },
+                    { label: 'Quais suas Preferências?', key: 'preferencias_jogo' },
+                    { label: 'Você teria algum meio de divulgar o servidor? Se sim, qual?', key: 'meio_divulgacao' },
+                    { label: 'Dite com suas palavras o que é Anti-RP', key: 'definicao_anti_rp' },
+                    { label: 'Dite com suas palavras o que é Metagaming', key: 'definicao_metagaming' },
+                    { label: 'Dite com suas palavras o que é HardRP', key: 'definicao_hard_rp' },
+                    { label: 'Qual o nome e idade do seu personagem? E qual o significado do nome dele?', key: 'personagem_nome_idade' },
+                    { label: 'Qual a história do seu personagem?', key: 'personagem_historia' },
+                    { label: 'Do que seu personagem mais gosta? | E do que odeia?', key: 'personagem_gostos' },
+                    { label: 'Quais os medos do seu personagem?', key: 'personagem_medos' },
+                    { label: 'Qual a personalidade do seu personagem?', key: 'personagem_personalidade' }
+                ];
+            }
 
             let html = '';
-            html += `<div class="modal-row"><strong>Tipo</strong><div>${form.tipo || '-'}</div></div>`;
+            html += `<div class="modal-row"><strong>Tipo</strong><div>${ehStaff ? 'Staff' : (form.tipo || 'Player')}</div></div>`;
             html += `<div class="modal-row"><strong>Status</strong><div>${form.status || '-'}</div></div>`;
             const formattedCreated = formatDateTime(form.created_at || form.enviadoEm);
             html += `<div class="modal-row"><strong>Enviado em</strong><div>${formattedCreated}</div></div>`;
