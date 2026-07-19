@@ -771,15 +771,15 @@
                 const modalContent = document.getElementById('modal-formulario-conteudo');
                 if (!modalContent) return;
                 const rows = [
-                    { label: 'Nome / Apelido', value: card.nome_apelido },
-                    { label: 'Pronomes', value: card.pronomes },
-                    { label: 'Idade / Nascimento', value: card.idade_data_nascimento },
-                    { label: 'Áreas de auxílio', value: card.areas_auxilio },
-                    { label: 'Qualificações e experiências', value: card.qualificacoes_experiencias },
-                    { label: 'Disponibilidade', value: card.disponibilidade_horarios },
-                    { label: 'Prazos de entrega', value: card.prazos_entrega },
-                    { label: 'Interesse no projeto', value: card.interesse_projeto },
-                    { label: 'Experiência / punições', value: card.experiencia_smp_punicoes }
+                    { label: 'Como deseja que a Staff te chame? (nome ou apelido)', value: card.nome_apelido },
+                    { label: 'Quais seus pronomes?', value: card.pronomes },
+                    { label: 'Quantos anos você tem? | (dd/mm/aaaa)', value: card.idade_data_nascimento },
+                    { label: 'Em quais áreas você gostaria de auxiliar?', value: card.areas_auxilio },
+                    { label: 'Nos conte um pouco sobre suas qualificações e experiencias nas áreas que marcou acima', value: card.qualificacoes_experiencias },
+                    { label: 'Em que dias e horários estaria disponível para trabalhar no projeto?', value: card.disponibilidade_horarios },
+                    { label: 'Conseguiria entregar seus trabalhos com prazo de entrega?', value: card.prazos_entrega },
+                    { label: 'O que te despertou interesse no projeto?', value: card.interesse_projeto },
+                    { label: 'Já participou de algum SMP antes? Possui experiência como staff? Cite as experiências e caso necessário punições.', value: card.experiencia_smp_punicoes }
                 ];
                 modalContent.innerHTML = rows.map(item => `
                     <div class="modal-row"><strong>${item.label}</strong><div>${formatValueForDisplay(item.value)}</div></div>
@@ -942,17 +942,31 @@
             return directValue;
         }
 
-        window.verFormulario = function(index) {
-            const formulario = formulariosExibidos[index];
-            if (!formulario) return;
+        function getFormFieldsOrder(formulario) {
+            const tipo = (formulario.tipo || '').toString().toLowerCase();
+            const isStaff = tipo.includes('staff')
+                || formulario.areas_auxilio !== undefined
+                || formulario.qualificacoes_experiencias !== undefined
+                || formulario.prazos_entrega !== undefined
+                || formulario.interesse_projeto !== undefined
+                || formulario.experiencia_smp_punicoes !== undefined;
 
-            const data = formatDateTime(formulario.created_at || formulario.enviadoEm) || 'Data não informada';
-            const tipo = formulario.tipo || 'Players';
-            const status = formulario.status || 'Em análise';
+            if (isStaff) {
+                return [
+                    { label: 'Nome / Apelido', key: 'nome_apelido' },
+                    { label: 'Pronomes', key: 'pronomes' },
+                    { label: 'Idade / Nascimento', key: 'idade_data_nascimento' },
+                    { label: 'Áreas de auxílio', key: 'areas_auxilio' },
+                    { label: 'Qualificações e experiências', key: 'qualificacoes_experiencias' },
+                    { label: 'Disponibilidade', key: 'disponibilidade_horarios' },
+                    { label: 'Prazos de entrega', key: 'prazos_entrega' },
+                    { label: 'Interesse no projeto', key: 'interesse_projeto' },
+                    { label: 'Experiência / punições', key: 'experiencia_smp_punicoes' }
+                ];
+            }
 
-            // Ordem esperada das perguntas para Players
-            const fieldsOrder = [
-               { label: 'Como deseja que a Staff te chame? (nome ou apelido)', key: 'nome_apelido' },
+            return [
+                { label: 'Como deseja que a Staff te chame? (nome ou apelido)', key: 'nome_apelido' },
                 { label: 'Quais seus pronomes?', key: 'pronomes' },
                 { label: 'Quantos anos você tem? | (ddmmaaaa)', key: 'idade_data_nascimento' },
                 { label: 'Quais dias você estará disponível para jogar? Em quais horários?', key: 'disponibilidade_horarios' },
@@ -969,17 +983,25 @@
                 { label: 'Quais os medos do seu personagem?', key: 'personagem_medos' },
                 { label: 'Qual a personalidade do seu personagem?', key: 'personagem_personalidade' }
             ];
+        }
+
+        window.verFormulario = function(index) {
+            const formulario = formulariosExibidos[index];
+            if (!formulario) return;
+
+            const data = formatDateTime(formulario.created_at || formulario.enviadoEm) || 'Data não informada';
+            const tipo = formulario.tipo || 'Players';
+            const status = formulario.status || 'Em análise';
 
             let detalhes = '';
             detalhes += `<div class="modal-row"><strong>Tipo</strong><div>${tipo}</div></div>`;
             detalhes += `<div class="modal-row"><strong>Status</strong><div>${status}</div></div>`;
             detalhes += `<div class="modal-row"><strong>Enviado em</strong><div>${data}</div></div>`;
 
+            const fieldsOrder = getFormFieldsOrder(formulario);
+
             fieldsOrder.forEach(f => {
                 let val = getRespostaParaCampo(formulario, f.key);
-                if (f.key === 'preferencias_jogo' && Array.isArray(val)) {
-                    // keep as array for formatValueForDisplay
-                }
                 const disp = formatValueForDisplay(val);
                 detalhes += `<div class="modal-row"><strong>${f.label}</strong><div>${disp}</div></div>`;
             });
