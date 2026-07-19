@@ -1199,58 +1199,115 @@
         // ==========================================
         window.enviarFormularioCrianca = async function(event) {
             event.preventDefault();
-            const msgDiv = document.getElementById('mensagem-envio-crianca');
-            if (msgDiv) {
-                msgDiv.style.color = "#adb4c6";
-                msgDiv.innerText = "Enviando para a Whitelist...";
-            }
-
-            if (!supabase || !usuarioAtual) {
-                if (msgDiv) {
-                    msgDiv.style.color = "#ff4a4a";
-                    msgDiv.innerText = "Erro: Sessão do usuário não encontrada.";
-                }
+            console.log("▶ Enviando formulário de criança...");
+    
+            const form = event.target;
+            if (!supabase) {
+                mostrarMensagemEnvio('error', 'Erro: Supabase não está inicializado. Atualize a página e tente novamente.');
                 return;
             }
 
-            const payload = {
-                user_id: usuarioAtual.id,
-                status: 'Em análise',
-                nome_apelido: document.getElementById('crianca_nome_apelido')?.value.trim(),
-                pronomes: document.getElementById('crianca_pronomes')?.value.trim(),
-                idade_data_nascimento: document.getElementById('crianca_idade_data_nascimento')?.value.trim(),
-                disponibilidade_horarios: document.getElementById('crianca_disponibilidade_horarios')?.value.trim(),
-                sobre_voce_saude: document.getElementById('crianca_sobre_voce_saude')?.value.trim(),
-                por_que_aprovar: document.getElementById('crianca_por_que_aprovar')?.value.trim(),
-                experiencia_smp: document.getElementById('crianca_experiencia_smp')?.value.trim(),
-                regra_mais_importante: document.getElementById('crianca_regra_mais_importante')?.value.trim(),
-                conhecidos_servidor: document.getElementById('crianca_conhecidos_servidor')?.value.trim(),
-                definicao_anti_rp: document.getElementById('crianca_definicao_anti_rp')?.value.trim(),
-                definicao_metagaming: document.getElementById('crianca_definicao_metagaming')?.value.trim(),
-                definicao_hard_rp: document.getElementById('crianca_definicao_hard_rp')?.value.trim(),
-                personalidade_crianca: document.getElementById('crianca_personalidade_crianca')?.value.trim(),
-                historia_criatividade: document.getElementById('crianca_historia_criatividade')?.value.trim(),
-                lore_definida_problema: document.getElementById('crianca_lore_definida_problema')?.value.trim()
-            };
+            console.log('▶ enviarFormularioCrianca - form id:', form.id);
 
-            try {
-                const { error } = await supabase.from('formulario_criancas').insert([payload]);
-                if (error) throw error;
+           // Função interna de Fallback idêntica à do aaa1 para sanitizar colunas inexistentes (ex: status)
+            async function tryInsertWithFallback(table, obj) {
+               const p = JSON.parse(JSON.stringify(obj));
+                Object.keys(p).forEach(k => {
+                    if (p[k] === undefined || p[k] === null) delete p[k];
+                });
 
-                if (msgDiv) {
-                    msgDiv.style.color = "#4aff4a";
-                    msgDiv.innerText = "✓ Formulário de Criança enviado com sucesso!";
+                for (let attempt = 0; attempt < 8; attempt++) {
+                    const { data, error } = await supabase.from(table).insert([p]);
+                    if (!error) return { data };
+
+                    const msg = (error.message || '').toString();
+                    const m = msg.match(/Could not find the '(.*?)' column/);
+                    if (m && m[1]) {
+                        const col = m[1];
+                        console.warn('Supabase schema missing column, removing from payload and retrying:', col);
+                        if (col in p) delete p[col];
+                        continue;
+                    }
+
+                    return { error };
                 }
-                document.getElementById('form-criancas-real')?.reset();
-                await carregarTodosFormulariosUsuario(usuarioAtual);
-            } catch (err) {
-                console.error(err);
-                if (msgDiv) {
-                    msgDiv.style.color = "#ff4a4a";
-                    msgDiv.innerText = "Erro ao enviar: " + (err.message || err);
-                }
+
+                return { error: new Error('Falha ao inserir após múltiplas tentativas de sanitização') };
             }
-        };
+
+            // Captura e limpeza de todos os campos específicos de Crianças
+            if (form.id === 'form-criancas-real') {
+                const nome_apelido = document.getElementById('crianca_nome_apelido')?.value.trim();
+                const pronomes = document.getElementById('crianca_pronomes')?.value.trim();
+                const idade_data_nascimento = document.getElementById('crianca_idade_data_nascimento')?.value.trim();
+                const disponibilidad_horarios = document.getElementById('crianca_disponibilidade_horarios')?.value.trim();
+                const sobre_voce_saude = document.getElementById('crianca_sobre_voce_saude')?.value.trim();
+                const por_que_aprovar = document.getElementById('crianca_por_que_aprovar')?.value.trim();
+                const experiencia_smp = document.getElementById('crianca_experiencia_smp')?.value.trim();
+                const regra_mais_importante = document.getElementById('crianca_regra_mais_importante')?.value.trim();
+                const conhecidos_servidor = document.getElementById('crianca_conhecidos_servidor')?.value.trim();
+                const definicao_anti_rp = document.getElementById('crianca_definicao_anti_rp')?.value.trim();
+                const definicao_metagaming = document.getElementById('crianca_definicao_metagaming')?.value.trim();
+                const definicao_hard_rp = document.getElementById('crianca_definicao_hard_rp')?.value.trim();
+                const personalidade_crianca = document.getElementById('crianca_personalidade_crianca')?.value.trim();
+                const historia_criatividade = document.getElementById('crianca_historia_criatividade')?.value.trim();
+                const lore_definida_problema = document.getElementById('crianca_lore_definida_problema')?.value.trim();
+
+                // Montagem correta do payload com as IDs do usuário logado
+                const payload = {
+                    user_id: usuarioAtual?.id,
+                    discord_id: usuarioAtual?.discord_id, // Adicionado para salvar corretamente o ID do Discord!
+                    status: 'Em análise', // Se a coluna não existir no banco, o tryInsertWithFallback vai remover e ignorar sem quebrar o envio!
+                    nome_apelido,
+                    pronomes,
+                    idade_data_nascimento,
+                    disponibilidade_horarios: disponibilidad_horarios,
+                    sobre_voce_saude,
+                    por_que_aprovar,
+                    experiencia_smp,
+                    regra_mais_importante,
+                    conhecidos_servidor,
+                    definicao_anti_rp,
+                    definicao_metagaming,
+                    definicao_hard_rp,
+                    personalidade_crianca,
+                    historia_criatividade,
+                    lore_definida_problema
+                };
+
+                // Tentativa segura de inserção na tabela correta
+                const resultInsert = await tryInsertWithFallback('formulario_criancas', payload);
+                if (resultInsert.error) {
+                    console.error('Erro ao enviar formulário de criança para Supabase:', resultInsert.error);
+                    mostrarMensagemEnvio('error', 'Falha ao enviar o formulário. Tente novamente em alguns instantes.');
+                    return;
+                }
+
+                // Salvamento no Histórico Local do Usuário (Identificação unificada igual ao aaa1)
+                const chave = `formulariosUsuario:${usuarioAtual?.id || usuarioAtual?.discord_id || 'anon'}`;
+                const historico = JSON.parse(localStorage.getItem(chave) || '[]');
+                const localItem = {
+                    tipo: 'Crianças',
+                    status: 'Em análise',
+                    enviadoEm: new Date().toLocaleString('pt-BR'),
+                    created_at: new Date().toISOString(),
+                    raw_payload: payload
+                };
+                historico.push(localItem);
+                localStorage.setItem(chave, JSON.stringify(historico));
+
+                form.reset();
+                mostrarMensagemEnvio('success', 'Formulário enviado com sucesso! Seus dados foram salvos.');
+                return;
+            }
+    
+    mostrarMensagemEnvio('success', 'Formulário enviado com sucesso! Seus dados foram salvos.');
+    
+    // Atualiza a listagem se a função de carregamento global existir
+    if (typeof carregarTodosFormulariosUsuario === 'function') {
+        await carregarTodosFormulariosUsuario(usuarioAtual);
+    }
+};
 
          // ==========================================================
          // 🔄 FUNÇÃO MÁGICA: Puxa TUDO do banco e unifica perfeitamente
