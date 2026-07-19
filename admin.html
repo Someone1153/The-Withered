@@ -153,8 +153,9 @@
             const content = document.getElementById('modal-admin-conteudo');
             if (!modal || !content) return;
 
-            // 🔍 DETECTA O TIPO DO FORMULÁRIO (se veio da tabela formulario_staff ou se tem a flag de tipo)
+            // 🔍 DETECTA O TIPO DO FORMULÁRIO DE FORMA PRECISA
             const ehStaff = form.tipo?.toLowerCase().includes('staff') || form.areas_auxilio !== undefined;
+            const ehCrianca = form.tipo?.toLowerCase().includes('crian') || form.personalidade_crianca !== undefined || form.sobre_voce_saude !== undefined;
 
             let fieldsOrder = [];
 
@@ -170,6 +171,25 @@
                     { label: 'Conseguiria entregar seus trabalhos com prazo de entrega?', key: 'prazos_entrega' },
                     { label: 'O que te despertou interesse no projeto?', key: 'interesse_projeto' },
                     { label: 'Já participou de algum SMP antes? Possui experiência como staff? Cite as experiências e caso necessário punições.', key: 'experiencia_smp_punicoes' }
+                ];
+            } else if (ehCrianca) {
+                // 👶 ESTRUTURA EXATA PARA O FORMULÁRIO DE CRIANÇAS
+                fieldsOrder = [
+                    { label: 'Como deseja que a Staff te chame? (nome ou apelido)', key: 'nome_apelido' },
+                    { label: 'Quais seus pronomes?', key: 'pronomes' },
+                    { label: 'Quantos anos você tem? | (dd/mm/aaaa)', key: 'idade_data_nascimento' },
+                    { label: 'Quais dias você estará disponível para jogar? Em quais horários?', key: 'disponibilidade_horarios' },
+                    { label: 'Informações de saúde / Laudos / Gatilhos', key: 'sobre_voce_saude' },
+                    { label: 'Por que deveríamos te aprovar?', key: 'por_que_aprovar' },
+                    { label: 'Experiência em outros SMP', key: 'experiencia_smp' },
+                    { label: 'Regra considerada mais importante', key: 'regra_mais_importante' },
+                    { label: 'Conhecidos no servidor', key: 'conhecidos_servidor' },
+                    { label: 'Dite com suas palavras o que é Anti-RP', key: 'definicao_anti_rp' },
+                    { label: 'Dite com suas palavras o que é Metagaming', key: 'definicao_metagaming' },
+                    { label: 'Dite com suas palavras o que é HardRP', key: 'definicao_hard_rp' },
+                    { label: 'Qual personalidade você gostaria de interpretar como criança?', key: 'personalidade_crianca' },
+                    { label: 'História / Criatividade', key: 'historia_criatividade' },
+                    { label: 'Problema com lore e aparência definidas pela staff?', key: 'lore_definida_problema' }
                 ];
             } else {
                 // 🎮 ESTRUTURA PADRÃO PARA O FORMULÁRIO DE PLAYERS
@@ -194,7 +214,11 @@
             }
 
             let html = '';
-            html += `<div class="modal-row"><strong>Tipo</strong><div>${ehStaff ? 'Staff' : (form.tipo || 'Player')}</div></div>`;
+            let labelTipo = 'Player';
+            if (ehStaff) labelTipo = 'Staff';
+            if (ehCrianca) labelTipo = 'Crianças';
+
+            html += `<div class="modal-row"><strong>Tipo</strong><div>${labelTipo}</div></div>`;
             html += `<div class="modal-row"><strong>Status</strong><div>${form.status || '-'}</div></div>`;
             const formattedCreated = formatDateTime(form.created_at || form.enviadoEm);
             html += `<div class="modal-row"><strong>Enviado em</strong><div>${formattedCreated}</div></div>`;
@@ -257,12 +281,6 @@
 
             content.innerHTML = html;
             modal.classList.add('modal-aberto');
-        }
-
-        window.fecharModalAdmin = function() {
-            const modal = document.getElementById('modal-admin-form');
-            if (!modal) return;
-            modal.classList.remove('modal-aberto');
         }
 
         async function carregarFormularios() {
