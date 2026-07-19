@@ -283,6 +283,12 @@
             modal.classList.add('modal-aberto');
         }
 
+        window.fecharModalAdmin = function() {
+            const modal = document.getElementById('modal-admin-form');
+            if (!modal) return;
+            modal.classList.remove('modal-aberto');
+        }
+
         async function carregarFormularios() {
             const listaPlayers = document.getElementById('lista-players');
             const listaStaff = document.getElementById('lista-staff');
