@@ -671,7 +671,11 @@
         }
 
         function mostrarMensagemEnvio(tipo, mensagem, containerId = 'mensagem-envio-player') {
-            const container = document.getElementById(containerId);
+            let container = document.getElementById(containerId);
+            if (!container && containerId !== 'mensagem-envio-player') {
+                console.warn('containerId não encontrado, usando mensagem-envio-player como fallback:', containerId);
+                container = document.getElementById('mensagem-envio-player');
+            }
             if (!container) return;
             container.textContent = mensagem;
             container.className = `mensagem-envio mensagem-${tipo}`;
@@ -890,6 +894,8 @@
                 return;
             }
 
+            console.log('▶ enviarFormulario - form id:', form.id);
+
             async function tryInsertWithFallback(table, obj) {
                 // make a shallow copy we can mutate
                 const p = JSON.parse(JSON.stringify(obj));
@@ -994,7 +1000,8 @@
                 const experiencia_smp_punicoes = document.getElementById('staff_experiencia_smp_punicoes')?.value.trim();
 
                 const areasSelecionadas = Array.from(form.querySelectorAll('input[name="areas_auxilio"]:checked')).map(el => el.value);
-                const areas_auxilio = areasSelecionadas.join(', ');
+                const areas_auxilio = areasSelecionadas;
+                console.log('▶ areas_auxilio array:', areas_auxilio);
 
                 const payloadStaff = {
                     user_id: usuarioAtual?.id,
@@ -1010,13 +1017,16 @@
                     experiencia_smp_punicoes
                 };
 
+                console.log('▶ Enviando formulário de Staff para Supabase', payloadStaff);
                 const resultStaff = await tryInsertWithFallback('formulario_staff', payloadStaff);
                 if (resultStaff.error) {
                     console.error('Erro ao enviar formulário de Staff para Supabase:', resultStaff.error);
-                    mostrarMensagemEnvio('error', 'Falha ao enviar o formulário de Staff. Tente novamente em alguns instantes.', 'mensagem-envio-staff');
+                    const mensagemErro = resultStaff.error.message || 'Falha ao enviar o formulário de Staff. Tente novamente em alguns instantes.';
+                    mostrarMensagemEnvio('error', mensagemErro, 'mensagem-envio-staff');
                     return;
                 }
 
+                console.log('✓ Formulário de Staff enviado:', resultStaff.data);
                 form.reset();
                 mostrarMensagemEnvio('success', 'Formulário enviado com sucesso! Seus dados foram salvos.', 'mensagem-envio-staff');
                 return;
