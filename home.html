@@ -551,86 +551,87 @@
                 areaFormulario.style.display = 'block';
 
             } else if (tipo === 'Crianças') {
-                areaFormulario.innerHTML = `
+                 areaFormulario.innerHTML = `
                     <div class="cabecalho-form">
                         <h2 class="titulo-interno-form">Formulário de Crianças</h2>
                         <p class="texto-boas-vindas">
-                            Olá, sejam muito bem-vindos ao processo seletivo do <strong>The Withered RP</strong>, somos um servidor HardRP de Minecraft que conta com Lore própria feita do zero, raças para que seu personagem se torne único e um mundo cheio de mistérios e novidades.<br><br>
-                            Lembrando, caso você não seja aprovado de imediato, não se preocupe pois abriremos o formulário novamente em breve, sinta-se livre para refazer o formulário na próxima convocação! Nós sempre utilizaremos o formulário mais recente para aprovação.
+                         Olá, sejam muito bem-vindos ao processo seletivo do <strong>The Withered RP</strong>, somos um servidor HardRP de Minecraft que conta com Lore própria feita do zero, raças para que seu personagem se torne único e um mundo cheio de mistérios e novidades.<br><br>
+                         Lembrando, caso você não seja aprovado de imediato, não se preocupe pois abriremos o formulário novamente em breve, sinta-se livre para refazer o formulário na próxima convocação! Nós sempre utilizaremos o formulário mais recente para aprovação.
                         </p>
-                        
+            
                         <div class="caixa-regras-aviso">
-                            <span class="aviso-destaque">Antes de responder as perguntas, deixaremos algumas coisas claras:</span>
+                         <span class="aviso-destaque">Antes de responder as perguntas, deixaremos algumas coisas claras:</span>
                             <ul>
-                                <li>Por favor responda as perguntas sempre com sinceridade, não iremos aceitar respostas forjadas por IA ou com informações que se provem falsas.</li>
-                                <li>Tente sempre responder as perguntas com mais detalhes, evitando respostas rasas e fracas.</li>
-                                <li>A idade mínima para o formulário é de 14 anos.</li>
-                                <li>É obrigatório possuir um microfone para conversas com a staff.</li>
+                             <li>Por favor responda as perguntas sempre com sinceridade, não iremos aceitar respostas forjadas por IA ou com informações que se provem falsas.</li>
+                             <li>Tente sempre responder as perguntas com mais detalhes, evitando respostas rasas e fracas.</li>
+                             <li>A idade mínima para o formulário é de 14 anos.</li>
+                             <li>É obrigatório possuir um microfone para conversas com a staff.</li>
                             </ul>
                         </div>
                     </div>
-
-                    <form id="form-criancas-real" onsubmit="enviarFormulario(event)">
+                    
+                    <form id="form-criancas-real" onsubmit="enviarFormularioCrianca(event)">
                         <div class="grupo-pergunta">
                             <label>Como deseja que a Staff te chame? (nome ou apelido)</label>
-                            <input type="text" class="campo-resposta" placeholder="Ex: Me chamo Gabriel, mas meus amigos costumam me chamar de Biel." required>
+                            <input id="crianca_nome_apelido" type="text" class="campo-resposta" placeholder="Ex: Me chamo Gabriel, mas meus amigos costumam me chamar de Biel." required>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Quais seus pronomes?</label>
-                            <input type="text" class="campo-resposta" placeholder="Ex: Ele/Dele, Ela/Dela, Elu/Delu..." required>
+                            <input id="crianca_pronomes" type="text" class="campo-resposta" placeholder="Ex: Ele/Dele, Ela/Dela, Elu/Delu..." required>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Quantos anos você tem? | (dd/mm/aaaa)</label>
-                            <input type="text" class="campo-resposta" placeholder="Ex: 17 anos | 24/09/2008" required>
+                            <input id="crianca_idade_data_nascimento" type="text" class="campo-resposta" placeholder="Ex: 17 anos | 24/09/2008" required>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Quais dias você estará disponível para jogar? Em quais horários?</label>
-                            <textarea class="campo-resposta-longa" rows="3" placeholder="Ex: Segunda a sexta das 18h às 22h. Finais de semana fico livre o dia todo." required></textarea>
+                            <textarea id="crianca_disponibilidade_horarios" class="campo-resposta-longa" rows="3" placeholder="Ex: Segunda a sexta das 18h às 22h. Finais de semana fico livre o dia todo." required></textarea>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Nos conte um pouco sobre você, seus gostos, desgostos e qualquer possível gatilho ou questão que deveríamos saber sobre você, inclua caso possua algum laudo médico (TDAH, Ansiedade, TEA, problemas do coração ou outros)</label>
-                            <textarea class="campo-resposta-longa" rows="4" placeholder="Sinta-se confortável para compartilhar apenas o necessário para sua segurança e boa convivência..." required></textarea>
+                            <textarea id="crianca_sobre_voce_saude" class="campo-resposta-longa" rows="4" placeholder="Sinta-se confortável para compartilhar apenas o necessário para sua segurança e boa convivência..." required></textarea>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Por que deveríamos te aprovar?</label>
-                            <textarea class="campo-resposta-longa" rows="4" placeholder="Fale um pouco sobre suas intenções no servidor e o que busca agregar interpretando uma criança..." required></textarea>
+                            <textarea id="crianca_por_que_aprovar" class="campo-resposta-longa" rows="4" placeholder="Fale um pouco sobre suas intentions no servidor e o que busca agregar interpretando uma criança..." required></textarea>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Já participou de algum SMP antes? Cite quais e como foi a experiência</label>
-                            <textarea class="campo-resposta-longa" rows="3" placeholder="Mencione outros projetos se houver..." required></textarea>
+                            <textarea id="crianca_experiencia_smp" class="campo-resposta-longa" rows="3" placeholder="Mencione outros projetos se houver..." required></textarea>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Cite a regra do servidor que você considera mais importante e o porquê</label>
-                            <textarea class="campo-resposta-longa" rows="4" placeholder="Justifique sua escolha com base em como essa regra impacta o ambiente de jogo..." required></textarea>
+                            <textarea id="crianca_regra_mais_importante" class="campo-resposta-longa" rows="4" placeholder="Justifique sua escolha com base em como essa regra impacta o ambiente de jogo..." required></textarea>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Algum conhecido seu está no servidor? Se sim, quem?</label>
-                            <input type="text" class="campo-resposta" placeholder="Indique o nome ou apelido de amigos/conhecidos que já fazem parte da comunidade.">
+                            <input id="crianca_conhecidos_servidor" type="text" class="campo-resposta" placeholder="Indique o nome ou apelido de amigos/conhecidos que já fazem parte da comunidade." required>
                         </div>
                         <div class="grupo-pergunta">
-                            <label>Dite com suas palavras o que é Anti-RP</label>
-                            <textarea class="campo-resposta-longa" rows="3" required></textarea>
+                           <label>Dite com suas palavras o que é Anti-RP</label>
+                           <textarea id="crianca_definicao_anti_rp" class="campo-resposta-longa" rows="3" required></textarea>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Dite com suas palavras o que é Metagaming</label>
-                            <textarea class="campo-resposta-longa" rows="3" required></textarea>
+                            <textarea id="crianca_definicao_metagaming" class="campo-resposta-longa" rows="3" required></textarea>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Dite com suas palavras o que é HardRP</label>
-                            <textarea class="campo-resposta-longa" rows="3" required></textarea>
+                            <textarea id="crianca_definicao_hard_rp" class="campo-resposta-longa" rows="3" required></textarea>
                         </div>
                         <div class="grupo-pergunta">
                             <label>Qual personalidade você gostaria de interpretar como criança?</label>
-                            <textarea class="campo-resposta-longa" rows="3" required></textarea>
+                            <textarea id="crianca_personalidade_crianca" class="campo-resposta-longa" rows="3" required></textarea>
                         </div>
                         <div class="grupo-pergunta">
-                            <label>Crie uma história, ela pode conter qualquer coisa e servirá somente para avaliarmos seu esforço e criatividade!</label>
-                            <textarea class="campo-resposta-longa" rows="6" required></textarea>
+                            <label>Crie uma história, ela pode conter qualquer coisa e servirá somente para avaliarmos seu esfoço e criatividade!</label>
+                            <textarea id="crianca_historia_criatividade" class="campo-resposta-longa" rows="6" required></textarea>
                         </div>
                         <div class="grupo-pergunta">
                             <label>A lore das crianças é decidida pela staff, seria um problema para você interpretar e desenvolver um personagem com uma lore e aparência definidas?</label>
-                            <textarea class="campo-resposta-longa" rows="3" required></textarea>
+                            <textarea id="crianca_lore_definida_problema" class="campo-resposta-longa" rows="3" required></textarea>
                         </div>
+                        <div id="mensagem-envio-crianca" style="margin-top: 15px; font-weight: bold; text-align: center;"></div>
                         <div class="botoes-acoes-form">
                             <button type="button" class="btn-voltar" onclick="voltarParaSelecao()">Voltar</button>
                             <button type="submit" class="btn-enviar-form">Enviar Formulário</button>
@@ -1193,6 +1194,64 @@
             return;
         };
 
+        // ==========================================
+        // FUNÇÃO DE ENVIO PARA CRIANÇAS
+        // ==========================================
+        window.enviarFormularioCrianca = async function(event) {
+            event.preventDefault();
+            const msgDiv = document.getElementById('mensagem-envio-crianca');
+            if (msgDiv) {
+                msgDiv.style.color = "#adb4c6";
+                msgDiv.innerText = "Enviando para a Whitelist...";
+            }
+
+            if (!supabase || !usuarioAtual) {
+                if (msgDiv) {
+                    msgDiv.style.color = "#ff4a4a";
+                    msgDiv.innerText = "Erro: Sessão do usuário não encontrada.";
+                }
+                return;
+            }
+
+            const payload = {
+                user_id: usuarioAtual.id,
+                status: 'Em análise',
+                nome_apelido: document.getElementById('crianca_nome_apelido')?.value.trim(),
+                pronomes: document.getElementById('crianca_pronomes')?.value.trim(),
+                idade_data_nascimento: document.getElementById('crianca_idade_data_nascimento')?.value.trim(),
+                disponibilidade_horarios: document.getElementById('crianca_disponibilidade_horarios')?.value.trim(),
+                sobre_voce_saude: document.getElementById('crianca_sobre_voce_saude')?.value.trim(),
+                por_que_aprovar: document.getElementById('crianca_por_que_aprovar')?.value.trim(),
+                experiencia_smp: document.getElementById('crianca_experiencia_smp')?.value.trim(),
+                regra_mais_importante: document.getElementById('crianca_regra_mais_importante')?.value.trim(),
+                conhecidos_servidor: document.getElementById('crianca_conhecidos_servidor')?.value.trim(),
+                definicao_anti_rp: document.getElementById('crianca_definicao_anti_rp')?.value.trim(),
+                definicao_metagaming: document.getElementById('crianca_definicao_metagaming')?.value.trim(),
+                definicao_hard_rp: document.getElementById('crianca_definicao_hard_rp')?.value.trim(),
+                personalidade_crianca: document.getElementById('crianca_personalidade_crianca')?.value.trim(),
+                historia_criatividade: document.getElementById('crianca_historia_criatividade')?.value.trim(),
+                lore_definida_problema: document.getElementById('crianca_lore_definida_problema')?.value.trim()
+            };
+
+            try {
+                const { error } = await supabase.from('formulario_criancas').insert([payload]);
+                if (error) throw error;
+
+                if (msgDiv) {
+                    msgDiv.style.color = "#4aff4a";
+                    msgDiv.innerText = "✓ Formulário de Criança enviado com sucesso!";
+                }
+                document.getElementById('form-criancas-real')?.reset();
+                await carregarTodosFormulariosUsuario(usuarioAtual);
+            } catch (err) {
+                console.error(err);
+                if (msgDiv) {
+                    msgDiv.style.color = "#ff4a4a";
+                    msgDiv.innerText = "Erro ao enviar: " + (err.message || err);
+                }
+            }
+        };
+
          // ==========================================================
          // 🔄 FUNÇÃO MÁGICA: Puxa TUDO do banco e unifica perfeitamente
          // ==========================================================
@@ -1228,7 +1287,22 @@
 
                 if (dataStaff) {
                     dataStaff.forEach(f => {
-                        todosFormularios.push({ ...f, exibicao_tipo: 'Staff', label_resumo: f.areas_auxilio || 'Geral' });
+                        todosFormularios.push({ ...f, exibicao_tipo: 'Staff', label_resumo: Array.isArray(f.areas_auxilio) ? f.areas_auxilio.join(' • ') : f.areas_auxilio || 'Geral' });
+                    });
+                }
+            } catch(e) { console.error(e); }
+
+            // 3. Puxa da tabela de Crianças
+            try {
+                const { data: dataCriancas } = await supabase
+                    .from('formulario_criancas')
+                    .select('*')
+                    .eq('user_id', userObj.id)
+                    .order('created_at', { ascending: false });
+
+                if (dataCriancas) {
+                    dataCriancas.forEach(f => {
+                        todosFormularios.push({ ...f, exibicao_tipo: 'Crianças', label_resumo: 'Interpretação Infantil' });
                     });
                 }
             } catch(e) { console.error(e); }
@@ -1304,6 +1378,24 @@
                     { label: 'Conseguiria entregar seus trabalhos com prazo de entrega?', key: 'prazos_entrega' },
                     { label: 'O que te despertou interesse no projeto?', key: 'interesse_projeto' },
                     { label: 'Já participou de algum SMP antes? Possui experiência como staff?', key: 'experiencia_smp_punicoes' }
+                ];
+            } else if (form.exibicao_tipo === 'Crianças') {
+                fieldsOrder = [
+                    { label: 'Como deseja que a Staff te chame? (nome ou apelido)', key: 'nome_apelido' },
+                    { label: 'Quais seus pronomes?', key: 'pronomes' },
+                    { label: 'Quantos anos você tem? | (ddmmaaaa)', key: 'idade_data_nascimento' },
+                    { label: 'Quais dias você estará disponível para jogar? Em quais horários?', key: 'disponibilidade_horarios' },
+                    { label: 'Informações de saúde / Laudos / Gatilhos', key: 'sobre_voce_saude' },
+                    { label: 'Por que deveríamos te aprovar?', key: 'por_que_aprovar' },
+                    { label: 'Experiência em outros SMP', key: 'experiencia_smp' },
+                    { label: 'Regra considerada mais importante', key: 'regra_mais_importante' },
+                    { label: 'Conhecidos no servidor', key: 'conhecidos_servidor' },
+                    { label: 'Definição de Anti-RP', key: 'definicao_anti_rp' },
+                    { label: 'Definição de Metagaming', key: 'definicao_metagaming' },
+                    { label: 'Definição de HardRP', key: 'definicao_hard_rp' },
+                    { label: 'Personalidade da Criança', key: 'personalidade_crianca' },
+                    { label: 'História / Criatividade', key: 'historia_criatividade' },
+                    { label: 'Problema com lore e aparência definidas?', key: 'lore_definida_problema' }
                 ];
             } else {
                 fieldsOrder = [
