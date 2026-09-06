@@ -213,8 +213,8 @@
 
             if (error) {
                 console.error('Erro ao carregar usuários:', error);
-                onlineContainer.innerHTML = '<p class="admin-error">Não foi possível carregar os usuários.</p>';
-                todosContainer.innerHTML = '';
+                onlineContainer.innerHTML = `<p class="admin-error">Erro ao carregar: ${error.message}</p>`;
+                todosContainer.innerHTML = '<p class="texto-vazio">Verifique a tabela usuarios_site e as políticas RLS.</p>';
                 return;
             }
 
@@ -329,6 +329,11 @@
 
                 await carregarEstadosFormularios();
                 await carregarFormularios();
+                setInterval(() => {
+                    if (document.getElementById('painel-usuarios-admin')?.style.display !== 'none') {
+                        carregarUsuariosAdmin();
+                    }
+                }, 30000);
             } catch (err) {
                 console.error("Erro ao verificar permissões:", err);
                 window.location.href = "index.html";

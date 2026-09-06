@@ -272,7 +272,14 @@
                     last_seen: new Date().toISOString()
                 }, { onConflict: 'user_id' });
 
-            if (error) console.error('Erro ao registrar presença do usuário:', error);
+            if (error) {
+                console.error('Erro ao registrar presença do usuário em usuarios_site:', {
+                    mensagem: error.message,
+                    codigo: error.code,
+                    detalhes: error.details,
+                    usuario: usuario.id
+                });
+            }
         }
 
         function iniciarPresencaUsuario(usuario) {
