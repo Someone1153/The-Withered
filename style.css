@@ -640,11 +640,14 @@ body {
 
 /*  Removemos o fundo antigo que cobria apenas os formulários */
 .bloco-formulario-usuario {
-    margin-top: 40px; /* Dá um respiro excelente entre as infos do perfil e os formulários */
+    margin-top: 12px;
     padding: 0;
     background: none;
     border: none;
     width: 100%; /* Ocupa toda a largura interna da caixa */
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 .cabecalho-bloco-formulario {
@@ -652,21 +655,23 @@ body {
     justify-content: space-between;
     gap: 16px;
     align-items: flex-start;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
     width: 100%;
 }
 
 .perfil-usuario-container {
     width: 100%;
+    height: 100%;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
 .avatar-perfil-wrapper {
-    width: 128px;
-    height: 128px;
-    margin-bottom: 16px;
+    width: 256px;
+    height: 256px;
+    margin-bottom: 6px;
     border-radius: 50%;
     overflow: hidden;
     border: 3px solid rgba(200, 210, 255, 0.55);
@@ -683,7 +688,7 @@ body {
 .info-perfil-status-box {
     width: 100%;
     max-width: 500px; /* Mantém os dados de conta e status organizados no centro */
-    margin: 20px auto 0;
+    margin: 6px auto 0;
 }
 
 .titulo-bloco-formulario {
@@ -712,6 +717,11 @@ body {
 }
 
 .lista-formularios-usuario {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 8px;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 16px;
@@ -987,11 +997,15 @@ body {
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 10px;
 }
 
 .conteudo-painel.conteudo-perfil {
-    padding: 30px 30px 40px;
+    height: 100vh;
+    min-height: 0;
+    padding: 20px 30px 24px;
+    box-sizing: border-box;
+    overflow: hidden;
     justify-content: flex-start;
     align-items: center;
 }
@@ -999,11 +1013,29 @@ body {
 .conteudo-painel.conteudo-perfil .caixa-conteudo {
     max-width: 1400px; /* Aumentamos muito o limite para as colunas poderem esticar */
     width: 100%;
-    height: auto;
+    height: 100%;
+    max-height: none;
+    min-height: 0;
     padding: 20px;
+    overflow: hidden;
     background: none; /* REMOVE o fundo do quadradão */
     border: none;     /* REMOVE qualquer borda que estivesse juntando elas */
     box-shadow: none; /* REMOVE a sombra do quadradão anterior */
+}
+
+@media (max-width: 700px) {
+    .conteudo-painel.conteudo-perfil {
+        padding: 12px;
+    }
+
+    .conteudo-painel.conteudo-perfil .caixa-conteudo {
+        padding: 12px;
+    }
+
+    .avatar-perfil-wrapper {
+        width: 180px;
+        height: 180px;
+    }
 }
 
 .status-badge {
