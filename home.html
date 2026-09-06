@@ -430,11 +430,23 @@
             modal.setAttribute('aria-hidden', 'true');
         };
 
+        function ativarScrollMouseNoCarrosselStaff() {
+            const areaStaff = document.querySelector('.conteudo-staff-horizontal');
+            if (!areaStaff) return;
+
+            areaStaff.addEventListener('wheel', event => {
+                if (event.deltaY === 0) return;
+                event.preventDefault();
+                areaStaff.scrollLeft += event.deltaY;
+            }, { passive: false });
+        }
+
         // ==========================================
         // ONLOAD - VERIFICAR SESSÃO E CARREGAR PERFIL
         // ==========================================
         window.addEventListener('DOMContentLoaded', async function() {
             console.log("▶ Verificando sessão...");
+            ativarScrollMouseNoCarrosselStaff();
             
             // Primeiro inicializa Supabase
             await inicializarSupabase();
