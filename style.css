@@ -1046,6 +1046,100 @@ body {
     }
 }
 
+/* Perfil: cabecalho fixo e somente os formularios com rolagem */
+#caixa-principal-perfil {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.perfil-usuario-container {
+    width: min(100%, 980px);
+    height: 100%;
+    min-height: 0;
+    gap: 14px;
+}
+
+.perfil-cabecalho {
+    width: 100%;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+}
+
+.avatar-perfil-wrapper {
+    width: 180px;
+    height: 180px;
+    flex: 0 0 180px;
+    aspect-ratio: 1 / 1;
+    margin: 0;
+    border-radius: 14px;
+}
+
+.perfil-dados-basicos {
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.nome-usuario-perfil {
+    margin: 0;
+    color: #ffffff;
+}
+
+.tag-usuario-perfil {
+    margin: 4px 0 12px;
+    color: #b8b8b8;
+}
+
+.info-perfil-status-box {
+    max-width: none;
+    margin: 0;
+}
+
+.bloco-formulario-usuario {
+    width: 100%;
+    min-height: 0;
+    flex: 1 1 auto;
+    margin-top: 0;
+}
+
+.lista-formularios-usuario {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    align-content: start;
+    grid-auto-rows: max-content;
+}
+
+.card-formulario-usuario {
+    min-height: 160px;
+    height: max-content;
+    box-sizing: border-box;
+}
+
+@media (max-width: 700px) {
+    .perfil-cabecalho {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+    }
+
+    .avatar-perfil-wrapper {
+        width: 180px;
+        height: 180px;
+        flex-basis: 180px;
+    }
+
+    .perfil-dados-basicos {
+        width: 100%;
+    }
+}
+
 .status-badge {
     display: inline-flex;
     align-items: center;
