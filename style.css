@@ -727,7 +727,7 @@ body {
     padding-right: 8px;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    grid-auto-rows: max-content;
+    grid-auto-rows: 230px;
     align-content: start;
     gap: 16px;
     width: 100%;
@@ -738,8 +738,8 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 18px;
     padding: 20px 20px 18px;
-    min-height: 160px;
-    height: max-content;
+    height: 230px;
+    min-height: 230px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -779,10 +779,17 @@ body {
     color: #d1d5db;
     font-size: 0.94rem;
     line-height: 1.6;
+    min-height: 0;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
 }
 
 .card-actions {
-    margin-top: 14px;
+    margin-top: auto;
+    flex: 0 0 auto;
     display: flex;
     justify-content: flex-end;
 }
@@ -793,6 +800,7 @@ body {
     border: 1px solid rgba(88, 101, 242, 0.45);
     border-radius: 999px;
     padding: 10px 16px;
+    white-space: nowrap;
     cursor: pointer;
     transition: all 0.3s ease;
 }
@@ -1113,12 +1121,12 @@ body {
     overflow-x: hidden;
     overflow-y: auto;
     align-content: start;
-    grid-auto-rows: max-content;
+    grid-auto-rows: 230px;
 }
 
 .card-formulario-usuario {
-    min-height: 160px;
-    height: max-content;
+    min-height: 230px;
+    height: 230px;
     box-sizing: border-box;
 }
 
