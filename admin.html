@@ -33,6 +33,7 @@
 
                 <div id="modal-admin-form" class="modal-formulario">
                      <button type="button" class="modal-close-outside" onclick="fecharModalAdmin()">×</button>
+                     <div id="admin-status-flutuante" class="admin-status-flutuante">Em análise</div>
     
                      <div class="modal-conteudo-formulario admin-modal-conteudo">
                          <h3 class="modal-titulo">Visualizar Formulário</h3>
@@ -218,7 +219,6 @@
             if (ehCrianca) labelTipo = 'Crianças';
 
             html += `<div class="modal-row"><strong>Tipo</strong><div>${labelTipo}</div></div>`;
-            html += `<div class="modal-row"><strong>Status</strong><div>${form.status || '-'}</div></div>`;
             const formattedCreated = formatDateTime(form.created_at || form.enviadoEm);
             html += `<div class="modal-row"><strong>Enviado em</strong><div>${formattedCreated}</div></div>`;
 
@@ -280,21 +280,27 @@
 
             html += `
                 <div class="admin-decisao-formulario">
-                    <h4>Decisão deste formulário</h4>
-                    <label for="admin-status-formulario">Status</label>
+                    <h4>Finalizar avaliação</h4>
+                    <label for="admin-status-formulario">Escolha o status final</label>
                     <select id="admin-status-formulario">
                         <option value="Em análise" ${(form.status || 'Em análise') === 'Em análise' ? 'selected' : ''}>Em análise</option>
                         <option value="Aprovado" ${form.status === 'Aprovado' ? 'selected' : ''}>Aprovado</option>
                         <option value="Recusado" ${form.status === 'Recusado' ? 'selected' : ''}>Recusado</option>
                     </select>
-                    <label for="admin-comentario-formulario">Comentário</label>
-                    <textarea id="admin-comentario-formulario" rows="4" placeholder="Escreva um comentário sobre este formulário..."></textarea>
+                    <label for="admin-comentario-formulario">Comentário sobre o formulário</label>
+                    <textarea id="admin-comentario-formulario" rows="8" placeholder="Escreva aqui a avaliação, orientações ou motivo da decisão..."></textarea>
                     <button type="button" id="admin-decisao-final-btn" class="btn-enviar-form">Decisão final</button>
                     <p id="admin-decisao-mensagem" class="admin-decisao-mensagem"></p>
                 </div>
             `;
 
             content.innerHTML = html;
+            const statusFlutuante = document.getElementById('admin-status-flutuante');
+            if (statusFlutuante) {
+                const statusAtual = form.status || 'Em análise';
+                statusFlutuante.textContent = `Status: ${statusAtual}`;
+                statusFlutuante.className = `admin-status-flutuante ${getStatusClassAdmin(statusAtual)}`;
+            }
             const comentario = document.getElementById('admin-comentario-formulario');
             if (comentario) comentario.value = form.comentario_admin || '';
             document.getElementById('admin-decisao-final-btn')?.addEventListener('click', () => salvarDecisaoAdmin(form));
@@ -336,6 +342,12 @@
             form.decisao_final = true;
             if (mensagem) mensagem.textContent = 'Decisão final salva com sucesso.';
             await carregarFormularios();
+        }
+
+        function getStatusClassAdmin(status) {
+            if (status === 'Aprovado') return 'status-aprovado';
+            if (status === 'Recusado') return 'status-reprovado';
+            return 'status-em-analise';
         }
 
         window.fecharModalAdmin = function() {

@@ -867,8 +867,14 @@ body {
 
 .admin-modal-conteudo .modal-row {
     gap: 4px;
-    padding: 8px 10px;
-    font-size: 0.92rem;
+    padding: 14px 16px;
+    font-size: 1rem;
+    line-height: 1.55;
+}
+
+.admin-modal-conteudo .modal-row strong {
+    color: #ffffff;
+    font-size: 1rem;
 }
 
 .modal-back-btn {
@@ -908,6 +914,21 @@ body {
 .modal-close-outside:hover {
     background: rgba(255, 255, 255, 0.35);
     transform: scale(1.05); /* Dá um leve zoom no botão */
+}
+
+.admin-status-flutuante {
+    position: fixed;
+    top: 30px;
+    left: 28px;
+    z-index: 99999;
+    min-width: 170px;
+    padding: 13px 20px;
+    border: 2px solid transparent;
+    border-radius: 14px;
+    font-size: 1.15rem;
+    font-weight: 800;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
 }
 
 .modal-label {
@@ -1085,7 +1106,7 @@ body {
 
 .admin-decisao-formulario {
     margin-top: 22px;
-    padding-top: 18px;
+    padding: 24px 0 4px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -1108,8 +1129,8 @@ body {
     color: #ffffff;
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 10px;
-    padding: 10px 12px;
+    border-radius: 12px;
+    padding: 13px 14px;
     font: inherit;
 }
 
@@ -1120,7 +1141,15 @@ body {
 
 .admin-decisao-formulario textarea {
     resize: vertical;
-    min-height: 90px;
+    min-height: 170px;
+    line-height: 1.55;
+}
+
+.admin-decisao-formulario button {
+    width: 100%;
+    margin-top: 18px;
+    padding: 15px 20px;
+    font-size: 1rem;
 }
 
 .admin-decisao-formulario button:disabled {
