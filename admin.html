@@ -8,8 +8,9 @@
 <body class="corpo-painel">
     <div class="container-painel">
         <aside class="sidebar">
-            <div class="logo-sidebar">Admin Panel</div>
+            <div class="logo-sidebar">Painel Administrativo</div>
             <a href="home.html" class="item-menu">Voltar ao Painel</a>
+            <a href="#" id="menu-formularios-admin" class="item-menu ativo" onclick="alternarPainelAdmin('formularios')">Formulários Feitos</a>
             <a href="#" id="menu-usuarios-admin" class="item-menu" onclick="alternarPainelAdmin('usuarios')">Usuários</a>
         </aside>
         
@@ -167,11 +168,13 @@
             const formularios = document.getElementById('colunas-formularios');
             const usuarios = document.getElementById('painel-usuarios-admin');
             const menuUsuarios = document.getElementById('menu-usuarios-admin');
+            const menuFormularios = document.getElementById('menu-formularios-admin');
 
             if (painel === 'usuarios') {
                 formularios.style.display = 'none';
                 usuarios.style.display = 'block';
                 menuUsuarios.classList.add('ativo');
+                menuFormularios.classList.remove('ativo');
                 carregarUsuariosAdmin();
                 return;
             }
@@ -179,6 +182,7 @@
             formularios.style.display = 'grid';
             usuarios.style.display = 'none';
             menuUsuarios.classList.remove('ativo');
+            menuFormularios.classList.add('ativo');
         };
 
         function renderUsuarioAdmin(usuario, online) {
