@@ -823,8 +823,8 @@ body {
 .admin-modal-conteudo {
    width: 100%;
     max-width: 920px;
-    background: rgba(15, 18, 30, 0.98);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: linear-gradient(180deg, #0d0716 0%, #08050d 100%);
+    border: 1px solid rgba(109, 40, 217, 0.45);
     border-radius: 40px;
     padding: 80px 40px 80px; 
     box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
@@ -887,6 +887,8 @@ body {
     padding: 14px 16px;
     font-size: 1rem;
     line-height: 1.55;
+    background: rgba(109, 40, 217, 0.06);
+    border-color: rgba(167, 139, 250, 0.14);
 }
 
 .admin-modal-conteudo .modal-row strong {
@@ -1303,18 +1305,21 @@ body {
 }
 
 .admin-enviar-finais-btn {
-    border: 1px solid rgba(200, 210, 255, 0.35);
+    border: 1px solid #a78bfa;
     border-radius: 9px;
     padding: 8px 10px;
-    color: #e8ecff;
-    background: rgba(88, 101, 242, 0.16);
+    color: #ffffff;
+    background: linear-gradient(135deg, #6d28d9, #4c1d95);
     font-size: 0.76rem;
     font-weight: 700;
     cursor: pointer;
+    box-shadow: 0 0 10px rgba(167, 139, 250, 0.35);
 }
 
 .admin-enviar-finais-btn:hover {
-    background: rgba(88, 101, 242, 0.3);
+    background: linear-gradient(135deg, #7c3aed, #5b21b6);
+    border-color: #c4b5fd;
+    box-shadow: 0 0 16px rgba(167, 139, 250, 0.6);
 }
 
 .admin-enviar-finais-btn:disabled {
@@ -1358,7 +1363,8 @@ body {
 }
 
 .admin-switch input:checked + .admin-switch-slider {
-    background: #52b879;
+    background: #6d28d9;
+    box-shadow: 0 0 12px rgba(167, 139, 250, 0.55);
 }
 
 .admin-switch input:checked + .admin-switch-slider::before {
@@ -1388,7 +1394,8 @@ body {
     padding: 30px;
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 20px;
-    background: rgba(15, 18, 30, 0.98);
+    background: #0d0716;
+    border-color: rgba(167, 139, 250, 0.35);
     color: #ffffff;
     text-align: center;
     box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
@@ -1417,6 +1424,22 @@ body {
 .modal-formulario-fechado-conteudo .btn-enviar-form {
     min-width: 120px;
     margin-top: 24px;
+}
+
+.modal-confirmacao-acoes .btn-enviar-form,
+.modal-formulario-fechado-conteudo .btn-enviar-form,
+.admin-decisao-formulario button {
+    background: linear-gradient(135deg, #6d28d9, #4c1d95);
+    border: 1px solid #a78bfa;
+    box-shadow: 0 0 12px rgba(167, 139, 250, 0.38);
+}
+
+.modal-confirmacao-acoes .btn-enviar-form:hover,
+.modal-formulario-fechado-conteudo .btn-enviar-form:hover,
+.admin-decisao-formulario button:hover {
+    background: linear-gradient(135deg, #7c3aed, #5b21b6);
+    border-color: #c4b5fd;
+    box-shadow: 0 0 18px rgba(167, 139, 250, 0.65);
 }
 
 .admin-compact-row {
