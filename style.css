@@ -1386,6 +1386,49 @@ body {
     box-shadow: 0 0 10px rgba(87, 217, 130, 0.7);
 }
 
+.admin-formulario-usuario-cabecalho {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 4px;
+    padding: 12px;
+    border: 1px solid rgba(167, 139, 250, 0.16);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.045);
+}
+
+.admin-formulario-usuario-cabecalho img {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.admin-formulario-usuario-cabecalho div {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.admin-formulario-usuario-cabecalho strong,
+.admin-formulario-usuario-cabecalho span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-formulario-usuario-cabecalho strong {
+    color: #ffffff;
+    font-size: 1rem;
+}
+
+.admin-formulario-usuario-cabecalho span {
+    color: #aeb3c2;
+    font-size: 0.84rem;
+}
+
 @media (max-width: 900px) {
     .painel-usuarios-grid {
         grid-template-columns: 1fr;

@@ -357,10 +357,31 @@
             window.location.href = 'index.html';
         };
 
-        function abrirModalAdmin(form) {
+        async function abrirModalAdmin(form) {
             const modal = document.getElementById('modal-admin-form');
             const content = document.getElementById('modal-admin-conteudo');
             if (!modal || !content) return;
+
+            let usuarioFormulario = null;
+            if (form.user_id || form.discord_id) {
+                let consultaUsuario = supabaseClient
+                    .from(PRESENCA_TABELA)
+                    .select('user_id, discord_id, display_name, avatar_url')
+                    .limit(1);
+
+                if (form.user_id) {
+                    consultaUsuario = consultaUsuario.eq('user_id', String(form.user_id));
+                } else {
+                    consultaUsuario = consultaUsuario.eq('discord_id', String(form.discord_id));
+                }
+
+                const { data: usuariosEncontrados, error: usuarioError } = await consultaUsuario;
+                if (usuarioError) {
+                    console.warn('Não foi possível carregar o perfil do formulário:', usuarioError);
+                } else {
+                    usuarioFormulario = usuariosEncontrados?.[0] || null;
+                }
+            }
 
             // 🔍 DETECTA O TIPO DO FORMULÁRIO DE FORMA PRECISA
             const ehStaff = form.tipo?.toLowerCase().includes('staff') || form.areas_auxilio !== undefined;
@@ -426,6 +447,19 @@
             let labelTipo = 'Player';
             if (ehStaff) labelTipo = 'Staff';
             if (ehCrianca) labelTipo = 'Crianças';
+
+            const nomeUsuario = usuarioFormulario?.display_name || 'Usuário não identificado';
+            const avatarUsuario = usuarioFormulario?.avatar_url || 'https://cdn.discordapp.com/embed/avatars/0.png';
+            const idUsuario = usuarioFormulario?.discord_id || form.discord_id || form.user_id || '-';
+            html += `
+                <div class="admin-formulario-usuario-cabecalho">
+                    <img src="${avatarUsuario}" alt="Avatar de ${nomeUsuario}">
+                    <div>
+                        <strong>${nomeUsuario}</strong>
+                        <span>${idUsuario}</span>
+                    </div>
+                </div>
+            `;
 
             html += `<div class="modal-row"><strong>Tipo</strong><div>${labelTipo}</div></div>`;
             const formattedCreated = formatDateTime(form.created_at || form.enviadoEm);
