@@ -13,7 +13,6 @@
         </aside>
         
         <main class="conteudo-painel">
-            <!-- 🛠️ REMOVEMOS A CLASSE .caixa-conteudo E ADICIONAMOS UM WRAPPER TOTALMENTE EXPANSÍVEL -->
             <div class="admin-wrapper-global" style="width: 100%; max-width: 1600px; margin: 0 auto; padding: 20px;">
                 <h2 style="color: #fff; margin-bottom: 10px;">Painel Administrativo</h2>
                 
@@ -279,8 +278,64 @@
                 });
             }
 
+            html += `
+                <div class="admin-decisao-formulario">
+                    <h4>Decisão deste formulário</h4>
+                    <label for="admin-status-formulario">Status</label>
+                    <select id="admin-status-formulario">
+                        <option value="Em análise" ${(form.status || 'Em análise') === 'Em análise' ? 'selected' : ''}>Em análise</option>
+                        <option value="Aprovado" ${form.status === 'Aprovado' ? 'selected' : ''}>Aprovado</option>
+                        <option value="Recusado" ${form.status === 'Recusado' ? 'selected' : ''}>Recusado</option>
+                    </select>
+                    <label for="admin-comentario-formulario">Comentário</label>
+                    <textarea id="admin-comentario-formulario" rows="4" placeholder="Escreva um comentário sobre este formulário..."></textarea>
+                    <button type="button" id="admin-decisao-final-btn" class="btn-enviar-form">Decisão final</button>
+                    <p id="admin-decisao-mensagem" class="admin-decisao-mensagem"></p>
+                </div>
+            `;
+
             content.innerHTML = html;
+            const comentario = document.getElementById('admin-comentario-formulario');
+            if (comentario) comentario.value = form.comentario_admin || '';
+            document.getElementById('admin-decisao-final-btn')?.addEventListener('click', () => salvarDecisaoAdmin(form));
             modal.classList.add('modal-aberto');
+        }
+
+        async function salvarDecisaoAdmin(form) {
+            const status = document.getElementById('admin-status-formulario')?.value;
+            const comentario = document.getElementById('admin-comentario-formulario')?.value.trim() || '';
+            const mensagem = document.getElementById('admin-decisao-mensagem');
+
+            if (!form.__table || !form.id || !status) {
+                if (mensagem) mensagem.textContent = 'Não foi possível identificar este formulário.';
+                return;
+            }
+
+            const botao = document.getElementById('admin-decisao-final-btn');
+            if (botao) botao.disabled = true;
+            if (mensagem) mensagem.textContent = 'Salvando decisão...';
+
+            const { error } = await supabaseClient
+                .from(form.__table)
+                .update({
+                    status,
+                    comentario_admin: comentario,
+                    decisao_final: true
+                })
+                .eq('id', form.id);
+
+            if (botao) botao.disabled = false;
+            if (error) {
+                console.error('Erro ao salvar decisão do formulário:', error);
+                if (mensagem) mensagem.textContent = 'Erro ao salvar. Verifique as colunas e as políticas do Supabase.';
+                return;
+            }
+
+            form.status = status;
+            form.comentario_admin = comentario;
+            form.decisao_final = true;
+            if (mensagem) mensagem.textContent = 'Decisão final salva com sucesso.';
+            await carregarFormularios();
         }
 
         window.fecharModalAdmin = function() {
@@ -361,6 +416,7 @@
             const criancas = [];
 
             playersData.forEach(item => {
+                item.__table = 'formulario_players';
                 const tipo = (item.tipo || '').toString().toLowerCase();
                 if (tipo.includes('staff')) staff.push(item);
                 else if (tipo.includes('crian')) criancas.push(item);
@@ -368,10 +424,10 @@
             });
 
             // Adiciona os registros de formulario_staff diretamente na lista de Staff.
-            staff.push(...staffData);
+            staff.push(...staffData.map(item => ({ ...item, __table: 'formulario_staff' })));
 
             // Adiciona os registros de formulario_criancas diretamente na lista de Crianças.
-            criancas.push(...criancasData);
+            criancas.push(...criancasData.map(item => ({ ...item, __table: 'formulario_criancas' })));
 
             function renderList(container, items) {
                 if (!container) return;

@@ -1083,6 +1083,58 @@ body {
     color: #ffd4d4;
 }
 
+.admin-decisao-formulario {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-decisao-formulario h4 {
+    margin: 0 0 14px;
+    color: #ffffff;
+}
+
+.admin-decisao-formulario label {
+    display: block;
+    margin: 12px 0 6px;
+    color: #cfd5e8;
+    font-size: 0.9rem;
+}
+
+.admin-decisao-formulario select,
+.admin-decisao-formulario textarea {
+    width: 100%;
+    box-sizing: border-box;
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font: inherit;
+}
+
+.admin-decisao-formulario select option {
+    color: #111827;
+    background: #ffffff;
+}
+
+.admin-decisao-formulario textarea {
+    resize: vertical;
+    min-height: 90px;
+}
+
+.admin-decisao-formulario button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.admin-decisao-mensagem {
+    min-height: 20px;
+    margin: 10px 0 0;
+    color: #b9c2d8;
+    font-size: 0.9rem;
+}
+
 .admin-card {
     background: rgba(20, 20, 30, 0.9);
     border: 1px solid rgba(255, 255, 255, 0.08);

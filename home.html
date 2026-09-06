@@ -49,11 +49,11 @@
                         <div class="conteudo-card-staff">
                             <span class="nome-destaque-azul">Jess</span>
                             <div class="tags-staff">
-                                <span class="tag-funcao badge-criador">Criador do servidor</span>
+                                <span class="tag-funcao badge-criador">Criador do site</span>
                                 <span class="tag-funcao">Desenvolvedor</span>
-                                <span class="tag-funcao">Entrevistador</span>
-                                <span class="tag-funcao">Lore Maker</span>
-                                <span class="tag-funcao">Autista de suporte 1</span>
+                                <span class="tag-funcao">blablabla</span>
+                                <span class="tag-funcao">blablabla</span>
+                                <span class="tag-funcao">blablabla</span>
                             </div>
                         </div>
                     </div>
@@ -61,11 +61,11 @@
                     <div class="card-staff-box card-exemplo-teste">
                         <div class="topo-card-decorativo"></div>
                         <div class="conteudo-card-staff">
-                            <h2 class="nome-staff">Membro Teste</h2>
+                            <h2 class="nome-staff">Nyny</h2>
                             <div class="tags-staff">
-                                <span class="tag-funcao">Moderador</span>
-                                <span class="tag-funcao">Designer</span>
-                                <span class="tag-funcao">Teste</span>
+                                <span class="tag-funcao">Subdona</span>
+                                <span class="tag-funcao">blablabla</span>
+                                <span class="tag-funcao">blablabla</span>
                             </div>
                         </div>
                     </div>
@@ -1385,7 +1385,11 @@
                 card.className = 'card-formulario-usuario';
                 
                 const dataFormatada = formatDateTime(form.created_at);
-                const statusAtual = form.status || 'Em análise';
+                const decisaoFinal = form.decisao_final === true;
+                const statusAtual = decisaoFinal ? (form.status || 'Em análise') : 'Aguardando decisão';
+                const comentarioFinal = decisaoFinal && form.comentario_admin
+                    ? `<p><strong>Comentário da Staff:</strong> ${formatValueForDisplay(form.comentario_admin)}</p>`
+                    : `<p><strong>Comentário da Staff:</strong> A decisão ainda não foi publicada.</p>`;
 
                 card.innerHTML = `
                     <div class="card-topo">
@@ -1393,10 +1397,11 @@
                             <span class="card-tipo">${form.exibicao_tipo}</span>
                             <span class="card-data">${dataFormatada}</span>
                         </div>
-                        <span class="status-badge status-em-analise">${statusAtual}</span>
+                        <span class="status-badge ${getStatusClass(statusAtual)}">${statusAtual}</span>
                     </div>
                     <div class="card-resumo">
                         <strong>Destaques:</strong> ${form.label_resumo}
+                        ${comentarioFinal}
                     </div>
                     <div class="card-actions">
                         <button class="card-visualizar-btn" onclick="verDetalhesFormUsuario(${index})">Ver formulário</button>
@@ -1407,9 +1412,13 @@
 
             // Atualiza o status geral do topo da aba baseado no último enviado
             const ultimoForm = todosFormularios[0];
-            document.getElementById('status-badge-formulario').innerText = ultimoForm.status || 'Em análise';
+            document.getElementById('status-badge-formulario').innerText = ultimoForm.decisao_final === true
+                ? (ultimoForm.status || 'Em análise')
+                : 'Aguardando decisão';
             document.getElementById('status-resumo-formulario').innerText = `Último envio: ${formatDateTime(ultimoForm.created_at)}`;
-            document.querySelector(".status-pendente").innerText = ultimoForm.status || 'Em análise';
+            document.querySelector(".status-pendente").innerText = ultimoForm.decisao_final === true
+                ? (ultimoForm.status || 'Em análise')
+                : 'Aguardando decisão';
         }
 
         // ==========================================================
@@ -1477,10 +1486,16 @@
             }
 
             let html = '';
+            const decisaoFinal = form.decisao_final === true;
             fieldsOrder.forEach(f => {
                 const val = form[f.key] || '-';
                 html += `<div style="margin-bottom:16px;"><strong style="color:#fff; display:block; margin-bottom:4px;">${f.label}</strong><div style="color:#d1d5db; line-height:1.5;">${val}</div></div>`;
             });
+
+            html += decisaoFinal
+                ? `<div class="modal-row"><strong>Status final</strong><div>${formatValueForDisplay(form.status)}</div></div>
+                   <div class="modal-row"><strong>Comentário da Staff</strong><div>${formatValueForDisplay(form.comentario_admin)}</div></div>`
+                : `<div class="modal-row"><strong>Decisão</strong><div>A decisão final ainda não foi publicada.</div></div>`;
 
             content.innerHTML = html;
             modal.classList.add('modal-aberto');
