@@ -1264,6 +1264,38 @@ body {
     font-size: 1.05rem;
 }
 
+.admin-coluna-cabecalho {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.admin-coluna-cabecalho h3 {
+    margin: 6px 0;
+}
+
+.admin-enviar-finais-btn {
+    border: 1px solid rgba(200, 210, 255, 0.35);
+    border-radius: 9px;
+    padding: 8px 10px;
+    color: #e8ecff;
+    background: rgba(88, 101, 242, 0.16);
+    font-size: 0.76rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.admin-enviar-finais-btn:hover {
+    background: rgba(88, 101, 242, 0.3);
+}
+
+.admin-enviar-finais-btn:disabled {
+    opacity: 0.55;
+    cursor: wait;
+}
+
 .admin-compact-row {
     min-height: 52px;
     display: flex;
@@ -1282,6 +1314,40 @@ body {
 .admin-compact-row:hover {
     background: rgba(255, 255, 255, 0.08);
     }
+
+.admin-compact-row.admin-row-decisao-salva {
+    opacity: 0.62;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.admin-compact-row.admin-row-decisao-salva:hover {
+    opacity: 0.82;
+}
+
+.admin-leitura-indicador {
+    flex: 0 0 auto;
+    width: 11px;
+    height: 11px;
+    margin-left: 10px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 8px currentColor;
+}
+
+.admin-indicador-analise {
+    color: #f3d36b;
+    background: #f3d36b;
+}
+
+.admin-indicador-aprovado {
+    color: #7ed48a;
+    background: #7ed48a;
+}
+
+.admin-indicador-recusado {
+    color: #e58f8f;
+    background: #e58f8f;
+}
 
 .admin-compact-row div {
     overflow: hidden;

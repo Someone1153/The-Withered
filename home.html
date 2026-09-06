@@ -1385,11 +1385,11 @@
                 card.className = 'card-formulario-usuario';
                 
                 const dataFormatada = formatDateTime(form.created_at);
-                const decisaoFinal = form.decisao_final === true;
-                const statusAtual = decisaoFinal ? (form.status || 'Em análise') : 'Aguardando decisão';
-                const comentarioFinal = decisaoFinal && form.comentario_admin
+                const respostaPublicada = form.decisao_final === true && form.resposta_final_enviada === true;
+                const statusAtual = respostaPublicada ? (form.status || 'Em análise') : 'Em análise';
+                const comentarioFinal = respostaPublicada && form.comentario_admin
                     ? `<p><strong>Comentário da Staff:</strong> ${formatValueForDisplay(form.comentario_admin)}</p>`
-                    : `<p><strong>Comentário da Staff:</strong> A decisão ainda não foi publicada.</p>`;
+                    : '';
 
                 card.innerHTML = `
                     <div class="card-topo">
@@ -1412,13 +1412,13 @@
 
             // Atualiza o status geral do topo da aba baseado no último enviado
             const ultimoForm = todosFormularios[0];
-            document.getElementById('status-badge-formulario').innerText = ultimoForm.decisao_final === true
+            document.getElementById('status-badge-formulario').innerText = ultimoForm.decisao_final === true && ultimoForm.resposta_final_enviada === true
                 ? (ultimoForm.status || 'Em análise')
-                : 'Aguardando decisão';
+                : 'Em análise';
             document.getElementById('status-resumo-formulario').innerText = `Último envio: ${formatDateTime(ultimoForm.created_at)}`;
-            document.querySelector(".status-pendente").innerText = ultimoForm.decisao_final === true
+            document.querySelector(".status-pendente").innerText = ultimoForm.decisao_final === true && ultimoForm.resposta_final_enviada === true
                 ? (ultimoForm.status || 'Em análise')
-                : 'Aguardando decisão';
+                : 'Em análise';
         }
 
         // ==========================================================
@@ -1486,16 +1486,16 @@
             }
 
             let html = '';
-            const decisaoFinal = form.decisao_final === true;
+            const respostaPublicada = form.decisao_final === true && form.resposta_final_enviada === true;
             fieldsOrder.forEach(f => {
                 const val = form[f.key] || '-';
                 html += `<div style="margin-bottom:16px;"><strong style="color:#fff; display:block; margin-bottom:4px;">${f.label}</strong><div style="color:#d1d5db; line-height:1.5;">${val}</div></div>`;
             });
 
-            html += decisaoFinal
+            html += respostaPublicada
                 ? `<div class="modal-row"><strong>Status final</strong><div>${formatValueForDisplay(form.status)}</div></div>
                    <div class="modal-row"><strong>Comentário da Staff</strong><div>${formatValueForDisplay(form.comentario_admin)}</div></div>`
-                : `<div class="modal-row"><strong>Decisão</strong><div>A decisão final ainda não foi publicada.</div></div>`;
+                : `<div class="modal-row"><strong>Status</strong><div>Em análise</div></div>`;
 
             content.innerHTML = html;
             modal.classList.add('modal-aberto');

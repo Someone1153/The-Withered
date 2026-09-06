@@ -18,15 +18,24 @@
                 
                 <div id="colunas-formularios" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-top: 20px; width: 100%;">
                     <div class="coluna-formularios" id="col-players">
-                        <h3 style="margin-bottom:15px">Players</h3>
+                        <div class="admin-coluna-cabecalho">
+                            <h3>Players</h3>
+                            <button type="button" class="admin-enviar-finais-btn" onclick="enviarRespostasFinais('formulario_players')">Enviar respostas finais</button>
+                        </div>
                         <div id="lista-players"></div>
                     </div>
                     <div class="coluna-formularios" id="col-staff">
-                        <h3 style="margin-bottom:15px">Staff</h3>
+                        <div class="admin-coluna-cabecalho">
+                            <h3>Staff</h3>
+                            <button type="button" class="admin-enviar-finais-btn" onclick="enviarRespostasFinais('formulario_staff')">Enviar respostas finais</button>
+                        </div>
                         <div id="lista-staff"></div>
                     </div>
                     <div class="coluna-formularios" id="col-criancas">
-                        <h3 style="margin-bottom:15px">Crianças</h3>
+                        <div class="admin-coluna-cabecalho">
+                            <h3>Crianças</h3>
+                            <button type="button" class="admin-enviar-finais-btn" onclick="enviarRespostasFinais('formulario_criancas')">Enviar respostas finais</button>
+                        </div>
                         <div id="lista-criancas"></div>
                     </div>
                 </div>
@@ -326,7 +335,8 @@
                 .update({
                     status,
                     comentario_admin: comentario,
-                    decisao_final: true
+                    decisao_final: true,
+                    resposta_final_enviada: false
                 })
                 .eq('id', form.id);
 
@@ -340,9 +350,30 @@
             form.status = status;
             form.comentario_admin = comentario;
             form.decisao_final = true;
+            form.resposta_final_enviada = false;
             if (mensagem) mensagem.textContent = 'Decisão final salva com sucesso.';
             await carregarFormularios();
         }
+
+        window.enviarRespostasFinais = async function(table) {
+            const botao = document.querySelector(`[onclick="enviarRespostasFinais('${table}')"]`);
+            if (botao) botao.disabled = true;
+
+            const { error } = await supabaseClient
+                .from(table)
+                .update({ resposta_final_enviada: true })
+                .eq('decisao_final', true)
+                .or('resposta_final_enviada.is.null,resposta_final_enviada.eq.false');
+
+            if (botao) botao.disabled = false;
+            if (error) {
+                console.error('Erro ao enviar respostas finais:', error);
+                alert('Não foi possível enviar as respostas finais. Verifique as colunas e as políticas do Supabase.');
+                return;
+            }
+
+            await carregarFormularios();
+        };
 
         function getStatusClassAdmin(status) {
             if (status === 'Aprovado') return 'status-aprovado';
@@ -453,13 +484,21 @@
                     const numero = idx + 1;
                     const dataEnvio = formatDateTime(form.created_at || form.enviadoEm) || 'Data não informada';
                     const nome = form.nome_apelido || form.tag || 'Sem nome';
+                    const decisaoSalva = form.decisao_final === true;
+                    const statusIndicador = decisaoSalva ? (form.status || 'Em análise') : 'Em análise';
+                    const indicadorClasse = statusIndicador === 'Aprovado'
+                        ? 'admin-indicador-aprovado'
+                        : statusIndicador === 'Recusado'
+                            ? 'admin-indicador-recusado'
+                            : 'admin-indicador-analise';
 
                     const row = document.createElement('div');
-                    row.className = 'admin-compact-row';
+                    row.className = `admin-compact-row${decisaoSalva ? ' admin-row-decisao-salva' : ''}`;
                     row.innerHTML = `
                         <span style="min-width:30px; font-weight:700; color:#c8d2ff">${numero}</span>
                         <span style="flex:1; font-weight:600; color:#fff; overflow:hidden; text-overflow:ellipsis; padding-right:10px;">${nome}</span>
                         <span style="color:#a3a3a3; font-size:0.85rem; white-space:nowrap;">${dataEnvio}</span>
+                        <span class="admin-leitura-indicador ${indicadorClasse}" title="${decisaoSalva ? `Decisão salva: ${statusIndicador}` : 'Ainda não lido'}" aria-label="${decisaoSalva ? `Decisão salva: ${statusIndicador}` : 'Ainda não lido'}"></span>
                     `;
                     row.addEventListener('click', () => abrirModalAdmin(form));
                     container.appendChild(row);
