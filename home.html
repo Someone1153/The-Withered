@@ -161,6 +161,7 @@
         let usuarioAtual = null;
         let submissaoEfetuada = false;
         let formulariosExibidos = [];
+        let presencaIntervalo = null;
         const formularioTipos = {
             Players: 'players',
             Staff: 'staff',
@@ -258,6 +259,28 @@
             }
         }
 
+        async function registrarPresencaUsuario(usuario) {
+            if (!supabase || !usuario?.id) return;
+
+            const { error } = await supabase
+                .from('usuarios_site')
+                .upsert({
+                    user_id: usuario.id,
+                    discord_id: usuario.discord_id,
+                    display_name: usuario.nome,
+                    avatar_url: usuario.avatar,
+                    last_seen: new Date().toISOString()
+                }, { onConflict: 'user_id' });
+
+            if (error) console.error('Erro ao registrar presença do usuário:', error);
+        }
+
+        function iniciarPresencaUsuario(usuario) {
+            registrarPresencaUsuario(usuario);
+            clearInterval(presencaIntervalo);
+            presencaIntervalo = setInterval(() => registrarPresencaUsuario(usuario), 30 * 1000);
+        }
+
         async function carregarEstadosFormularios() {
             try {
                 const { data, error } = await supabase
@@ -316,6 +339,7 @@
                 };
 
                 console.log("✓ Usuário logado:", usuarioAtual);
+                iniciarPresencaUsuario(usuarioAtual);
                 await carregarEstadosFormularios();
                 carregarPerfil(usuarioAtual);
                 await carregarTodosFormulariosUsuario(usuarioAtual);

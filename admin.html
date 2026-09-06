@@ -10,6 +10,7 @@
         <aside class="sidebar">
             <div class="logo-sidebar">Admin Panel</div>
             <a href="home.html" class="item-menu">Voltar ao Painel</a>
+            <a href="#" id="menu-usuarios-admin" class="item-menu" onclick="alternarPainelAdmin('usuarios')">Usuários</a>
         </aside>
         
         <main class="conteudo-painel">
@@ -52,6 +53,26 @@
                     </div>
                 </div>
 
+                <section id="painel-usuarios-admin" class="painel-usuarios-admin" style="display: none;">
+                    <div class="painel-usuarios-cabecalho">
+                        <div>
+                            <h2>Usuários</h2>
+                            <p>Contas que já acessaram o site e presença atual.</p>
+                        </div>
+                        <button type="button" class="admin-enviar-finais-btn" onclick="carregarUsuariosAdmin()">Atualizar</button>
+                    </div>
+                    <div class="painel-usuarios-grid">
+                        <div class="lista-usuarios-box">
+                            <h3>Online agora</h3>
+                            <div id="lista-usuarios-online" class="lista-usuarios"></div>
+                        </div>
+                        <div class="lista-usuarios-box">
+                            <h3>Todos os usuários</h3>
+                            <div id="lista-todos-usuarios" class="lista-usuarios"></div>
+                        </div>
+                    </div>
+                </section>
+
                 <div id="modal-admin-form" class="modal-formulario">
                      <button type="button" class="modal-close-outside" onclick="fecharModalAdmin()">×</button>
                      <div id="admin-status-flutuante" class="admin-status-flutuante">Em análise</div>
@@ -83,6 +104,7 @@
         const SUPABASE_ANON_KEY = "sb_publishable_XrlHqqACgEz_OqAHyVIVag_wC55nwsB";
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const admins = ["780382546542198816"];
+        const PRESENCA_TABELA = 'usuarios_site';
         const formularioTipos = {
             Players: 'players',
             Staff: 'staff',
@@ -140,6 +162,73 @@
 
             return Array.from(candidates).filter(Boolean);
         }
+
+        window.alternarPainelAdmin = function(painel) {
+            const formularios = document.getElementById('colunas-formularios');
+            const usuarios = document.getElementById('painel-usuarios-admin');
+            const menuUsuarios = document.getElementById('menu-usuarios-admin');
+
+            if (painel === 'usuarios') {
+                formularios.style.display = 'none';
+                usuarios.style.display = 'block';
+                menuUsuarios.classList.add('ativo');
+                carregarUsuariosAdmin();
+                return;
+            }
+
+            formularios.style.display = 'grid';
+            usuarios.style.display = 'none';
+            menuUsuarios.classList.remove('ativo');
+        };
+
+        function renderUsuarioAdmin(usuario, online) {
+            const nome = usuario.display_name || usuario.nome || 'Usuário';
+            const avatar = usuario.avatar_url || 'https://cdn.discordapp.com/embed/avatars/0.png';
+            const ultimaAtividade = usuario.last_seen ? formatDateTime(usuario.last_seen) : 'Sem atividade registrada';
+            return `
+                <div class="usuario-admin-item">
+                    <img src="${avatar}" alt="Avatar de ${nome}">
+                    <div class="usuario-admin-dados">
+                        <strong>${nome}</strong>
+                        <span>${usuario.discord_id || usuario.user_id || '-'}</span>
+                        <small>${online ? 'Online agora' : `Visto em ${ultimaAtividade}`}</small>
+                    </div>
+                    <span class="usuario-online-indicador ${online ? 'online' : ''}" title="${online ? 'Online agora' : 'Offline'}"></span>
+                </div>
+            `;
+        }
+
+        window.carregarUsuariosAdmin = async function() {
+            const onlineContainer = document.getElementById('lista-usuarios-online');
+            const todosContainer = document.getElementById('lista-todos-usuarios');
+            if (!onlineContainer || !todosContainer) return;
+
+            onlineContainer.innerHTML = '<p class="admin-loading">Carregando...</p>';
+            todosContainer.innerHTML = '<p class="admin-loading">Carregando...</p>';
+
+            const { data, error } = await supabaseClient
+                .from(PRESENCA_TABELA)
+                .select('*')
+                .order('last_seen', { ascending: false });
+
+            if (error) {
+                console.error('Erro ao carregar usuários:', error);
+                onlineContainer.innerHTML = '<p class="admin-error">Não foi possível carregar os usuários.</p>';
+                todosContainer.innerHTML = '';
+                return;
+            }
+
+            const limiteOnline = Date.now() - 2 * 60 * 1000;
+            const usuarios = Array.isArray(data) ? data : [];
+            const online = usuarios.filter(usuario => new Date(usuario.last_seen).getTime() >= limiteOnline);
+
+            onlineContainer.innerHTML = online.length
+                ? online.map(usuario => renderUsuarioAdmin(usuario, true)).join('')
+                : '<p class="texto-vazio">Ninguém online no momento.</p>';
+            todosContainer.innerHTML = usuarios.length
+                ? usuarios.map(usuario => renderUsuarioAdmin(usuario, online.includes(usuario))).join('')
+                : '<p class="texto-vazio">Nenhum usuário registrado.</p>';
+        };
 
         function switchId(tipo) {
             return `switch-${formularioTipos[tipo]}`;

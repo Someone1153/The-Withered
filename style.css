@@ -1274,6 +1274,128 @@ body {
     color: #ffd4d4;
 }
 
+.painel-usuarios-admin {
+    margin-top: 20px;
+    min-height: 75vh;
+    padding: 24px;
+    border: 1px solid rgba(109, 40, 217, 0.35);
+    border-radius: 24px;
+    background: rgba(10, 7, 16, 0.78);
+}
+
+.painel-usuarios-cabecalho {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.painel-usuarios-cabecalho h2 {
+    margin: 0;
+    color: #ffffff;
+}
+
+.painel-usuarios-cabecalho p {
+    margin: 6px 0 0;
+    color: #b8b8b8;
+}
+
+.painel-usuarios-grid {
+    display: grid;
+    grid-template-columns: minmax(260px, 0.8fr) minmax(320px, 1.2fr);
+    gap: 20px;
+    height: 64vh;
+}
+
+.lista-usuarios-box {
+    min-height: 0;
+    padding: 18px;
+    border: 1px solid rgba(167, 139, 250, 0.16);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.035);
+    overflow: hidden;
+}
+
+.lista-usuarios-box h3 {
+    margin: 0 0 14px;
+    color: #ffffff;
+}
+
+.lista-usuarios {
+    height: calc(100% - 38px);
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
+.usuario-admin-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.045);
+}
+
+.usuario-admin-item img {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.usuario-admin-dados {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.usuario-admin-dados strong,
+.usuario-admin-dados span,
+.usuario-admin-dados small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.usuario-admin-dados strong {
+    color: #ffffff;
+}
+
+.usuario-admin-dados span,
+.usuario-admin-dados small {
+    color: #aeb3c2;
+    font-size: 0.82rem;
+}
+
+.usuario-online-indicador {
+    width: 10px;
+    height: 10px;
+    margin-left: auto;
+    flex: 0 0 10px;
+    border-radius: 50%;
+    background: #666b78;
+}
+
+.usuario-online-indicador.online {
+    background: #57d982;
+    box-shadow: 0 0 10px rgba(87, 217, 130, 0.7);
+}
+
+@media (max-width: 900px) {
+    .painel-usuarios-grid {
+        grid-template-columns: 1fr;
+        height: auto;
+    }
+
+    .lista-usuarios-box {
+        height: 360px;
+    }
+}
+
 .admin-decisao-formulario {
     margin-top: 22px;
     padding: 24px 0 4px;
