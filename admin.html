@@ -20,6 +20,10 @@
                     <div class="coluna-formularios" id="col-players">
                         <div class="admin-coluna-cabecalho">
                             <h3>Players</h3>
+                            <label class="admin-switch" title="Abrir ou fechar formulário de Players">
+                                <input type="checkbox" id="switch-players" onchange="confirmarEstadoFormulario('Players', this)">
+                                <span class="admin-switch-slider"></span>
+                            </label>
                             <button type="button" class="admin-enviar-finais-btn" onclick="enviarRespostasFinais('formulario_players')">Enviar respostas finais</button>
                         </div>
                         <div id="lista-players"></div>
@@ -27,6 +31,10 @@
                     <div class="coluna-formularios" id="col-staff">
                         <div class="admin-coluna-cabecalho">
                             <h3>Staff</h3>
+                            <label class="admin-switch" title="Abrir ou fechar formulário de Staff">
+                                <input type="checkbox" id="switch-staff" onchange="confirmarEstadoFormulario('Staff', this)">
+                                <span class="admin-switch-slider"></span>
+                            </label>
                             <button type="button" class="admin-enviar-finais-btn" onclick="enviarRespostasFinais('formulario_staff')">Enviar respostas finais</button>
                         </div>
                         <div id="lista-staff"></div>
@@ -34,6 +42,10 @@
                     <div class="coluna-formularios" id="col-criancas">
                         <div class="admin-coluna-cabecalho">
                             <h3>Crianças</h3>
+                            <label class="admin-switch" title="Abrir ou fechar formulário de Crianças">
+                                <input type="checkbox" id="switch-criancas" onchange="confirmarEstadoFormulario('Crianças', this)">
+                                <span class="admin-switch-slider"></span>
+                            </label>
                             <button type="button" class="admin-enviar-finais-btn" onclick="enviarRespostasFinais('formulario_criancas')">Enviar respostas finais</button>
                         </div>
                         <div id="lista-criancas"></div>
@@ -49,6 +61,17 @@
                          <div id="modal-admin-conteudo" class="modal-formulario-conteudo"></div>
                     </div>
                 </div>
+
+                <div id="modal-confirmacao-formulario" class="modal-confirmacao-formulario" aria-hidden="true">
+                    <div class="modal-confirmacao-conteudo">
+                        <h3 id="modal-confirmacao-titulo">Alterar formulário</h3>
+                        <p id="modal-confirmacao-texto"></p>
+                        <div class="modal-confirmacao-acoes">
+                            <button type="button" class="btn-voltar" onclick="fecharConfirmacaoFormulario()">Cancelar</button>
+                            <button type="button" class="btn-enviar-form" id="confirmar-estado-formulario-btn">Confirmar</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
@@ -60,6 +83,12 @@
         const SUPABASE_ANON_KEY = "sb_publishable_XrlHqqACgEz_OqAHyVIVag_wC55nwsB";
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const admins = ["780382546542198816"];
+        const formularioTipos = {
+            Players: 'players',
+            Staff: 'staff',
+            Crianças: 'criancas'
+        };
+        let estadosFormularios = { Players: true, Staff: true, Crianças: true };
 
         function formatDateTime(v) {
             if (!v) return '-';
@@ -112,6 +141,82 @@
             return Array.from(candidates).filter(Boolean);
         }
 
+        function switchId(tipo) {
+            return `switch-${formularioTipos[tipo]}`;
+        }
+
+        async function carregarEstadosFormularios() {
+            const { data, error } = await supabaseClient
+                .from('config_formularios')
+                .select('tipo, aberto');
+
+            if (error) {
+                console.error('Erro ao carregar estados dos formulários:', error);
+                return;
+            }
+
+            (data || []).forEach(item => {
+                const tipo = Object.keys(formularioTipos).find(chave => formularioTipos[chave] === item.tipo);
+                if (tipo) estadosFormularios[tipo] = item.aberto !== false;
+            });
+
+            Object.keys(formularioTipos).forEach(tipo => {
+                const input = document.getElementById(switchId(tipo));
+                if (input) input.checked = estadosFormularios[tipo];
+            });
+        }
+
+        let confirmacaoPendente = null;
+
+        window.confirmarEstadoFormulario = function(tipo, input) {
+            const novoEstado = input.checked;
+            input.checked = estadosFormularios[tipo];
+            confirmacaoPendente = { tipo, novoEstado, input };
+
+            document.getElementById('modal-confirmacao-titulo').textContent = novoEstado
+                ? `Abrir formulário de ${tipo}`
+                : `Fechar formulário de ${tipo}`;
+            document.getElementById('modal-confirmacao-texto').textContent = novoEstado
+                ? 'Os usuários poderão acessar e responder este formulário.'
+                : 'Os usuários não poderão acessar ou responder este formulário enquanto ele estiver fechado.';
+            document.getElementById('modal-confirmacao-formulario').classList.add('modal-aberto');
+            document.getElementById('modal-confirmacao-formulario').setAttribute('aria-hidden', 'false');
+
+            document.getElementById('confirmar-estado-formulario-btn').onclick = salvarEstadoFormulario;
+        };
+
+        window.fecharConfirmacaoFormulario = function() {
+            if (confirmacaoPendente?.input) confirmacaoPendente.input.checked = estadosFormularios[confirmacaoPendente.tipo];
+            confirmacaoPendente = null;
+            const modal = document.getElementById('modal-confirmacao-formulario');
+            modal.classList.remove('modal-aberto');
+            modal.setAttribute('aria-hidden', 'true');
+        };
+
+        async function salvarEstadoFormulario() {
+            if (!confirmacaoPendente) return;
+            const { tipo, novoEstado, input } = confirmacaoPendente;
+            const botao = document.getElementById('confirmar-estado-formulario-btn');
+            botao.disabled = true;
+
+            const { error } = await supabaseClient
+                .from('config_formularios')
+                .upsert({ tipo: formularioTipos[tipo], aberto: novoEstado }, { onConflict: 'tipo' });
+
+            botao.disabled = false;
+            if (error) {
+                console.error('Erro ao salvar estado do formulário:', error);
+                alert(`Não foi possível alterar este formulário: ${error.message}`);
+                fecharConfirmacaoFormulario();
+                return;
+            }
+
+            estadosFormularios[tipo] = novoEstado;
+            input.checked = novoEstado;
+            confirmacaoPendente = null;
+            fecharConfirmacaoFormulario();
+        }
+
         window.onload = async function() {
             try {
                 const { data: { session } } = await supabaseClient.auth.getSession();
@@ -133,6 +238,7 @@
                     return;
                 }
 
+                await carregarEstadosFormularios();
                 await carregarFormularios();
             } catch (err) {
                 console.error("Erro ao verificar permissões:", err);

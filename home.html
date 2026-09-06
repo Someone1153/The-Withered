@@ -135,6 +135,14 @@
         </div>
     </div>
 
+    <div id="modal-formulario-fechado" class="modal-formulario-fechado" aria-hidden="true">
+        <div class="modal-formulario-fechado-conteudo">
+            <h3>Formulário fechado</h3>
+            <p>Este formulário está fechado no momento. Tente novamente mais tarde.</p>
+            <button type="button" class="btn-enviar-form" onclick="fecharAvisoFormularioFechado()">OK</button>
+        </div>
+    </div>
+
     <script type="module">
         console.log("🚀 Iniciando home.html");
 
@@ -149,6 +157,12 @@
         let usuarioAtual = null;
         let submissaoEfetuada = false;
         let formulariosExibidos = [];
+        const formularioTipos = {
+            Players: 'players',
+            Staff: 'staff',
+            Crianças: 'criancas'
+        };
+        let estadosFormularios = { Players: true, Staff: true, Crianças: true };
 
         function extrairDiscordInfo(user) {
             if (!user) return { discord_id: null, display_name: null };
@@ -240,6 +254,28 @@
             }
         }
 
+        async function carregarEstadosFormularios() {
+            try {
+                const { data, error } = await supabase
+                    .from('config_formularios')
+                    .select('tipo, aberto');
+                if (error) throw error;
+
+                (data || []).forEach(item => {
+                    const tipo = Object.keys(formularioTipos).find(chave => formularioTipos[chave] === item.tipo);
+                    if (tipo) estadosFormularios[tipo] = item.aberto !== false;
+                });
+            } catch (error) {
+                console.error('Erro ao carregar disponibilidade dos formulários:', error);
+            }
+        }
+
+        window.fecharAvisoFormularioFechado = function() {
+            const modal = document.getElementById('modal-formulario-fechado');
+            modal.classList.remove('modal-aberto');
+            modal.setAttribute('aria-hidden', 'true');
+        };
+
         // ==========================================
         // ONLOAD - VERIFICAR SESSÃO E CARREGAR PERFIL
         // ==========================================
@@ -276,6 +312,7 @@
                 };
 
                 console.log("✓ Usuário logado:", usuarioAtual);
+                await carregarEstadosFormularios();
                 carregarPerfil(usuarioAtual);
                 await carregarTodosFormulariosUsuario(usuarioAtual);
 
@@ -349,7 +386,15 @@
         // ==========================================
         // FUNÇÃO PARA ABRIR FORMULÁRIOS
         // ==========================================
-        window.abrirFormulario = function(tipo) {
+        window.abrirFormulario = async function(tipo) {
+            await carregarEstadosFormularios();
+            if (estadosFormularios[tipo] === false) {
+                const aviso = document.getElementById('modal-formulario-fechado');
+                aviso.classList.add('modal-aberto');
+                aviso.setAttribute('aria-hidden', 'false');
+                return;
+            }
+
             const telaSelecao = document.getElementById('tela-selecao');
             const areaFormulario = document.getElementById('area-formulario-dinamico');
             const caixaPrincipal = document.getElementById('caixa-principal-formularios');
