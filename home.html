@@ -1385,7 +1385,8 @@
                 card.className = 'card-formulario-usuario';
                 
                 const dataFormatada = formatDateTime(form.created_at);
-                const respostaPublicada = form.decisao_final === true && form.resposta_final_enviada === true;
+                const respostaPublicada = (form.decisao_final === true || form.decisao_final === 'true' || form.decisao_final === 1 || form.decisao_final === '1')
+                    && (form.resposta_final_enviada === true || form.resposta_final_enviada === 'true' || form.resposta_final_enviada === 1 || form.resposta_final_enviada === '1');
                 const statusAtual = respostaPublicada ? (form.status || 'Em análise') : 'Em análise';
                 const comentarioFinal = respostaPublicada && form.comentario_admin
                     ? `<p><strong>Comentário da Staff:</strong> ${formatValueForDisplay(form.comentario_admin)}</p>`
@@ -1412,11 +1413,13 @@
 
             // Atualiza o status geral do topo da aba baseado no último enviado
             const ultimoForm = todosFormularios[0];
-            document.getElementById('status-badge-formulario').innerText = ultimoForm.decisao_final === true && ultimoForm.resposta_final_enviada === true
+            const ultimaRespostaPublicada = (ultimoForm.decisao_final === true || ultimoForm.decisao_final === 'true' || ultimoForm.decisao_final === 1 || ultimoForm.decisao_final === '1')
+                && (ultimoForm.resposta_final_enviada === true || ultimoForm.resposta_final_enviada === 'true' || ultimoForm.resposta_final_enviada === 1 || ultimoForm.resposta_final_enviada === '1');
+            document.getElementById('status-badge-formulario').innerText = ultimaRespostaPublicada
                 ? (ultimoForm.status || 'Em análise')
                 : 'Em análise';
             document.getElementById('status-resumo-formulario').innerText = `Último envio: ${formatDateTime(ultimoForm.created_at)}`;
-            document.querySelector(".status-pendente").innerText = ultimoForm.decisao_final === true && ultimoForm.resposta_final_enviada === true
+            document.querySelector(".status-pendente").innerText = ultimaRespostaPublicada
                 ? (ultimoForm.status || 'Em análise')
                 : 'Em análise';
         }
@@ -1486,7 +1489,8 @@
             }
 
             let html = '';
-            const respostaPublicada = form.decisao_final === true && form.resposta_final_enviada === true;
+            const respostaPublicada = (form.decisao_final === true || form.decisao_final === 'true' || form.decisao_final === 1 || form.decisao_final === '1')
+                && (form.resposta_final_enviada === true || form.resposta_final_enviada === 'true' || form.resposta_final_enviada === 1 || form.resposta_final_enviada === '1');
             fieldsOrder.forEach(f => {
                 const val = form[f.key] || '-';
                 html += `<div style="margin-bottom:16px;"><strong style="color:#fff; display:block; margin-bottom:4px;">${f.label}</strong><div style="color:#d1d5db; line-height:1.5;">${val}</div></div>`;

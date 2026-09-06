@@ -330,7 +330,7 @@
             if (botao) botao.disabled = true;
             if (mensagem) mensagem.textContent = 'Salvando decisão...';
 
-            const { error } = await supabaseClient
+            const { data: updatedRows, error } = await supabaseClient
                 .from(form.__table)
                 .update({
                     status,
@@ -338,19 +338,22 @@
                     decisao_final: true,
                     resposta_final_enviada: false
                 })
-                .eq('id', form.id);
+                .eq('id', form.id)
+                .select('id, status, comentario_admin, decisao_final, resposta_final_enviada');
 
             if (botao) botao.disabled = false;
             if (error) {
                 console.error('Erro ao salvar decisão do formulário:', error);
-                if (mensagem) mensagem.textContent = 'Erro ao salvar. Verifique as colunas e as políticas do Supabase.';
+                if (mensagem) mensagem.textContent = `Erro ao salvar: ${error.message}`;
                 return;
             }
 
-            form.status = status;
-            form.comentario_admin = comentario;
-            form.decisao_final = true;
-            form.resposta_final_enviada = false;
+            if (!updatedRows || updatedRows.length === 0) {
+                if (mensagem) mensagem.textContent = 'Nenhum registro foi alterado. Verifique o ID e as políticas de atualização do Supabase.';
+                return;
+            }
+
+            Object.assign(form, updatedRows[0]);
             if (mensagem) mensagem.textContent = 'Decisão final salva com sucesso.';
             await carregarFormularios();
         }
@@ -359,26 +362,51 @@
             const botao = document.querySelector(`[onclick="enviarRespostasFinais('${table}')"]`);
             if (botao) botao.disabled = true;
 
-            const { error } = await supabaseClient
+            const { data: pendentes, error: buscaError } = await supabaseClient
                 .from(table)
-                .update({ resposta_final_enviada: true })
-                .eq('decisao_final', true)
-                .or('resposta_final_enviada.is.null,resposta_final_enviada.eq.false');
+                .select('id, decisao_final, resposta_final_enviada')
+                .eq('decisao_final', true);
 
-            if (botao) botao.disabled = false;
-            if (error) {
-                console.error('Erro ao enviar respostas finais:', error);
-                alert('Não foi possível enviar as respostas finais. Verifique as colunas e as políticas do Supabase.');
+            if (buscaError) {
+                if (botao) botao.disabled = false;
+                console.error('Erro ao buscar decisões finais:', buscaError);
+                alert(`Erro ao buscar respostas: ${buscaError.message}`);
                 return;
             }
 
+            const registrosPendentes = (pendentes || []).filter(item => item.resposta_final_enviada !== true);
+            let enviados = 0;
+            for (const registro of registrosPendentes) {
+                const { data: atualizados, error } = await supabaseClient
+                    .from(table)
+                    .update({ resposta_final_enviada: true })
+                    .eq('id', registro.id)
+                    .select('id');
+
+                if (error) {
+                    if (botao) botao.disabled = false;
+                    console.error('Erro ao publicar resposta final:', error);
+                    alert(`Erro ao enviar respostas finais: ${error.message}`);
+                    return;
+                }
+                if (atualizados && atualizados.length > 0) enviados += 1;
+            }
+
+            if (botao) botao.disabled = false;
             await carregarFormularios();
+            alert(enviados > 0
+                ? `${enviados} resposta(s) final(is) enviada(s) aos usuários.`
+                : 'Nenhuma decisão final pendente para enviar.');
         };
 
         function getStatusClassAdmin(status) {
             if (status === 'Aprovado') return 'status-aprovado';
             if (status === 'Recusado') return 'status-reprovado';
             return 'status-em-analise';
+        }
+
+        function valorVerdadeiro(value) {
+            return value === true || value === 'true' || value === 1 || value === '1';
         }
 
         window.fecharModalAdmin = function() {
@@ -484,7 +512,7 @@
                     const numero = idx + 1;
                     const dataEnvio = formatDateTime(form.created_at || form.enviadoEm) || 'Data não informada';
                     const nome = form.nome_apelido || form.tag || 'Sem nome';
-                    const decisaoSalva = form.decisao_final === true;
+                    const decisaoSalva = valorVerdadeiro(form.decisao_final);
                     const statusIndicador = decisaoSalva ? (form.status || 'Em análise') : 'Em análise';
                     const indicadorClasse = statusIndicador === 'Aprovado'
                         ? 'admin-indicador-aprovado'
