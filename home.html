@@ -97,7 +97,7 @@
                     <div class="info-perfil-status-box">
                         <div class="info-linha-perfil">
                             <span class="info-titulo">Status da Whitelist:</span>
-                            <span class="info-valor status-pendente">Aguardando Formulário</span>
+                            <span class="info-valor status-pendente status-em-analise">Em análise</span>
                         </div>
                         <div class="info-linha-perfil">
                             <span class="info-titulo">Cargos no Servidor:</span>
@@ -116,11 +116,6 @@
                                 <h3 class="titulo-bloco-formulario">Formulários enviados</h3>
                                 <p class="texto-bloco-formulario">Acompanhe os formulários enviados para a whitelist.</p>
                             </div>
-                        </div>
-
-                        <div class="linha-status-formulario">
-                            <span id="status-badge-formulario" class="status-badge status-em-analise">Em análise</span>
-                            <span id="status-resumo-formulario" class="status-resumo-formulario"></span>
                         </div>
 
                         <div id="lista-formularios-usuario" class="lista-formularios-usuario"></div>
@@ -668,7 +663,7 @@
 
         function getStatusClass(status) {
             if (status === 'Aprovado') return 'status-aprovado';
-            if (status === 'Reprovado') return 'status-reprovado';
+            if (status === 'Recusado' || status === 'Reprovado') return 'status-reprovado';
             return 'status-em-analise';
         }
 
@@ -692,10 +687,9 @@
 
             const envio = cards[0];
             const status = envio.status || 'Em análise';
-            const data = formatDateTime(envio.created_at || envio.created_at || envio.enviadoEm) || 'Data não informada';
             statusBadge.textContent = status;
             statusBadge.className = `status-badge ${getStatusClass(status)}`;
-            resumo.textContent = `Último envio: ${data}`;
+            resumo.textContent = '';
 
             lista.innerHTML = cards.map(card => {
                 const areas = formatValueForDisplay(card.areas_auxilio);
@@ -797,16 +791,11 @@
         }
 
         async function carregarStatusFormulario(usuario) {
-            const badge = document.getElementById('status-badge-formulario');
-            const resumo = document.getElementById('status-resumo-formulario');
             const lista = document.getElementById('lista-formularios-usuario');
 
             if (!lista) return;
 
             const renderVazio = () => {
-                badge.textContent = 'Sem formulário';
-                badge.className = 'status-badge status-vazio';
-                resumo.textContent = '';
                 lista.innerHTML = `
                     <div class="card-formulario-vazio">
                         Está meio vazio por aqui... Envie um formulário e ele irá aparecer aqui!
@@ -817,11 +806,6 @@
             const renderFormularios = (formularios) => {
                 formulariosExibidos = formularios;
                 const envio = formularios[0];
-                badge.textContent = envio.status || 'Em análise';
-                badge.className = `status-badge ${getStatusClass(envio.status || 'Em análise')}`;
-                const dataEnvio = formatDateTime(envio.created_at || envio.enviadoEm);
-                resumo.textContent = dataEnvio && dataEnvio !== '-' ? `Último envio: ${dataEnvio}` : '';
-
                 lista.innerHTML = formularios.map((formulario, index) => {
                     const tipo = formulario.tipo || 'Players';
                     const status = formulario.status || 'Em análise';
@@ -1367,9 +1351,6 @@
 
             if (todosFormularios.length === 0) {
                 containerUnificado.innerHTML = '<p style="color:#adb4c6; font-size:0.95rem;">Nenhum formulário enviado até o momento.</p>';
-                document.getElementById('status-badge-formulario').className = "status-badge status-vazio";
-                document.getElementById('status-badge-formulario').innerText = "Sem envios";
-                document.getElementById('status-resumo-formulario').innerText = "";
                 document.querySelector(".status-pendente").innerText = "Aguardando Formulário";
                 return;
             }
@@ -1415,13 +1396,12 @@
             const ultimoForm = todosFormularios[0];
             const ultimaRespostaPublicada = (ultimoForm.decisao_final === true || ultimoForm.decisao_final === 'true' || ultimoForm.decisao_final === 1 || ultimoForm.decisao_final === '1')
                 && (ultimoForm.resposta_final_enviada === true || ultimoForm.resposta_final_enviada === 'true' || ultimoForm.resposta_final_enviada === 1 || ultimoForm.resposta_final_enviada === '1');
-            document.getElementById('status-badge-formulario').innerText = ultimaRespostaPublicada
-                ? (ultimoForm.status || 'Em análise')
-                : 'Em análise';
-            document.getElementById('status-resumo-formulario').innerText = `Último envio: ${formatDateTime(ultimoForm.created_at)}`;
-            document.querySelector(".status-pendente").innerText = ultimaRespostaPublicada
-                ? (ultimoForm.status || 'Em análise')
-                : 'Em análise';
+            const statusPerfil = ultimaRespostaPublicada ? (ultimoForm.status || 'Em análise') : 'Em análise';
+            const statusPerfilElement = document.querySelector(".status-pendente");
+            if (statusPerfilElement) {
+                statusPerfilElement.innerText = statusPerfil;
+                statusPerfilElement.className = `info-valor status-pendente ${getStatusClass(statusPerfil)}`;
+            }
         }
 
         // ==========================================================
