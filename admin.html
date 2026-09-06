@@ -349,7 +349,13 @@
             }
 
             if (!updatedRows || updatedRows.length === 0) {
-                if (mensagem) mensagem.textContent = 'Nenhum registro foi alterado. Verifique o ID e as políticas de atualização do Supabase.';
+                console.error('Update sem linhas alteradas:', {
+                    tabela: form.__table,
+                    id: form.id,
+                    status,
+                    motivo: 'O registro foi lido, mas a política RLS pode estar bloqueando UPDATE.'
+                });
+                if (mensagem) mensagem.textContent = 'O formulário foi lido, mas o Supabase bloqueou a atualização. Crie uma política RLS de UPDATE para admins.';
                 return;
             }
 
